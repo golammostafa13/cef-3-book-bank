@@ -1431,3 +1431,30 @@ body {
     scrollbar-color: var(--line) transparent;
   }
 }
+
+@media (max-width: 767px) {
+  .hero3d__canvas {
+    transition: opacity 300ms ease;
+  }
+}
+
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  /* Hide the books stack fallback while the 3D model is loading, so it doesn't overlap text */
+  .hero3d:not([data-live="true"]):not([data-static="true"]) .hero3d__fallback {
+    display: none !important;
+  }
+  
+  /* Show a loader at the model position while loading */
+  .hero3d:not([data-live="true"]):not([data-static="true"]) .hero3d__stage::after {
+    content: ". . .";
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    letter-spacing: 0.5rem;
+    color: var(--ink-mute);
+    animation: stack3d-float 2s ease-in-out infinite;
+    z-index: 10;
+  }
+}

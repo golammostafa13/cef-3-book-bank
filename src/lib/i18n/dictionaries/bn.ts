@@ -284,9 +284,11 @@ export const bn: Dictionary = {
   auth: {
     title: "সাইন ইন",
     lead: "আপনার গুগল অ্যাকাউন্ট দিয়ে এগিয়ে যান।",
+    leadEmail: "আপনার অ্যাডমিন ইমেল ঠিকানা দিয়ে সাইন ইন করুন।",
     freeBrowse: "সাইন ইন ছাড়াই ঘুরে দেখুন",
     notConfigured: "এই ডিপ্লয়মেন্টে সাইন ইন করা যাচ্ছে না।",
     devTitle: "ডেভেলপমেন্ট সাইন ইন",
+    adminTitle: "অ্যাডমিন সাইন ইন",
     devEmailLabel: "ইমেল ঠিকানা",
     devContinue: "সাইন ইন করুন",
     signingIn: "সাইন ইন হচ্ছে…",
@@ -295,6 +297,7 @@ export const bn: Dictionary = {
     errorUnverified: "এই সাইন ইন যাচাই করা যায়নি।",
     errorEmailEmpty: "আপনার ইমেল ঠিকানা লিখুন।",
     errorEmailInvalid: "এটি ইমেল ঠিকানার মতো মনে হচ্ছে না।",
+    errorNotAdmin: "এই ইমেল ঠিকানা সাইন ইন করার জন্য অনুমোদিত নয়।",
     errorUnavailable: "পাওয়া যাচ্ছে না।",
   },
 

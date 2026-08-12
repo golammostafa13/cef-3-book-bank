@@ -3,7 +3,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
+  adminEmails,
+  isAdminEmail,
   isDevSignInAllowed,
+  isEmailSignInAllowed,
   normaliseEmail,
   sessionCookieName,
   sessionTtlSeconds,
@@ -119,7 +122,7 @@ export async function devSignInAction(
   const lang = localeOf(formData);
   const dict = getDictionaryFor(lang);
 
-  if (!isDevSignInAllowed()) {
+  if (!isEmailSignInAllowed()) {
     return { ok: false, message: dict.auth.errorUnavailable };
   }
 
@@ -138,6 +141,10 @@ export async function devSignInAction(
     !parts[1].endsWith(".") &&
     !email.includes(" ");
   if (!valid) return { ok: false, message: dict.auth.errorEmailInvalid };
+
+  if (adminEmails.length > 0 && !isAdminEmail(email)) {
+    return { ok: false, message: dict.auth.errorNotAdmin };
+  }
 
   await setSessionCookie(
     await signSession({ email, name: email.split("@")[0] }),

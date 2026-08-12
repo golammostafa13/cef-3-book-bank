@@ -5,7 +5,11 @@ import { ArrowRight } from "lucide-react";
 import { BookStack3D } from "@/components/book-stack-3d";
 import { DevSignIn } from "@/components/auth/dev-sign-in";
 import { GoogleSignIn } from "@/components/auth/google-sign-in";
-import { googleClientId, isDevSignInAllowed } from "@/lib/auth/config";
+import {
+  adminEmails,
+  googleClientId,
+  isEmailSignInAllowed,
+} from "@/lib/auth/config";
 import { getSession } from "@/lib/auth/current";
 import { getFeatured } from "@/lib/data/books";
 import { getDictionary, hasLocale, localePath } from "@/lib/i18n";
@@ -81,14 +85,18 @@ export default async function SignInPage(props: PageProps<"/[lang]/signin">) {
             {dict.auth.title}
           </h1>
           <p className={cn("mt-2 text-[0.95rem] text-ink-mute", bn)}>
-            {dict.auth.lead}
+            {googleClientId ? dict.auth.lead : dict.auth.leadEmail}
           </p>
 
           <div className="mt-7">
             {googleClientId ? (
               <GoogleSignIn clientId={googleClientId} lang={lang} next={next} />
-            ) : isDevSignInAllowed() ? (
-              <DevSignIn lang={lang} next={next} />
+            ) : isEmailSignInAllowed() ? (
+              <DevSignIn
+                lang={lang}
+                next={next}
+                hasAdminEmails={adminEmails.length > 0}
+              />
             ) : (
               <p
                 role="alert"

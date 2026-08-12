@@ -286,9 +286,11 @@ export const en = {
   auth: {
     title: "Sign in",
     lead: "Continue with your Google account.",
+    leadEmail: "Sign in with your admin email address.",
     freeBrowse: "Browse without signing in",
     notConfigured: "Sign-in is not available on this deployment.",
     devTitle: "Development sign-in",
+    adminTitle: "Admin sign-in",
     devEmailLabel: "Email address",
     devContinue: "Sign in",
     signingIn: "Signing in…",
@@ -297,6 +299,7 @@ export const en = {
     errorUnverified: "That sign-in could not be verified.",
     errorEmailEmpty: "Enter your email address.",
     errorEmailInvalid: "That does not look like an email address.",
+    errorNotAdmin: "This email address is not authorized to sign in.",
     errorUnavailable: "Not available.",
   },
 

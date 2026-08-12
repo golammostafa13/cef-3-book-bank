@@ -85,14 +85,16 @@ export function isGoogleConfigured(): boolean {
 }
 
 /**
- * The local escape hatch.
- *
- * Without a Google client id there is no way to sign in at all, which makes the
- * admin unreachable on a fresh clone. In development only, and only when Google
- * is *not* configured, the sign-in page accepts an address directly. Production
- * builds can never take this path — the check is on NODE_ENV, which Next inlines
- * at build time, so the branch is compiled out of a production bundle entirely.
+ * Direct email sign-in is allowed when Google is not configured, provided
+ * that either we are outside production or admin emails have been configured.
  */
-export function isDevSignInAllowed(): boolean {
-  return process.env.NODE_ENV !== "production" && !googleClientId;
+export function isEmailSignInAllowed(): boolean {
+  return (
+    !googleClientId &&
+    (process.env.NODE_ENV !== "production" || adminEmails.length > 0)
+  );
 }
+
+/** Legacy alias for `isEmailSignInAllowed`. */
+export const isDevSignInAllowed = isEmailSignInAllowed;
+

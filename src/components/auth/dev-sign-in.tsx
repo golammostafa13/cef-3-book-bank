@@ -23,9 +23,11 @@ const empty: SignInState = { ok: false };
 export function DevSignIn({
   lang,
   next = "",
+  hasAdminEmails = false,
 }: {
   lang: Locale;
   next?: string;
+  hasAdminEmails?: boolean;
 }) {
   const dict = getDictionary(lang);
   const [state, formAction, pending] = useActionState(devSignInAction, empty);
@@ -42,7 +44,7 @@ export function DevSignIn({
           bn,
         )}
       >
-        {dict.auth.devTitle}
+        {hasAdminEmails ? dict.auth.adminTitle : dict.auth.devTitle}
       </p>
 
       <label

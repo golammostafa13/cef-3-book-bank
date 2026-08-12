@@ -1,4 +1,5 @@
 import {
+  adminEmails,
   authSecret,
   sessionCookieName,
   sessionTtlSeconds,
@@ -44,6 +45,7 @@ export interface Session {
  */
 function secret(): string {
   if (authSecret) return authSecret;
+  if (adminEmails.length > 0) return `admin-secret-${adminEmails.join(",")}`;
   return process.env.NODE_ENV === "production" ? "" : "dev-only-insecure-secret";
 }
 

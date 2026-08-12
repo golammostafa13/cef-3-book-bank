@@ -8,6 +8,7 @@ import { defaultLocale, type Locale } from "@/lib/i18n/config";
 import { textClass } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
 import type { HeroScene, SceneBook } from "@/lib/hero-scene";
+import { createHeroScene } from "@/lib/hero-scene";
 
 /**
  * The scrolling hero.
@@ -147,9 +148,6 @@ export function Hero3D({
 
     (async () => {
       try {
-        // Kept out of the initial bundle: three.js is larger than the rest of
-        // this route put together, and the hero is complete without it.
-        const { createHeroScene } = await import("@/lib/hero-scene");
         // Cover art is typeset, so the textures have to be drawn with the real
         // faces loaded — otherwise every board bakes in the fallback font.
         if (document.fonts) await document.fonts.ready;
