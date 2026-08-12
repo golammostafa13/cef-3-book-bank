@@ -1,0 +1,1433 @@
+@import "tailwindcss";
+
+/* next-themes uses a class on <html>; wire it to Tailwind v4's dark variant. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------
+   Design tokens — light
+   Warm stone ground + near-black ink + one hot orange accent,
+   taken from the ReadBook reference. Dark mode is a token swap
+   only; no component ever overrides colour per-theme.
+---------------------------------------------------------------- */
+:root {
+  --bg: #e9e5e1;
+  --bg-deep: #ded9d3;
+  --surface: #f7f6f4;
+  --surface-2: #fffefd;
+  --ink: #111111;
+  --ink-mute: #6b6560;
+  --ink-faint: #9c948c;
+  --line: #d6d0c9;
+  --line-soft: #e3ded7;
+
+  --accent: #ff6b2c;
+  --accent-hover: #f05a1b;
+  --accent-ink: #ffffff;
+  --accent-soft: #ffe8dc;
+
+  /* The wordmark's gradient. Three stops, all within the warm half of the
+     palette the covers already use: the brand reads as a brighter version of
+     the library rather than as a sticker from another design. */
+  --brand-1: #ff8a3d;
+  --brand-2: #ff5722;
+  --brand-3: #e0347a;
+
+  /* Card stock. The catalogue tile is a slab of warm paper that ramps through
+     peach into a saturated foot, so the volume stands in colour and the one
+     control on the card is unmissable against it. `lip` is the lit top bevel
+     and `well-lift` the light behind the book — one token each instead of a
+     per-theme override in every card rule. */
+  --card-top: #fffdfb;
+  --card-mid: #ffe9db;
+  --card-foot: #ee5a18;
+  --card-lip: rgba(255, 255, 255, 0.72);
+  --well-lift: rgba(255, 255, 255, 0.55);
+
+  --ok: #2f855a;
+  --ok-soft: #d9f0e3;
+  --warn: #c05621;
+  --warn-soft: #fce6d5;
+  --danger: #c53030;
+  --danger-soft: #fbdcdc;
+  --neutral: #718096;
+  --neutral-soft: #e4e7eb;
+
+  /* Depth: warm-tinted, three stacked layers per step. A single flat
+     shadow reads as a 2010s card; stacked ones read as real depth. */
+  --shadow-1: 0 1px 2px rgba(61, 45, 32, 0.06), 0 2px 4px rgba(61, 45, 32, 0.04);
+  --shadow-2: 0 1px 2px rgba(61, 45, 32, 0.06), 0 4px 10px rgba(61, 45, 32, 0.07),
+    0 10px 20px rgba(61, 45, 32, 0.05);
+  --shadow-3: 0 2px 4px rgba(61, 45, 32, 0.07), 0 8px 18px rgba(61, 45, 32, 0.09),
+    0 20px 40px rgba(61, 45, 32, 0.08);
+  --shadow-4: 0 4px 8px rgba(61, 45, 32, 0.08), 0 16px 32px rgba(61, 45, 32, 0.1),
+    0 36px 68px rgba(61, 45, 32, 0.12);
+
+  --radius: 0.875rem;
+}
+
+.dark {
+  --bg: #14120f;
+  --bg-deep: #0d0c0a;
+  --surface: #1e1b17;
+  --surface-2: #262119;
+  --ink: #f5f2ee;
+  --ink-mute: #a8a099;
+  --ink-faint: #736c65;
+  --line: #332e28;
+  --line-soft: #292420;
+
+  --accent: #ff7a3d;
+  --accent-hover: #ff8f5a;
+  --accent-ink: #1a0f08;
+  --accent-soft: #3a2418;
+
+  /* Lifted, not just reused: the same three hues at this luminance would sink
+     into the dark ground and the gradient would read as one flat colour. */
+  --brand-1: #ffa05c;
+  --brand-2: #ff7043;
+  --brand-3: #ff5c9b;
+
+  /* Same slab in a dimmer room. The foot keeps its full chroma — that block of
+     colour is the card's one bright object and the ground its button reads
+     against — while the stock above it goes to warm charcoal. */
+  --card-top: #241f1a;
+  --card-mid: #33241b;
+  --card-foot: #e8551a;
+  --card-lip: rgba(255, 255, 255, 0.05);
+  --well-lift: rgba(255, 255, 255, 0.05);
+
+  --ok: #68d391;
+  --ok-soft: #1c3529;
+  --warn: #f6ad55;
+  --warn-soft: #3a2a17;
+  --danger: #fc8181;
+  --danger-soft: #3a1e1e;
+  --neutral: #a0aec0;
+  --neutral-soft: #2a2e33;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.45), 0 8px 18px rgba(0, 0, 0, 0.35);
+  --shadow-3: 0 4px 10px rgba(0, 0, 0, 0.5), 0 16px 32px rgba(0, 0, 0, 0.4);
+  --shadow-4: 0 8px 20px rgba(0, 0, 0, 0.55), 0 32px 60px rgba(0, 0, 0, 0.5);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-mute: var(--ink-mute);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+
+  --color-brand-1: var(--brand-1);
+  --color-brand-2: var(--brand-2);
+  --color-brand-3: var(--brand-3);
+
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-neutral: var(--neutral);
+  --color-neutral-soft: var(--neutral-soft);
+
+  --font-sans: var(--font-display), var(--font-bengali), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-display: var(--font-display), var(--font-bengali), ui-sans-serif, sans-serif;
+  --font-bengali: var(--font-bengali), ui-sans-serif, sans-serif;
+  --font-reading: var(--font-serif-bengali), Georgia, "Times New Roman", serif;
+
+  --shadow-e1: var(--shadow-1);
+  --shadow-e2: var(--shadow-2);
+  --shadow-e3: var(--shadow-3);
+  --shadow-e4: var(--shadow-4);
+
+  --radius-xl: var(--radius);
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Bengali conjuncts need more vertical room than Latin. Set once here
+     rather than patching line-height per component. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display), var(--font-bengali), ui-sans-serif, system-ui,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Bengali text runs taller; opt in with .bn rather than globally
+   inflating Latin leading. */
+.bn {
+  font-family: var(--font-bengali), ui-sans-serif, sans-serif;
+  line-height: 1.75;
+}
+
+/* Bengali takes no letter-spacing: the script joins, and tracking pulls
+   conjuncts visually apart. The utilities that set it (tracking-[0.2em] on
+   eyebrows, -0.03em on headlines) are shared with the English layout, so this
+   overrides them wherever .bn is in play — one of the few places !important is
+   the correct tool. */
+.bn,
+.bn * {
+  letter-spacing: normal !important;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* ---------------------------------------------------------------
+   The wordmark.
+
+   One gradient across the whole name. Three stops rather than two:
+   two would spend the whole width fading and read as a flat wash,
+   whereas holding orange through the middle and turning to rose
+   only at the end keeps the name saturated and legible while still
+   obviously being a gradient.
+---------------------------------------------------------------- */
+.brand-grad {
+  /* 100deg rather than 90: the slight diagonal moves the stops through
+     the middle of the glyphs instead of banding them horizontally. */
+  background-image: linear-gradient(
+    100deg,
+    var(--brand-1) 0%,
+    var(--brand-2) 42%,
+    var(--brand-3) 96%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  /* Clipped text has no colour of its own, so anything that cannot paint
+     the gradient — forced colours, print, a very old engine — would render
+     nothing at all. These two put the ink back. */
+  -webkit-text-fill-color: transparent;
+}
+
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .brand-grad {
+    background-image: none;
+    color: var(--accent);
+    -webkit-text-fill-color: var(--accent);
+  }
+}
+
+@media (forced-colors: active), print {
+  .brand-grad {
+    background-image: none;
+    color: var(--ink);
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+/* The mark: three leaves standing in a rounded tile. The tile carries the
+   same gradient as the wordmark plus a soft glow, which is what keeps the
+   two halves of the lockup reading as one object. */
+.brand-mark {
+  background-image: linear-gradient(
+    140deg,
+    var(--brand-1) 0%,
+    var(--brand-2) 55%,
+    var(--brand-3) 100%
+  );
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.16),
+    0 6px 16px -6px var(--brand-2),
+    inset 0 1px 0 rgb(255 255 255 / 0.28);
+}
+
+/* ---------------------------------------------------------------
+   Book3D — the signature element.
+
+   A cover rendered as a real object: five faces of a bound volume
+   (front board, spine, fore-edge page block, head, tail), assembled
+   from CSS 3D transforms. Pure CSS, GPU-composited, zero JS.
+
+   Geometry: the box spans z ∈ [-depth/2, +depth/2]. Every face is
+   authored as a flat rectangle in that plane and rotated onto its
+   own side, so changing --depth alone rebinds the whole object.
+---------------------------------------------------------------- */
+.book3d {
+  perspective: 1500px;
+  /* Camera sits slightly above centre, which is what makes the head
+     of the book visible and reads as "on a table in front of you". */
+  perspective-origin: 50% 34%;
+}
+
+.book3d__inner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--ry, -22deg)) rotateX(var(--rx, 3deg))
+    translateZ(0);
+  transition: transform 680ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.book3d:hover .book3d__inner,
+.book3d:focus-within .book3d__inner {
+  /* The book turns toward the reader and lifts off the surface. */
+  transform: rotateY(var(--ry-hover, -6deg)) rotateX(0deg)
+    translateY(-6px) translateZ(14px);
+}
+
+/* --- Front board ------------------------------------------------ */
+.book3d__face {
+  position: absolute;
+  inset: 0;
+  /* Tight radius at the spine, generous at the fore-edge: exactly how a
+     bound board is trimmed. */
+  border-radius: 2px 7px 7px 2px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(calc(var(--depth, 26px) / 2));
+  box-shadow: var(--shadow-3);
+}
+
+/* Hinge: the compressed groove where the board meets the spine, plus the
+   ambient occlusion that always lives in it. */
+.book3d__hinge {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 15%;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(0, 0, 0, 0.22) 22%,
+    rgba(0, 0, 0, 0.04) 62%,
+    transparent 100%
+  );
+}
+
+/* A lit sliver along the fore-edge of the board — the highlight that
+   separates cover from page block. */
+.book3d__lip {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: 3px;
+  pointer-events: none;
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+}
+
+/* --- Spine ------------------------------------------------------ */
+.book3d__spine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--depth, 26px);
+  transform-origin: left center;
+  transform: rotateY(-90deg) translateX(calc(var(--depth, 26px) / -2));
+  background:
+    /* Raised bands top and bottom, as on a cased binding. */
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.14) 0 3%,
+      transparent 3% 8%,
+      rgba(0, 0, 0, 0.18) 8% 9%,
+      transparent 9% 91%,
+      rgba(0, 0, 0, 0.18) 91% 92%,
+      transparent 92% 97%,
+      rgba(255, 255, 255, 0.1) 97% 100%
+    ),
+    /* The rounded barrel of the spine, read as light falloff. Every
+       color-mix percentage stays ≤ 100: above that the function is invalid
+       and the whole background is dropped. */
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--spine-color, #4a3524) 62%, #000),
+      color-mix(in srgb, var(--spine-color, #4a3524) 86%, #fff) 42%,
+      var(--spine-color, #4a3524) 62%,
+      color-mix(in srgb, var(--spine-color, #4a3524) 70%, #000)
+    );
+  border-radius: 3px 0 0 3px;
+}
+
+/* --- Fore-edge page block --------------------------------------- */
+.book3d__pages {
+  position: absolute;
+  top: 1.4%;
+  right: 0;
+  height: 97.2%;
+  width: var(--depth, 26px);
+  transform-origin: right center;
+  transform: rotateY(90deg) translateX(calc(var(--depth, 26px) / 2));
+  background:
+    /* Shading: the block is slightly concave, and darkest where it meets
+       the boards at either end. */
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.3),
+      rgba(0, 0, 0, 0) 18%,
+      rgba(0, 0, 0, 0) 82%,
+      rgba(0, 0, 0, 0.26)
+    ),
+    /* Individual leaves. Two frequencies stops it reading as a hatch pattern. */
+    repeating-linear-gradient(
+      to right,
+      #f6f1e8 0px,
+      #f6f1e8 1px,
+      #d9cfbe 1px,
+      #d9cfbe 2px,
+      #efe8dc 2px,
+      #efe8dc 3px
+    );
+  border-radius: 0 2px 2px 0;
+}
+
+/* --- Head (top edge) -------------------------------------------
+   Only visible because the camera is above centre, and it is the single
+   biggest contributor to the object reading as solid rather than as a
+   rotated rectangle. */
+.book3d__head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--depth, 26px);
+  transform-origin: center top;
+  transform: translateZ(calc(var(--depth, 26px) / -2)) rotateX(90deg);
+  background:
+    /* Board thickness at front and back of the block. */
+    linear-gradient(
+      to bottom,
+      var(--spine-color, #4a3524) 0 8%,
+      transparent 8% 92%,
+      color-mix(in srgb, var(--spine-color, #4a3524) 84%, #000) 92% 100%
+    ),
+    /* Occlusion into the gutter at the spine side. */
+    linear-gradient(to right, rgba(0, 0, 0, 0.5), transparent 26%),
+    /* Page leaves, stacked front-to-back. */
+    repeating-linear-gradient(
+      to bottom,
+      #f7f2ea 0px,
+      #f7f2ea 1px,
+      #dcd2c1 1px,
+      #dcd2c1 2px
+    );
+  border-radius: 2px 3px 0 0;
+}
+
+/* --- Tail (bottom edge) ---------------------------------------- */
+.book3d__tail {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--depth, 26px);
+  transform-origin: center bottom;
+  transform: translateZ(calc(var(--depth, 26px) / -2)) rotateX(-90deg);
+  background:
+    linear-gradient(
+      to top,
+      var(--spine-color, #4a3524) 0 8%,
+      transparent 8% 92%,
+      color-mix(in srgb, var(--spine-color, #4a3524) 84%, #000) 92% 100%
+    ),
+    linear-gradient(to right, rgba(0, 0, 0, 0.55), transparent 26%),
+    repeating-linear-gradient(
+      to bottom,
+      #ece5d9 0px,
+      #ece5d9 1px,
+      #cec3b0 1px,
+      #cec3b0 2px
+    );
+  /* The tail sits in its own shade — no light reaches under a book. */
+  filter: brightness(0.82);
+  border-radius: 0 0 3px 2px;
+}
+
+/* Contact shadow on the ground plane, sold separately from the box-shadow
+   so it can splay as the book turns and lifts. */
+.book3d__shadow {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -7%;
+  height: 14%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(61, 45, 32, 0.38),
+    rgba(61, 45, 32, 0.12) 45%,
+    transparent 72%
+  );
+  filter: blur(11px);
+  transform: translateZ(-34px);
+  transition: opacity 680ms ease, transform 680ms ease, filter 680ms ease;
+}
+
+.book3d:hover .book3d__shadow,
+.book3d:focus-within .book3d__shadow {
+  /* Lifted object: shadow spreads, softens and loses density. */
+  transform: translateZ(-34px) translateY(7px) scale(1.06, 0.86);
+  filter: blur(16px);
+  opacity: 0.72;
+}
+
+.dark .book3d__shadow {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(0, 0, 0, 0.66),
+    rgba(0, 0, 0, 0.22) 45%,
+    transparent 72%
+  );
+}
+
+/* Specular sweep across the cover — laminated-board finish. Travels as the
+   book turns, which is what makes the rotation feel lit rather than animated. */
+.book3d__glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 26%,
+    rgba(255, 255, 255, 0.26) 44%,
+    rgba(255, 255, 255, 0.06) 53%,
+    transparent 64%
+  );
+  opacity: 0.9;
+  pointer-events: none;
+  transition: transform 680ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.book3d:hover .book3d__glare,
+.book3d:focus-within .book3d__glare {
+  transform: translateX(18%);
+}
+
+/* ---------------------------------------------------------------
+   Stack3D — books lying flat, seen from above at an angle.
+
+   Same box algebra as Book3D, one axis over: each volume shows its
+   top board plus the two page edges facing the camera. Used for the
+   hero, where the reference design puts a stack of books.
+---------------------------------------------------------------- */
+.stack3d {
+  perspective: 1800px;
+  perspective-origin: 50% 40%;
+}
+
+.stack3d__scene {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  transform-style: preserve-3d;
+  /* The one place the whole composition's viewing angle is set. */
+  transform: rotateX(58deg) rotateZ(var(--yaw, -34deg));
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stack3d:hover .stack3d__scene {
+  transform: rotateX(52deg) rotateZ(calc(var(--yaw, -34deg) + 6deg));
+}
+
+.stack3d__book {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+/* Top board — carries the cover art. */
+.stack3d__top {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 2px 5px 5px 2px;
+  transform: translateZ(var(--t, 18px));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.14);
+}
+
+/* Fore-edge along the bottom of the volume. */
+.stack3d__edge-front {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: var(--t, 18px);
+  transform-origin: center top;
+  transform: rotateX(90deg);
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--spine-color, #4a3524) 100%, transparent) 0 12%,
+      transparent 12% 100%
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      #f6f1e8 0px,
+      #f6f1e8 1px,
+      #d8cebc 1px,
+      #d8cebc 2px
+    );
+  filter: brightness(0.94);
+}
+
+/* Fore-edge along the right of the volume. */
+.stack3d__edge-side {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: var(--t, 18px);
+  height: 100%;
+  transform-origin: left center;
+  transform: rotateY(-90deg);
+  background:
+    linear-gradient(
+      to left,
+      color-mix(in srgb, var(--spine-color, #4a3524) 100%, transparent) 0 12%,
+      transparent 12% 100%
+    ),
+    repeating-linear-gradient(
+      to left,
+      #f4efe6 0px,
+      #f4efe6 1px,
+      #d5cbb8 1px,
+      #d5cbb8 2px
+    );
+  filter: brightness(0.86);
+}
+
+/* Ground shadow for the whole stack, cast on the z = 0 plane. */
+.stack3d__ground {
+  position: absolute;
+  inset: -6% -10% -12% -6%;
+  background: radial-gradient(
+    ellipse at 46% 54%,
+    rgba(61, 45, 32, 0.34),
+    rgba(61, 45, 32, 0.1) 48%,
+    transparent 74%
+  );
+  filter: blur(18px);
+}
+
+.dark .stack3d__ground {
+  background: radial-gradient(
+    ellipse at 46% 54%,
+    rgba(0, 0, 0, 0.62),
+    rgba(0, 0, 0, 0.2) 48%,
+    transparent 74%
+  );
+}
+
+/* ---------------------------------------------------------------
+   Coverflow — the featured carousel.
+
+   A ring of covers standing in front of the reader, the middle one
+   face-on and the rest turning away to either side. Same box algebra
+   as the rest of the 3D work: one perspective on the stage, and every
+   panel placed by four numbers handed in from React —
+
+     --x  how far out along the ring, in % of the panel's own width
+     --ry how far turned away, in degrees
+     --a  distance from the middle, unsigned, for shade and gloss
+     --s  scale, so the middle cover is the largest object on screen
+     --op opacity
+
+   Spacing is handed in rather than derived from the index because it
+   is not linear: the first cover out has to clear the middle one,
+   which is both wider (nothing scales it down) and unturned (nothing
+   foreshortens it), so ring one steps further than ring two.
+
+   Transitions are on `transform` and `opacity` only, so advancing the
+   carousel is one compositor job no matter how many covers are up.
+---------------------------------------------------------------- */
+.coverflow {
+  /* One measurement drives the whole stage. The height is the cover's own
+     2:3 board plus room for the name plate that hangs below it, so the plate
+     can never be clipped by the overflow that keeps the ring off the page
+     edges — at any viewport width, without a media query. */
+  --panel-w: clamp(10.5rem, 21vw, 17.5rem);
+  height: calc(var(--panel-w) * 1.5 + 4.5rem);
+
+  perspective: 1700px;
+  /* Camera a little above the middle of the panel, so the covers are
+     read slightly from above, like books held up in front of you. */
+  perspective-origin: 50% 42%;
+}
+
+.coverflow__stage {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.coverflow__panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--panel-w);
+  /* So each panel can carry its own board thickness in real 3D. */
+  transform-style: preserve-3d;
+  /* Centring first, then the ring placement: the rotation that follows
+     happens about the panel's own axis rather than the stage's. */
+  transform: translate(-50%, -50%) translateX(calc(var(--x) * 1%))
+    translateZ(calc(var(--a) * -165px)) rotateY(calc(var(--ry) * 1deg))
+    scale(var(--s));
+  opacity: var(--op);
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 760ms ease;
+  will-change: transform, opacity;
+}
+
+/* The cover board itself: a laminated panel with a lit fore-edge. */
+.coverflow__board {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.15rem;
+  box-shadow: var(--shadow-4), inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+/* Board thickness.
+   A turned cover shows its own edge, and that edge is what separates a real
+   board from a decal floating in space. Which side is visible depends on which
+   way the cover is turned, so there is one of these per hand: a cover to the
+   left of the middle faces right, and shows its left edge.
+   Both recede away from the reader (hence -90°/90°), so the strip sits behind
+   the board rather than in front of it. */
+.coverflow__edge {
+  position: absolute;
+  top: 1.5%;
+  height: 97%;
+  width: 15px;
+  background-color: var(--edge, #2b2320);
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.5),
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(0, 0, 0, 0.45)
+  );
+}
+
+.coverflow__edge--l {
+  left: 0;
+  transform-origin: left center;
+  transform: rotateY(90deg);
+  border-radius: 3px 0 0 3px;
+}
+
+.coverflow__edge--r {
+  right: 0;
+  transform-origin: right center;
+  transform: rotateY(-90deg);
+  border-radius: 0 3px 3px 0;
+}
+
+/* Specular sweep, angled to match the panel's own turn. Off the middle
+   panel — a highlight belongs on the object being looked at. */
+.coverflow__gloss {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    108deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.22) 46%,
+    rgba(255, 255, 255, 0.04) 56%,
+    transparent 68%
+  );
+  /* Barely there on the cover being read; strong on the turned ones, where a
+     laminated board really would catch the light edge-on. */
+  opacity: calc(0.1 + var(--a) * 0.18);
+  transition: opacity 760ms ease;
+}
+
+/* Panels behind the middle one sit in its shade. Depth is carried by shade and
+   scale rather than by transparency: covers faded into the page ground read as
+   half-loaded images, not as objects standing further back. */
+.coverflow__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(20, 14, 9, 0.55);
+  opacity: calc(var(--a) * 0.24);
+  transition: opacity 760ms ease;
+}
+
+/* The ground the ring stands on: one pool of light, no floor plane. A
+   drawn floor would need a horizon, and the section has none. */
+.coverflow__floor {
+  position: absolute;
+  inset: auto 0 -4% 0;
+  height: 22%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(61, 45, 32, 0.28),
+    rgba(61, 45, 32, 0.08) 45%,
+    transparent 72%
+  );
+  filter: blur(14px);
+}
+
+.dark .coverflow__floor {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(0, 0, 0, 0.6),
+    rgba(0, 0, 0, 0.2) 45%,
+    transparent 72%
+  );
+}
+
+/* ---------------------------------------------------------------
+   Shelf3D — a row of spines standing on a plank, seen straight on
+   with a shallow tilt. Gives categories and the admin dashboard the
+   same physical vocabulary as the covers.
+---------------------------------------------------------------- */
+.shelf3d {
+  perspective: 900px;
+  perspective-origin: 50% 120%;
+}
+
+.shelf3d__row {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--shelf-rx, 6deg));
+}
+
+.shelf3d__spine {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px 2px 0 0;
+  box-shadow: inset -2px 0 3px rgba(0, 0, 0, 0.28),
+    inset 2px 0 2px rgba(255, 255, 255, 0.12);
+  transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.shelf3d__row:hover .shelf3d__spine {
+  transform: translateY(2px);
+}
+
+.shelf3d__row:hover .shelf3d__spine:hover {
+  /* The hovered volume is pulled up out of the row, as you would to read it. */
+  transform: translateY(-8px) rotateX(-4deg);
+}
+
+/* The plank: a front rail plus the shadow the books drop onto it. */
+.shelf3d__plank {
+  position: relative;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--line) 60%, var(--ink)) 0 2px,
+    var(--line) 2px 60%,
+    color-mix(in srgb, var(--line) 70%, var(--ink)) 100%
+  );
+  box-shadow: 0 6px 12px -6px rgba(61, 45, 32, 0.5);
+}
+
+.shelf3d__plank::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent);
+}
+
+/* ---------------------------------------------------------------
+   Tile3D — the depth treatment for stat tiles and panels. A tile is
+   a slab: lit top bevel, dark bottom bevel, and it presses in when
+   pointed at.
+---------------------------------------------------------------- */
+.tile3d {
+  position: relative;
+  box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(61, 45, 32, 0.06);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms ease;
+}
+
+.dark .tile3d {
+  box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.tile3d:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-3), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.dark .tile3d:hover {
+  box-shadow: var(--shadow-3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ---------------------------------------------------------------
+   Book card — the catalogue tile.
+
+   A peach-lit slab with the volume standing in it. Three things do
+   the work: warm gradient stock (paper, not #fff), one soft glow
+   behind the cover so the book looks lit from the front of the
+   shelf, and a single unhurried lift on hover that the book's own
+   turn rides on top of. Every colour is a token, so dark mode is a
+   swap and no card rule is written twice.
+
+   The lift lives here rather than on the element carrying
+   `.reveal-3d`: a filled scroll-driven animation owns `transform`
+   for good, and would silently eat the hover.
+---------------------------------------------------------------- */
+.book-card {
+  position: relative;
+  isolation: isolate;
+  /* Pale where the type is, saturated where the button is. The ramp holds its
+     top tone through the record so nothing is ever read against a gradient,
+     then turns over the length of the cover. */
+  background-image: linear-gradient(
+    180deg,
+    var(--card-top) 0%,
+    var(--card-top) 44%,
+    var(--card-mid) 68%,
+    var(--card-foot) 98%
+  );
+  box-shadow: var(--shadow-1), inset 0 1px 0 var(--card-lip);
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 520ms ease, border-color 320ms ease;
+}
+
+.book-card:hover,
+.book-card:focus-within {
+  transform: translateY(-6px);
+  /* The lifted card throws its own colour onto the page — the halo the
+     reference card sits in, and the reason it reads as a lit object. */
+  box-shadow: var(--shadow-3), 0 22px 44px -22px var(--card-foot),
+    inset 0 1px 0 var(--card-lip);
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+}
+
+/* Light behind the volume. Without it the pale covers sink into the saturated
+   half of the ramp; with it they read as standing in front of the colour. */
+.book-card__well::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    78% 58% at 50% 30%,
+    var(--well-lift),
+    transparent 74%
+  );
+  opacity: 0.75;
+  transition: opacity 520ms ease;
+}
+
+.book-card:hover .book-card__well::before,
+.book-card:focus-within .book-card__well::before {
+  opacity: 1;
+}
+
+/* Featured volumes carry the wordmark's gradient as a rail along the top
+   edge — the same mark, so "featured" needs no second colour of its own. */
+.book-card__rail {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2.5px;
+  z-index: 1;
+  background-image: linear-gradient(
+    100deg,
+    var(--brand-1) 0%,
+    var(--brand-2) 48%,
+    var(--brand-3) 100%
+  );
+}
+
+/* ---------------------------------------------------------------
+   View transitions.
+
+   The book covers in the grid and on the detail page are one paired
+   <ViewTransition name="cover-…">, so opening a book moves that
+   object rather than cutting between two pages. Only the timing and
+   the mid-flight blur are set here — the geometry is the browser's.
+---------------------------------------------------------------- */
+::view-transition-group(.morph) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-image-pair(.morph) {
+  /* Hides the pixel interpolation while a 90px cover becomes a 280px one. */
+  animation-name: morph-blur;
+}
+
+@keyframes morph-blur {
+  30% {
+    filter: blur(3px);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Scroll-driven reveal.
+
+   Two classes, one timeline. `.reveal` is the flat rise, for small
+   things inside an already-revealed block. `.reveal-3d` is the
+   section move: the block comes up off the page and tips upright
+   about its own bottom edge, which is the same physical language as
+   the books — objects with a front and a back, lit from above.
+
+   Both are driven by `animation-timeline: view()`, so progress is
+   scroll position, not elapsed time: scrub back up and the motion
+   runs backwards. There are no scroll listeners anywhere in the app,
+   and nothing runs on the main thread.
+
+   Tunable per element, because a rail of twelve cards and a full
+   section want different pacing:
+     --lag   how far into its own entry the element waits, in %.
+             Set from the grid index to cascade a row.
+     --span  how much scrolling the move takes, in %. Short for tall
+             sections (their entry phase is a whole section tall),
+             longer for small tiles.
+---------------------------------------------------------------- */
+.reveal,
+.reveal-3d {
+  --lag: 0;
+  --span: 46%;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal,
+    .reveal-3d {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--lag) * 1%) entry
+        calc(var(--lag) * 1% + var(--span));
+    }
+
+    .reveal-3d {
+      animation-name: reveal-3d-in;
+      /* Hinged at the foot, so the block stands up rather than pivoting
+         through its own middle. */
+      transform-origin: 50% 100%;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-3d-in {
+  from {
+    opacity: 0;
+    /* translateZ does the scaling — pushing the block away under a real
+       perspective, rather than a scale() that would just shrink it. */
+    transform: perspective(1500px) translate3d(0, 46px, -130px) rotateX(9deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1500px) translate3d(0, 0, 0) rotateX(0deg);
+  }
+}
+
+.shelf-tilt {
+  transform: perspective(1600px) rotateX(9deg) rotateZ(-1.2deg);
+}
+
+/* Fine dotted paper texture; costs nothing and stops large warm areas
+   from looking like flat #E9E5E1. */
+.paper-grain {
+  background-image: radial-gradient(
+    rgba(61, 45, 32, 0.055) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+.dark .paper-grain {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+/* ---------------------------------------------------------------
+   Accessibility: one global kill-switch for every 3D / motion effect.
+---------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Kill the cover morph too — a 280px object flying across the viewport is
+     exactly what this preference is asking us not to do. */
+  ::view-transition-group(.morph),
+  ::view-transition-image-pair(.morph) {
+    animation: none !important;
+  }
+
+  .book3d__inner,
+  .book3d:hover .book3d__inner,
+  .book3d:focus-within .book3d__inner {
+    transform: none !important;
+  }
+
+  .book3d__spine,
+  .book3d__pages,
+  .book3d__head,
+  .book3d__tail,
+  .book3d__glare,
+  .book3d__hinge,
+  .book3d__lip,
+  .book3d__shadow {
+    display: none !important;
+  }
+
+  .book3d__face {
+    transform: none !important;
+  }
+
+  /* The flat-lying stack has no 2D fallback worth keeping: without the
+     viewing angle it is a pile of overlapping rectangles. Covers stay,
+     the perspective goes. */
+  .stack3d__scene,
+  .stack3d:hover .stack3d__scene {
+    transform: none !important;
+  }
+
+  .stack3d__edge-front,
+  .stack3d__edge-side {
+    display: none !important;
+  }
+
+  .stack3d__top {
+    transform: none !important;
+  }
+
+  .shelf3d__row,
+  .shelf3d__spine,
+  .shelf3d__row:hover .shelf3d__spine,
+  .shelf3d__row:hover .shelf3d__spine:hover,
+  .tile3d:hover,
+  .book-card:hover,
+  .book-card:focus-within,
+  .shelf-tilt {
+    /* Zeroed transition durations would otherwise turn every lift into an
+       instant jump, which is worse than no lift at all. */
+    transform: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Hero — the scrolling scene.
+
+   A tall empty track with one screen-height panel stuck to the top
+   of it. Scrolling the track moves nothing on screen; it moves a
+   number, which `components/hero-3d.tsx` hands to the WebGL scene
+   and writes back here as `--b0`/`--b1`/`--b2` so the three blocks
+   of copy cross-fade in step with what the scene is doing.
+
+   The panel is complete before any of that: the headline, the lead,
+   the buttons and the stats are server-rendered DOM at full opacity,
+   with the static book pile beside them. The canvas fades in over
+   the top once three.js has loaded and drawn a frame, and the pile
+   fades out under it. Nothing on this page ever waits for WebGL.
+
+   Layout is one row of two columns, everything sharing it:
+     column 1  the headline block (beat 0)
+     column 2  the static pile — and, once live, roughly where the
+               scene puts the volume
+     spanning  beats 1 and 2, centred across the full width
+---------------------------------------------------------------- */
+.hero3d {
+  --beats: 3.4;
+  position: relative;
+  height: calc(var(--beats) * 100svh);
+}
+
+@media (max-width: 767px) {
+  /* A phone scrolls a screen in far fewer pixels; the same beat count
+     would make the hero feel like a tunnel. */
+  .hero3d {
+    --beats: 2.8;
+  }
+}
+
+.hero3d__pin {
+  --b0: 1;
+  --b1: 0;
+  --b2: 0;
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero3d__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.hero3d[data-live="true"] .hero3d__canvas {
+  opacity: 1;
+}
+
+.hero3d__stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 2rem;
+  height: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding: 5rem 1.25rem 4rem;
+}
+
+@media (min-width: 1024px) {
+  .hero3d__stage {
+    grid-template-columns: 1.05fr 0.95fr;
+    padding-inline: 2rem;
+  }
+}
+
+/* Both children share the one grid cell row; the copy spans the whole
+   width so beats 1 and 2 can centre on the panel rather than on the
+   headline's column. */
+.hero3d__copy {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  display: grid;
+  /* The container must not swallow clicks meant for the scene or the
+     page; only the block that is actually showing takes them back. */
+  pointer-events: none;
+}
+
+.hero3d__fallback {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  align-self: center;
+  height: min(60svh, 26rem);
+  transition: opacity 700ms ease;
+}
+
+@media (min-width: 1024px) {
+  .hero3d__fallback {
+    grid-column: 2;
+    height: min(72svh, 34rem);
+  }
+}
+
+.hero3d[data-live="true"] .hero3d__fallback {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.hero3d__beat {
+  grid-area: 1 / 1;
+  align-self: center;
+  /* Hidden rather than transparent between beats: an invisible block of
+     copy that still takes tab focus is a keyboard trap. `--b*` handles
+     the cross-fade, `data-beat` the discrete swap, and the thresholds
+     for the two sit in the gaps between the fades. */
+  visibility: hidden;
+  will-change: opacity, transform;
+}
+
+.hero3d__pin[data-beat="0"] .hero3d__beat[data-b="0"],
+.hero3d__pin[data-beat="1"] .hero3d__beat[data-b="1"],
+.hero3d__pin[data-beat="2"] .hero3d__beat[data-b="2"] {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.hero3d__beat[data-b="0"] {
+  opacity: var(--b0);
+  transform: translateY(calc((1 - var(--b0)) * 26px));
+  justify-self: start;
+  max-width: 36rem;
+}
+
+.hero3d__beat[data-b="1"] {
+  opacity: var(--b1);
+  transform: translateY(calc((1 - var(--b1)) * 26px));
+}
+
+.hero3d__beat[data-b="2"] {
+  opacity: var(--b2);
+  transform: translateY(calc((1 - var(--b2)) * 26px));
+}
+
+.hero3d__beat--centre {
+  justify-self: center;
+  max-width: 44rem;
+  text-align: center;
+}
+
+.hero3d__hint {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  translate: -50% 0;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  opacity: var(--b0);
+}
+
+.hero3d__hint-rail {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 2.4rem;
+  overflow: hidden;
+  background: var(--line);
+}
+
+/* A single mote running down the rail — the one thing on this page that
+   animates on a clock rather than on scroll, because it is what tells
+   the reader that scrolling is what the panel is for. */
+.hero3d__hint-rail::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 40%;
+  background: var(--accent);
+  animation: hero3d-hint 1.9s ease-in-out infinite;
+}
+
+@keyframes hero3d-hint {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(250%);
+  }
+}
+
+/* Reduced motion, and the rare browser with no WebGL at all: the track
+   collapses to one screen and the panel becomes the ordinary two-column
+   hero it already contains. Done here rather than in script so a reader
+   who asked for less motion never sees a four-screen page flash first. */
+@media (prefers-reduced-motion: reduce) {
+  .hero3d {
+    height: auto;
+  }
+
+  .hero3d__pin {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .hero3d__canvas,
+  .hero3d__hint,
+  .hero3d__beat[data-b="1"],
+  .hero3d__beat[data-b="2"] {
+    display: none;
+  }
+
+  .hero3d__stage {
+    padding-block: 4rem 6rem;
+  }
+
+  .hero3d__beat[data-b="0"] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero3d__fallback {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.hero3d[data-static="true"] {
+  height: auto;
+}
+
+.hero3d[data-static="true"] .hero3d__pin {
+  position: static;
+  height: auto;
+  overflow: visible;
+}
+
+.hero3d[data-static="true"] .hero3d__canvas,
+.hero3d[data-static="true"] .hero3d__hint,
+.hero3d[data-static="true"] .hero3d__beat[data-b="1"],
+.hero3d[data-static="true"] .hero3d__beat[data-b="2"] {
+  display: none;
+}
+
+.hero3d[data-static="true"] .hero3d__beat[data-b="0"] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+/* Coarse pointers (touch) get no hover-tilt — it can only misfire. */
+@media (pointer: coarse) {
+  .book3d__inner {
+    --ry: -12deg;
+  }
+}
+
+/* Focus ring: single definition, used everywhere. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Thin scrollbars that match the warm palette. */
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+}
