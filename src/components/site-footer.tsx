@@ -153,7 +153,7 @@ export function SiteFooter({
                 aria-label={label}
                 rel="noopener noreferrer"
                 target="_blank"
-                className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-ink/5 hover:text-ink"
+                className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent"
               >
                 <Icon className="size-[18px]" />
               </a>

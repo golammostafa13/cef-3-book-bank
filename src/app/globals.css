@@ -5,9 +5,16 @@
 
 /* ---------------------------------------------------------------
    Design tokens — light
-   Warm stone ground + near-black ink + one hot orange accent,
-   taken from the ReadBook reference. Dark mode is a token swap
-   only; no component ever overrides colour per-theme.
+   Warm stone ground + near-black ink + one deep emerald primary.
+   Warm paper under a leaf green is the botanical pairing — it reads
+   natural and calm where the old near-black pill read funereal — and
+   the green is dark enough to carry white text at 5.5:1, so the one
+   colour that means "act" never trades contrast for warmth. Orange
+   survives only as `--warn`, which is now unambiguously a warning
+   rather than half the brand.
+
+   Dark mode is a token swap only; no component ever overrides
+   colour per-theme.
 ---------------------------------------------------------------- */
 :root {
   --bg: #e9e5e1;
@@ -20,26 +27,35 @@
   --line: #d6d0c9;
   --line-soft: #e3ded7;
 
-  --accent: #ff6b2c;
-  --accent-hover: #f05a1b;
+  /* Emerald-700, not emerald-600. The brighter green is the prettier swatch and
+     fails on the only thing this colour has to do: white on #059669 is 3.3:1,
+     under the 4.5:1 a button label needs. This one is 5.5:1. */
+  --accent: #047857;
+  --accent-hover: #036045;
   --accent-ink: #ffffff;
-  --accent-soft: #ffe8dc;
+  --accent-soft: #e0f1e9;
 
-  /* The wordmark's gradient. Three stops, all within the warm half of the
-     palette the covers already use: the brand reads as a brighter version of
-     the library rather than as a sticker from another design. */
-  --brand-1: #ff8a3d;
-  --brand-2: #ff5722;
-  --brand-3: #e0347a;
+  /* The same brand green for things that emit light rather than fill a shape —
+     the hero's rim light and its dust motes, the glow behind a panel. A colour
+     dark enough to carry white text is by definition too dark to work as a
+     light source: `--accent` as a PointLight barely registers. */
+  --accent-lit: #34d399;
 
-  /* Card stock. The catalogue tile is a slab of warm paper that ramps through
-     peach into a saturated foot, so the volume stands in colour and the one
-     control on the card is unmissable against it. `lip` is the lit top bevel
-     and `well-lift` the light behind the book — one token each instead of a
-     per-theme override in every card rule. */
-  --card-top: #fffdfb;
-  --card-mid: #ffe9db;
-  --card-foot: #ee5a18;
+  /* The wordmark's gradient. A journey the eye reads as landscape — leaf, to
+     deep foliage, to the water behind it — rather than three tints of one
+     green, which at this width would read as a single flat colour. */
+  --brand-1: #65a30d;
+  --brand-2: #059669;
+  --brand-3: #0e7490;
+
+  /* Card stock. The catalogue tile is a slab of paper that ramps through a
+     green tint into a saturated foot, so the volume stands in colour and the
+     one control on the card is unmissable against it. `lip` is the lit top
+     bevel and `well-lift` the light behind the book — one token each instead
+     of a per-theme override in every card rule. */
+  --card-top: #fdfefc;
+  --card-mid: #dcefe4;
+  --card-foot: #047857;
   --card-lip: rgba(255, 255, 255, 0.72);
   --well-lift: rgba(255, 255, 255, 0.55);
 
@@ -62,6 +78,17 @@
   --shadow-4: 0 4px 8px rgba(61, 45, 32, 0.08), 0 16px 32px rgba(61, 45, 32, 0.1),
     0 36px 68px rgba(61, 45, 32, 0.12);
 
+  /* The primary control's own shadow, tinted with the primary itself. A neutral
+     grey shadow under a saturated pill reads as dirt; the coloured one reads as
+     the button sitting above the page and is most of why a flat fill looks
+     modern rather than 2010s. Tight top layer for the edge, wide negative-spread
+     layer for the bloom. */
+  --shadow-accent: 0 1px 2px rgba(4, 120, 87, 0.26),
+    0 6px 14px -4px rgba(4, 120, 87, 0.4), 0 14px 30px -10px rgba(4, 120, 87, 0.5);
+  --shadow-accent-lg: 0 1px 2px rgba(4, 120, 87, 0.28),
+    0 10px 22px -6px rgba(4, 120, 87, 0.45),
+    0 22px 44px -12px rgba(4, 120, 87, 0.55);
+
   --radius: 0.875rem;
 }
 
@@ -76,23 +103,30 @@
   --line: #332e28;
   --line-soft: #292420;
 
-  --accent: #ff7a3d;
-  --accent-hover: #ff8f5a;
-  --accent-ink: #1a0f08;
-  --accent-soft: #3a2418;
+  /* Emerald-700 on this ground would read as a hole rather than a button. Lifted
+     to emerald-400, the pill takes dark ink back instead of white — which is
+     what makes it read as lit rather than as a darker patch of page. */
+  --accent: #34d399;
+  --accent-hover: #6ee7b7;
+  --accent-ink: #04231a;
+  --accent-soft: #123328;
+
+  /* Already bright enough to light with; lifted one more step so the rim still
+     separates from the pills that are now the same green. */
+  --accent-lit: #6ee7b7;
 
   /* Lifted, not just reused: the same three hues at this luminance would sink
      into the dark ground and the gradient would read as one flat colour. */
-  --brand-1: #ffa05c;
-  --brand-2: #ff7043;
-  --brand-3: #ff5c9b;
+  --brand-1: #a3e635;
+  --brand-2: #34d399;
+  --brand-3: #22d3ee;
 
   /* Same slab in a dimmer room. The foot keeps its full chroma — that block of
      colour is the card's one bright object and the ground its button reads
-     against — while the stock above it goes to warm charcoal. */
-  --card-top: #241f1a;
-  --card-mid: #33241b;
-  --card-foot: #e8551a;
+     against — while the stock above it goes to charcoal. */
+  --card-top: #201f1c;
+  --card-mid: #1c3a2e;
+  --card-foot: #059669;
   --card-lip: rgba(255, 255, 255, 0.05);
   --well-lift: rgba(255, 255, 255, 0.05);
 
@@ -109,6 +143,14 @@
   --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.45), 0 8px 18px rgba(0, 0, 0, 0.35);
   --shadow-3: 0 4px 10px rgba(0, 0, 0, 0.5), 0 16px 32px rgba(0, 0, 0, 0.4);
   --shadow-4: 0 8px 20px rgba(0, 0, 0, 0.55), 0 32px 60px rgba(0, 0, 0, 0.5);
+
+  /* Same idea, more bloom and less edge: on a dark ground the glow is the only
+     part of a shadow that is visible at all. */
+  --shadow-accent: 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 8px 20px -6px rgba(52, 211, 153, 0.42), 0 16px 34px -12px rgba(52, 211, 153, 0.32);
+  --shadow-accent-lg: 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 12px 26px -6px rgba(52, 211, 153, 0.48),
+    0 26px 50px -14px rgba(52, 211, 153, 0.38);
 }
 
 @theme inline {
@@ -126,6 +168,7 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-lit: var(--accent-lit);
 
   --color-brand-1: var(--brand-1);
   --color-brand-2: var(--brand-2);
@@ -150,6 +193,8 @@
   --shadow-e2: var(--shadow-2);
   --shadow-e3: var(--shadow-3);
   --shadow-e4: var(--shadow-4);
+  --shadow-glow: var(--shadow-accent);
+  --shadow-glow-lg: var(--shadow-accent-lg);
 
   --radius-xl: var(--radius);
   --radius-2xl: 1.25rem;
@@ -661,22 +706,60 @@ body {
 ---------------------------------------------------------------- */
 .coverflow {
   /* One measurement drives the whole stage. The height is the cover's own
-     2:3 board plus room for the name plate that hangs below it, so the plate
-     can never be clipped by the overflow that keeps the ring off the page
-     edges — at any viewport width, without a media query. */
-  --panel-w: clamp(10.5rem, 21vw, 17.5rem);
-  height: calc(var(--panel-w) * 1.5 + 4.5rem);
+     2:3 board plus the room the front one needs to stand up out of the ring.
+     The book's name is set below the stage rather than on a plate inside it,
+     which is what lets this be tight: nothing hangs off the bottom to be
+     clipped by the overflow that keeps the ring off the page edges. */
+  --panel-w: clamp(11rem, 22vw, 18rem);
+  height: calc(var(--panel-w) * 1.5 + 3rem);
 
-  perspective: 1700px;
+  /* Two numbers for the whole carousel's feel. Short and decisive: a
+     showcase that takes three quarters of a second to answer an arrow key
+     feels broken, however smooth the curve is. The easing lands hard at the
+     end — most of the distance is covered early, so the ring reads as
+     *arriving* rather than as drifting into place. */
+  --cf-dur: 420ms;
+  --cf-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  perspective: 1500px;
   /* Camera a little above the middle of the panel, so the covers are
      read slightly from above, like books held up in front of you. */
-  perspective-origin: 50% 42%;
+  perspective-origin: 50% 44%;
+
+  /* The ring is meant to run past both edges. Dissolving it there rather
+     than slicing it is the difference between "there is more of this" and a
+     cover that got cut in half. */
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 7%,
+    #000 93%,
+    transparent
+  );
 }
 
 .coverflow__stage {
   position: relative;
   height: 100%;
   transform-style: preserve-3d;
+}
+
+/* The pool of light the front cover stands in. Drawn on the stage rather than
+   in the panel, so it never turns with the board — and tinted with the accent,
+   so the section has one focal point that the ground itself points at. */
+.coverflow__spot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--panel-w) * 2.4);
+  height: calc(var(--panel-w) * 1.9);
+  translate: -50% -48%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) 20%, transparent),
+    transparent 72%
+  );
 }
 
 .coverflow__panel {
@@ -687,13 +770,16 @@ body {
   /* So each panel can carry its own board thickness in real 3D. */
   transform-style: preserve-3d;
   /* Centring first, then the ring placement: the rotation that follows
-     happens about the panel's own axis rather than the stage's. */
+     happens about the panel's own axis rather than the stage's. `--y` lifts
+     the front cover clear of the row and settles the turned ones back down
+     into it, which is what makes the middle read as the nearest object
+     rather than as the same cover in a wider slot. */
   transform: translate(-50%, -50%) translateX(calc(var(--x) * 1%))
-    translateZ(calc(var(--a) * -165px)) rotateY(calc(var(--ry) * 1deg))
-    scale(var(--s));
+    translateY(calc(var(--y, 0) * 1px)) translateZ(calc(var(--a) * -140px))
+    rotateY(calc(var(--ry) * 1deg)) scale(var(--s));
   opacity: var(--op);
-  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 760ms ease;
+  transition: transform var(--cf-dur) var(--cf-ease),
+    opacity calc(var(--cf-dur) * 0.6) linear;
   will-change: transform, opacity;
 }
 
@@ -702,7 +788,68 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 1.15rem;
-  box-shadow: var(--shadow-4), inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  box-shadow: var(--shadow-3), inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  transition: box-shadow var(--cf-dur) var(--cf-ease);
+}
+
+/* The one in front throws its own colour onto the ground under it. Held tight
+   under the board by the negative spread: any wider and the front cover casts
+   a coloured haze across the turned covers beside it, which reads as a smudge
+   on their art rather than as light. */
+.coverflow__board--front {
+  box-shadow: var(--shadow-4),
+    0 24px 38px -26px color-mix(in srgb, var(--accent) 50%, transparent),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* "This opens." Nothing on a bare cover says so, and the reader who wants
+   the book is pointing at the cover, not reading the caption below it. */
+.coverflow__open {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0.85rem;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  translate: 0 0.5rem;
+  transition: opacity 220ms ease, translate 220ms var(--cf-ease);
+}
+
+/* A scrim, so the pill lands on shade rather than on the imprint the cover
+   already prints along its foot. Bottom corners only — it has to sit inside
+   the board's own trim. */
+.coverflow__open::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -0.85rem;
+  z-index: -1;
+  height: 5rem;
+  border-radius: 0 0 1.15rem 1.15rem;
+  background: linear-gradient(
+    to top,
+    rgba(12, 9, 7, 0.6),
+    rgba(12, 9, 7, 0.16) 58%,
+    transparent
+  );
+}
+
+.coverflow__open > span {
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 0.45rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-2);
+}
+
+.coverflow__link:hover .coverflow__open,
+.coverflow__link:focus-visible .coverflow__open {
+  opacity: 1;
+  translate: 0 0;
 }
 
 /* Board thickness.
@@ -756,7 +903,7 @@ body {
   /* Barely there on the cover being read; strong on the turned ones, where a
      laminated board really would catch the light edge-on. */
   opacity: calc(0.1 + var(--a) * 0.18);
-  transition: opacity 760ms ease;
+  transition: opacity var(--cf-dur) ease;
 }
 
 /* Panels behind the middle one sit in its shade. Depth is carried by shade and
@@ -767,8 +914,93 @@ body {
   inset: 0;
   pointer-events: none;
   background: rgba(20, 14, 9, 0.55);
-  opacity: calc(var(--a) * 0.24);
-  transition: opacity 760ms ease;
+  opacity: calc(var(--a) * 0.28);
+  transition: opacity var(--cf-dur) ease;
+}
+
+/* ---- The handle on a turned cover ------------------------------
+   Side covers are inert, so their button sits over them rather than in them.
+   Nothing about a cover says "click to bring this one forward", so the button
+   draws its own edge when pointed at. */
+.coverflow__pick::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 1.15rem;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 75%, transparent),
+    0 12px 30px -14px color-mix(in srgb, var(--accent) 60%, transparent);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.coverflow__pick:hover::after,
+.coverflow__pick:focus-visible::after {
+  opacity: 1;
+}
+
+/* ---- Caption ---------------------------------------------------
+   The featured book's name, set below the stage in the page's own type. Out
+   here it is crisp (text inside a rotated, scaled 3D panel is not), it can be
+   as long as it likes, and it cannot collide with the neighbouring covers the
+   way a plate hanging off the board did. */
+.coverflow__caption {
+  animation: cf-caption-in 340ms var(--cf-ease) both;
+}
+
+@keyframes cf-caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Dots ------------------------------------------------------
+   The active dot doubles as the clock: while the ring is turning on its own,
+   its fill runs down over exactly one interval, so the movement is never a
+   surprise. Paused — by the button, by a pointer resting on the stage, or by
+   `prefers-reduced-motion` — it simply sits full. */
+.coverflow__dot {
+  position: relative;
+  height: 0.375rem;
+  width: 0.375rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line);
+  transition: width var(--cf-dur) var(--cf-ease), background-color 200ms ease;
+}
+
+.coverflow__dot:hover {
+  background: var(--ink-faint);
+}
+
+.coverflow__dot[data-current="true"] {
+  width: 2rem;
+  background: color-mix(in srgb, var(--accent) 24%, var(--line));
+}
+
+.coverflow__dot-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  background: var(--accent);
+}
+
+.coverflow__dot-fill--timed {
+  animation: cf-dot-fill linear both;
+}
+
+@keyframes cf-dot-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 /* The ground the ring stands on: one pool of light, no floor plane. A
@@ -1075,6 +1307,237 @@ body {
 }
 
 /* ---------------------------------------------------------------
+   ReadingScene — the illustration beside the sign-in card.
+
+   Line art in the page's own ink over flat colour: `--ink` for every
+   stroke, `--surface-2` for anything made of paper, and fixed hex only
+   for objects that are coloured in life — book cloth, sweater, leaves,
+   pencil. Dark mode is that same drawing with the tokens swapped; there
+   is no second artwork and no per-theme override anywhere.
+
+   `stroke-width: 0` on the root group is what keeps the markup clean.
+   Strokes become opt-in per element — a presentation attribute beats an
+   inherited value — so the hundred small filled shapes (bands, leaves,
+   sparkles) need no `stroke="none"` of their own, while the line work
+   states its weight and inherits its colour.
+
+   Four animations, transform and opacity only, each ending in the pose
+   it starts in — so the reduced-motion kill-switch below, which
+   collapses every duration to nothing, leaves the scene standing as
+   drawn rather than frozen mid-move.
+---------------------------------------------------------------- */
+.rscene {
+  /* The hair and a few solid details are `currentColor`. */
+  color: var(--ink);
+}
+
+.rscene__ink {
+  stroke: var(--ink);
+  stroke-width: 0;
+}
+
+/* Paper: the face, the hands, the pages, the sheet on the floor. */
+.rscene__paper {
+  fill: var(--surface-2);
+}
+
+/* The neck is a paper tube — an ink outline with a paper core. */
+.rscene__paper-s {
+  stroke: var(--surface-2);
+}
+
+/* SVG children have no layout box of their own, so `transform-origin`
+   has to be told which box to measure against. Without this every
+   rotation pivots about the viewBox origin, far off to the left. */
+.rscene__sway,
+.rscene__lean,
+.rscene__breathe,
+.rscene__float,
+.rscene__hoverlift,
+.rscene__twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The tree, hinged at its root. */
+.rscene__sway {
+  transform-origin: bottom center;
+  animation: rscene-sway 9s ease-in-out infinite;
+}
+
+/* The reader, breathing. 2.5px over six seconds: the figure has to look
+   alive without ever pulling the eye off the sign-in form. */
+.rscene__breathe {
+  animation: rscene-breathe 6s ease-in-out infinite;
+}
+
+.rscene__float {
+  animation: rscene-float 7.5s ease-in-out infinite;
+}
+
+.rscene__float--slow {
+  animation-duration: 10s;
+  animation-delay: -2.5s;
+}
+
+.rscene__twinkle {
+  animation: rscene-twinkle 5s ease-in-out infinite;
+}
+
+/* Pointing at the drawing sends the loose book further up and rocks the
+   pencil against the pile — enough to answer the pointer, not enough to
+   compete with the one control on the page. */
+.rscene__hoverlift,
+.rscene__lean {
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rscene:hover .rscene__hoverlift {
+  transform: translateY(-11px);
+}
+
+/* Pivot at the tip, which is the end resting on the floor. */
+.rscene__lean {
+  transform-origin: left center;
+}
+
+.rscene:hover .rscene__lean {
+  transform: rotate(-3.5deg);
+}
+
+@keyframes rscene-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+@keyframes rscene-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rscene-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(1.4deg);
+  }
+}
+
+@keyframes rscene-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  45% {
+    opacity: 0.3;
+    transform: scale(0.78);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Closing CTA — volumes adrift over paper.
+
+   This section used to be a solid near-black slab. A black rectangle is
+   the loudest object on a page whether or not what sits on it deserves
+   to be, and in dark mode it stopped reading as a panel at all — it read
+   as a hole cut in the page. Paper instead, lit by two pools of the brand
+   green, with four of the library's own volumes drifting behind the copy:
+   the section now sells the library by showing it rather than by shouting.
+
+   The volumes are decoration in the strict sense — `aria-hidden`, and
+   `pointer-events: none` so a book floating behind a heading can never
+   swallow the click meant for the one button here. Everything they say
+   ("there are books, they are objects, they are yours") the copy beside
+   them says in words.
+---------------------------------------------------------------- */
+.ctafloat {
+  position: relative;
+  /* Contains the stacking context, so the drifting volumes can sit behind
+     the copy without escaping to fight the header for z-order. */
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* Two pools of light rather than one flat fill: a bright one high-left
+   where the key light in every other 3D block on this page comes from,
+   and a deeper one low-right for the volume to fall away into. */
+.ctafloat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      62% 78% at 14% 6%,
+      color-mix(in srgb, var(--accent-lit) 26%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      54% 70% at 92% 96%,
+      color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+      transparent 70%
+    );
+}
+
+.ctafloat__body {
+  position: relative;
+  /* Above both the wash and the volumes. */
+  z-index: 2;
+}
+
+/* One drifting volume. Position, size, tilt, and timing all come in as
+   custom properties from the markup, so this rule is authored once and
+   the four instances differ only in their variables — a second copy of
+   these declarations per volume is how a composition like this rots. */
+.ctafloat__drift {
+  position: absolute;
+  z-index: 1;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  pointer-events: none;
+  /* The far pair sit back in the frame. Losing a little contrast and a
+     little focus is what reads as distance — scaling them down alone just
+     reads as smaller books at the same distance. */
+  opacity: var(--dim, 1);
+  filter: blur(var(--soft, 0px));
+  transform: rotate(var(--tilt, 0deg));
+  animation: ctafloat-drift var(--dur, 13s) ease-in-out var(--delay, 0s)
+    infinite;
+}
+
+/* Transform and opacity only, and the pose at 100% is the pose at 0% — so
+   the reduced-motion switch above, which collapses every duration to
+   nothing, leaves the composition standing as authored instead of frozen
+   mid-drift. The rotation rides on top of the resting tilt rather than
+   replacing it, which is why `--tilt` is read here again. */
+@keyframes ctafloat-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: translate3d(0, -19px, 0)
+      rotate(calc(var(--tilt, 0deg) + 1.6deg));
+  }
+}
+
+/* ---------------------------------------------------------------
    Accessibility: one global kill-switch for every 3D / motion effect.
 ---------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -1139,7 +1602,9 @@ body {
   .tile3d:hover,
   .book-card:hover,
   .book-card:focus-within,
-  .shelf-tilt {
+  .shelf-tilt,
+  .rscene:hover .rscene__hoverlift,
+  .rscene:hover .rscene__lean {
     /* Zeroed transition durations would otherwise turn every lift into an
        instant jump, which is worse than no lift at all. */
     transform: none !important;
@@ -1207,13 +1672,20 @@ body {
   opacity: 1;
 }
 
+/* Below `lg` this is two *rows*, not one: the copy on top, the volume under
+   it. It used to be one row that the copy and the volume shared, which is
+   correct on a wide viewport — they are side by side there — but on a phone
+   put the book squarely on top of the headline, and a WebGL cover behind
+   three lines of type is unreadable type. The scene puts its own volume in
+   the lower part of the frame to match (see `heroOffsetY` in hero-scene.ts). */
 .hero3d__stage {
   position: relative;
   z-index: 2;
   display: grid;
   grid-template-columns: 1fr;
-  align-items: center;
-  gap: 2rem;
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  gap: 1.5rem;
   height: 100%;
   max-width: 80rem;
   margin-inline: auto;
@@ -1223,6 +1695,9 @@ body {
 @media (min-width: 1024px) {
   .hero3d__stage {
     grid-template-columns: 1.05fr 0.95fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+    gap: 2rem;
     padding-inline: 2rem;
   }
 }
@@ -1233,23 +1708,36 @@ body {
 .hero3d__copy {
   grid-row: 1;
   grid-column: 1 / -1;
+  align-self: start;
   display: grid;
   /* The container must not swallow clicks meant for the scene or the
      page; only the block that is actually showing takes them back. */
   pointer-events: none;
 }
 
+/* Row 2 on a phone — under the copy rather than behind it. The height is what
+   is actually left over once the headline, the lead, two buttons and the stats
+   have had the top of the panel, so it is measured against the row and not
+   against the viewport; `min-height: 0` lets it be squeezed on a short screen
+   instead of pushing the copy up off the top. */
 .hero3d__fallback {
-  grid-row: 1;
+  grid-row: 2;
   grid-column: 1 / -1;
-  align-self: center;
-  height: min(60svh, 26rem);
+  align-self: stretch;
+  min-height: 0;
+  height: auto;
   transition: opacity 700ms ease;
 }
 
 @media (min-width: 1024px) {
+  .hero3d__copy {
+    align-self: center;
+  }
+
   .hero3d__fallback {
+    grid-row: 1;
     grid-column: 2;
+    align-self: center;
     height: min(72svh, 34rem);
   }
 }
@@ -1289,15 +1777,194 @@ body {
   transform: translateY(calc((1 - var(--b1)) * 26px));
 }
 
-.hero3d__beat[data-b="2"] {
+/* ---------------------------------------------------------------------
+   Beat 2 — the newest arrivals, read out as records.
+
+   Not a `.hero3d__beat`, because the beats share one grid cell with the
+   static composition and this block is far too tall to sit in it. Instead
+   it owns the whole pinned screen at the end of the scroll, by which point
+   every beat inside the copy grid has faded out. Same `--b2` ramp, same
+   `data-beat` gate on focus and clicks — a panel that is invisible but
+   still tabbable is a keyboard trap.
+
+   When the hero is not pinned at all (reduced motion, or no WebGL) the
+   rules further down turn this back into an ordinary block that flows
+   under the hero, so these books are on the page for every reader.
+   ------------------------------------------------------------------- */
+.hero3d__recent {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  /* `safe` matters here: on a short screen a centred overflowing grid
+     clips its own top, and the top is the heading. */
+  align-content: safe center;
+  justify-items: center;
+  gap: 1.75rem;
+  /* The top pad clears the site header. This panel fills the pinned screen,
+     which starts under a 72px sticky header — at 1.5rem the block's own
+     heading was behind it. */
+  padding: max(5.5rem, 4svh) 1.25rem max(1.5rem, 4svh);
+  /* Scrollable rather than clipped on a short screen — and chaining is
+     left on deliberately, so a touch that runs past the last row carries
+     on scrolling the page out of the hero instead of dead-ending. */
+  overflow-y: auto;
   opacity: var(--b2);
   transform: translateY(calc((1 - var(--b2)) * 26px));
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .hero3d__recent {
+    padding-inline: 2rem;
+  }
+}
+
+.hero3d__pin[data-beat="2"] .hero3d__recent {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.hero3d__recent-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .hero3d__beat--centre {
   justify-self: center;
   max-width: 44rem;
   text-align: center;
+}
+
+/* --- The list itself ------------------------------------------------
+   Its own block rather than utility classes on every row: it is drawn
+   over a WebGL scene, so the surface needs to be translucent and blurred
+   to stay readable against whatever cover happens to be behind it, and
+   that is three properties no single utility carries.
+   ------------------------------------------------------------------- */
+.hero-recent {
+  width: 100%;
+  max-width: 46rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  box-shadow: var(--e3, 0 18px 40px -24px rgb(0 0 0 / 0.45));
+  backdrop-filter: blur(14px);
+}
+
+@media (min-width: 640px) {
+  .hero-recent {
+    padding: 1.5rem 1.75rem;
+  }
+}
+
+.hero-recent__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.hero-recent__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-recent__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.5rem;
+  border-radius: 0.85rem;
+  transition: background-color 160ms ease;
+}
+
+.hero-recent__row + .hero-recent__row {
+  border-top: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+
+.hero-recent__row:hover {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.hero-recent__n {
+  flex: none;
+  width: 1.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+/* The spine, edge-on — the same object the scene has just finished
+   shelving, at the size a list row can afford. */
+.hero-recent__spine {
+  flex: none;
+  width: 0.375rem;
+  height: 2.25rem;
+  border-radius: 0.125rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.28);
+}
+
+.hero-recent__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-recent__details {
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-mute);
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+/* Below `sm` the row has no width for a second control; the title is
+   already the link to the record, so the file is what stays. */
+@media (min-width: 640px) {
+  .hero-recent__details {
+    display: inline-flex;
+  }
+}
+
+.hero-recent__details:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.hero-recent__download {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--ink-mute);
+  transition: all 160ms ease;
+}
+
+.hero-recent__download:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .hero3d__hint {
@@ -1366,13 +2033,12 @@ body {
 
   .hero3d__canvas,
   .hero3d__hint,
-  .hero3d__beat[data-b="1"],
-  .hero3d__beat[data-b="2"] {
+  .hero3d__beat[data-b="1"] {
     display: none;
   }
 
   .hero3d__stage {
-    padding-block: 4rem 6rem;
+    padding-block: 4rem 2rem;
   }
 
   .hero3d__beat[data-b="0"] {
@@ -1384,6 +2050,19 @@ body {
   .hero3d__fallback {
     opacity: 1;
     visibility: visible;
+  }
+
+  /* No scroll to scrub, so nothing to reveal it: the arrivals become a
+     plain block under the hero — which is where a reader who never sees
+     the scene would expect to find them. */
+  .hero3d__recent {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    overflow: visible;
+    padding-block: 0 5rem;
   }
 }
 
@@ -1399,8 +2078,7 @@ body {
 
 .hero3d[data-static="true"] .hero3d__canvas,
 .hero3d[data-static="true"] .hero3d__hint,
-.hero3d[data-static="true"] .hero3d__beat[data-b="1"],
-.hero3d[data-static="true"] .hero3d__beat[data-b="2"] {
+.hero3d[data-static="true"] .hero3d__beat[data-b="1"] {
   display: none;
 }
 
@@ -1408,6 +2086,23 @@ body {
   visibility: visible;
   opacity: 1;
   transform: none;
+}
+
+.hero3d[data-static="true"] .hero3d__stage {
+  padding-block: 4rem 2rem;
+}
+
+/* WebGL never arrived. Same treatment as reduced motion — the arrivals
+   flow as an ordinary block rather than waiting for a beat that will
+   never be scrubbed to. */
+.hero3d[data-static="true"] .hero3d__recent {
+  position: static;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  overflow: visible;
+  padding-block: 0 5rem;
 }
 
 /* Coarse pointers (touch) get no hover-tilt — it can only misfire. */
@@ -1438,13 +2133,26 @@ body {
   }
 }
 
-@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
-  /* Hide the books stack fallback while the 3D model is loading, so it doesn't overlap text */
+/* --- While the scene is still coming --------------------------------
+   The static pile is the hero for a reader who will never get the scene:
+   reduced motion, or no WebGL. It is not a placeholder for one that is
+   merely late. Shown during the wait it has to be laid out at hero scale
+   with no canvas over it yet, which is how it ends up covering the
+   headline — and then it is swapped out a moment later anyway.
+
+   So it is held back until we know which hero this reader is getting.
+   `:not([data-static])` keeps it for the no-WebGL case and the media
+   query keeps it for reduced motion, both of which resolve immediately;
+   only the genuinely-loading state is blank, and `hero-3d.tsx` gives that
+   state a deadline so it cannot last.
+   ------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
   .hero3d:not([data-live="true"]):not([data-static="true"]) .hero3d__fallback {
-    display: none !important;
+    display: none;
   }
-  
-  /* Show a loader at the model position while loading */
+
+  /* Something in the volume's place, so the half is waiting rather than
+     broken. Deliberately slight — it is on screen for a moment. */
   .hero3d:not([data-live="true"]):not([data-static="true"]) .hero3d__stage::after {
     content: ". . .";
     position: absolute;
@@ -1456,5 +2164,14 @@ body {
     color: var(--ink-mute);
     animation: stack3d-float 2s ease-in-out infinite;
     z-index: 10;
+  }
+}
+
+/* On a wide viewport the volume has its own column, so the wait marker
+   belongs in it rather than under the headline. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .hero3d:not([data-live="true"]):not([data-static="true"]) .hero3d__stage::after {
+    left: 72%;
+    bottom: 42%;
   }
 }

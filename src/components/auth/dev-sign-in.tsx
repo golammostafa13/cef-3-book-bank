@@ -38,15 +38,6 @@ export function DevSignIn({
       <input type="hidden" name="lang" value={lang} />
       <input type="hidden" name="next" value={next} />
 
-      <p
-        className={cn(
-          "mb-4 inline-flex rounded-full border border-dashed border-warn/60 bg-warn-soft/50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-warn",
-          bn,
-        )}
-      >
-        {hasAdminEmails ? dict.auth.adminTitle : dict.auth.devTitle}
-      </p>
-
       <label
         htmlFor="email"
         className={cn("mb-2 block text-sm font-medium text-ink", bn)}
@@ -83,7 +74,7 @@ export function DevSignIn({
 
       <Button
         type="submit"
-        variant="ink"
+        variant="primary"
         size="lg"
         className="mt-5 w-full"
         disabled={pending}

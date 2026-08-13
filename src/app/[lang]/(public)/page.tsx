@@ -10,20 +10,18 @@ import {
   Globe,
   Landmark,
   Library,
-  Sparkles,
   Zap,
 } from "lucide-react";
 import { Book3D } from "@/components/book-3d";
-import { BookCard } from "@/components/book-card";
 import { BookCarousel3D } from "@/components/book-carousel-3d";
 import { BookStack3D } from "@/components/book-stack-3d";
 import { Hero3D, type HeroBook } from "@/components/hero-3d";
+import type { HeroListBook } from "@/components/hero-recent";
 import { Shelf3D } from "@/components/shelf-3d";
 import { Button } from "@/components/ui/button";
 import {
   getCategoryShelves,
   getFeatured,
-  getPopular,
   getRecent,
   getStats,
 } from "@/lib/data/books";
@@ -35,7 +33,7 @@ import {
   textClass,
 } from "@/lib/i18n/content";
 import { site } from "@/lib/site";
-import { fill, titlesCount } from "@/lib/i18n/format";
+import { titlesCount } from "@/lib/i18n/format";
 import { cn } from "@/lib/utils";
 
 export default async function HomePage(props: PageProps<"/[lang]">) {
@@ -44,10 +42,9 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
   const dict = getDictionary(lang);
   const href = (path: string) => localePath(lang, path);
 
-  const [featured, popular, recent, categories, stats] = await Promise.all([
+  const [featured, recent, categories, stats] = await Promise.all([
     getFeatured(6),
-    getPopular(6),
-    getRecent(8),
+    getRecent(16),
     getCategoryShelves(9),
     getStats(),
   ]);
@@ -57,31 +54,70 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
   const pileBooks = featured.slice(0, 5);
 
   /**
-   * What the hero scene is built from: the first volume is the one that opens,
-   * the rest are the collection that arrives behind it. Deduplicated, because
-   * the same title turning up twice in a fifteen-cover shelf is the one thing
-   * that gives away that it is a shelf of samples.
+   * What the hero scene is built from: the newest arrivals, most recent first.
+   * The first volume is the one that opens, the rest are the collection that
+   * arrives behind it and settles into the shelf — and the list at the end of
+   * the scroll is those same books in that same order, so what the reader
+   * watches being shelved is exactly what they can then click.
    *
    * Only the seven fields the scene actually draws with cross to the client —
-   * a `Book` carries a description and a file URL that no cover needs, and all
-   * fifteen of them would be in the page's RSC payload.
+   * a `Book` carries a description and inventory columns no cover needs, and
+   * all sixteen of them would be in the page's RSC payload.
    */
-  const sceneBooks: HeroBook[] = [...featured, ...popular, ...recent]
-    .filter(
-      (book, i, all) => all.findIndex((other) => other.id === book.id) === i,
-    )
-    .slice(0, 16)
-    .map((book) => ({
-      id: book.id,
-      title: book.title,
-      titleBn: book.titleBn,
-      authorName: book.authorName,
-      authorNameBn: book.authorNameBn,
-      coverHue: book.coverHue,
-      pages: book.pages,
-    }));
+  const sceneBooks: HeroBook[] = recent.map((book) => ({
+    id: book.id,
+    title: book.title,
+    titleBn: book.titleBn,
+    authorName: book.authorName,
+    authorNameBn: book.authorNameBn,
+    coverHue: book.coverHue,
+    pages: book.pages,
+  }));
+
+  /**
+   * The same arrivals as records. Six, not sixteen: this is a list a reader
+   * scans at the end of a scroll, and the catalogue is one click away for the
+   * rest of them. Trimmed for the same payload reason as the scene, with the
+   * fields a row actually shows.
+   */
+  const recentList: HeroListBook[] = recent.slice(0, 6).map((book) => ({
+    id: book.id,
+    slug: book.slug,
+    title: book.title,
+    titleBn: book.titleBn,
+    authorName: book.authorName,
+    authorNameBn: book.authorNameBn,
+    coverHue: book.coverHue,
+    year: book.year,
+    format: book.format,
+    fileSizeMb: book.fileSizeMb,
+    fileUrl: book.fileUrl,
+  }));
 
   const propIcons = [BookOpen, Download, Globe];
+
+  /**
+   * The volumes drifting behind the closing call to action.
+   *
+   * Hand-placed, never generated: this is a composition, and the two things
+   * it has to get right — that no volume lands under the heading or the one
+   * button, and that the four of them read as being at different distances
+   * rather than as a row — are both judgements about *this* layout that no
+   * loop can make. Percentages rather than pixels so the arrangement holds
+   * from 1024px up.
+   *
+   * The far pair are wider, dimmer, and slightly out of focus; the near pair
+   * are smaller, sharper, and tilted harder. That inversion is deliberate —
+   * dimming alone reads as a faded book, not a distant one. Every duration is
+   * a different prime-ish number of seconds so the four never fall into step,
+   * which is the tell that turns a drift into a carousel.
+   */
+  const ctaFloaters = [
+    { book: featured[0], x: "-2%", y: "12%", w: "184px", tilt: "-9deg", angle: -30, dur: "15s", delay: "0s", dim: "0.5", soft: "1.1px" },
+    { book: featured[1], x: "9%", y: "58%", w: "126px", tilt: "7deg", angle: -16, dur: "11s", delay: "-3.5s", dim: "0.9", soft: "0px" },
+    { book: featured[2], x: "80%", y: "8%", w: "170px", tilt: "11deg", angle: 26, dur: "17s", delay: "-7s", dim: "0.46", soft: "1.3px" },
+    { book: featured[3], x: "87%", y: "62%", w: "122px", tilt: "-6deg", angle: 18, dur: "13s", delay: "-1.5s", dim: "0.9", soft: "0px" },
+  ].filter((f) => f.book);
 
   return (
     <>
@@ -97,9 +133,21 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
       ---------------------------------------------------------------- */}
       <Hero3D
         books={sceneBooks}
+        recent={recentList}
         lang={lang}
         brand={lang === "bn" ? site.nameBn : site.name}
-        hrefs={{ books: href("/books"), categories: href("/categories") }}
+        hrefs={{
+          books: href("/books"),
+          categories: href("/categories"),
+          recent: href("/books?sort=recent"),
+        }}
+        recentCopy={{
+          title: dict.home.recentTitle,
+          lead: dict.home.recentLead,
+          seeEverything: dict.common.seeEverything,
+          details: dict.book.details,
+          downloadOf: dict.common.downloadOf,
+        }}
         copy={{
           titleStart: dict.home.titleStart,
           titleMiddle: dict.home.titleMiddle,
@@ -294,76 +342,72 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
       </section>
 
       {/* ---------------------------------------------------------------
-          Recently added
-      ---------------------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
-        <div className="reveal-3d flex flex-wrap items-end justify-between gap-4">
-          <h2
-            className={cn(
-              "text-[clamp(1.9rem,4vw,2.9rem)] font-bold tracking-tight text-ink",
-              textClass(lang),
-            )}
-          >
-            {dict.home.recentTitle}
-          </h2>
-          <Button asChild variant="ghost" size="sm">
-            <Link href={href("/books?sort=recent")}>
-              {dict.common.seeEverything}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-
-        <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
-          {recent.slice(0, 8).map((book, i) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              lang={lang}
-              dict={dict}
-              index={i}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------------
           Closing CTA
+
+          The recently-added shelf used to stand here. It is now the last
+          beat of the hero — the scene assembles those exact books, and the
+          list the scroll resolves to is them, clickable.
       ---------------------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-5 pb-8 lg:px-8">
-        <div className="reveal-3d relative overflow-hidden rounded-3xl bg-ink px-8 py-16 text-center shadow-e4 lg:px-16 lg:py-24">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -left-24 -top-24 size-96 rounded-full opacity-30 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
-            }}
-          />
-          <Zap className="mx-auto size-8 text-accent" aria-hidden="true" />
-          <h2
-            className={cn(
-              "mx-auto mt-6 max-w-2xl text-[clamp(1.8rem,4vw,3rem)] font-bold leading-tight tracking-tight text-bg",
-              lang === "bn" && "bn leading-[1.35]",
-            )}
-          >
-            {dict.home.ctaTitle}
-          </h2>
-          <p
-            className={cn(
-              "mx-auto mt-4 max-w-lg text-lg text-bg/70",
-              textClass(lang),
-            )}
-          >
-            {dict.home.ctaLead}
-          </p>
-          <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <Button asChild variant="primary" size="lg">
-              <Link href={href("/books")}>
-                {dict.home.ctaButton}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
+      <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:pb-8">
+        <div className="ctafloat reveal-3d rounded-3xl px-8 py-16 text-center shadow-e3 lg:px-16 lg:py-28">
+          {/* The drifting volumes. Hidden below `lg`, where the copy already
+              fills the panel edge to edge and a book behind it would be
+              reading material laid over reading material. */}
+          <div aria-hidden="true" className="hidden lg:block">
+            {ctaFloaters.map((f) => (
+              <div
+                key={f.book.id}
+                className="ctafloat__drift"
+                style={
+                  {
+                    "--x": f.x,
+                    "--y": f.y,
+                    "--w": f.w,
+                    "--tilt": f.tilt,
+                    "--dur": f.dur,
+                    "--delay": f.delay,
+                    "--dim": f.dim,
+                    "--soft": f.soft,
+                  } as React.CSSProperties
+                }
+              >
+                <Book3D
+                  book={f.book}
+                  lang={lang}
+                  size="sm"
+                  angle={f.angle}
+                  hoverAngle={f.angle}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="ctafloat__body">
+            <Zap className="mx-auto size-8 text-accent" aria-hidden="true" />
+            <h2
+              className={cn(
+                "mx-auto mt-6 max-w-2xl text-[clamp(1.8rem,4vw,3rem)] font-bold leading-tight tracking-tight text-ink",
+                lang === "bn" && "bn leading-[1.35]",
+              )}
+            >
+              {dict.home.ctaTitle}
+            </h2>
+            <p
+              className={cn(
+                "mx-auto mt-4 max-w-lg text-lg text-ink-mute",
+                textClass(lang),
+              )}
+            >
+              {dict.home.ctaLead}
+            </p>
+            <div className="mt-9 flex flex-wrap justify-center gap-3">
+              <Button asChild variant="primary" size="lg">
+                <Link href={href("/books")}>
+                  {dict.home.ctaButton}
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

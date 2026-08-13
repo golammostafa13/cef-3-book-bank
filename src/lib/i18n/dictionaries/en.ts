@@ -78,17 +78,15 @@ export const en = {
     statAuthors: "Authors",
     statDownloads: "Downloads",
     /**
-     * The two beats the hero scrubs through after the headline. Each is one
-     * line the reader passes rather than reads twice, so they stay short —
-     * anything longer than a breath is the wrong length for a scroll beat.
+     * The beat the hero scrubs through after the headline. One line the reader
+     * passes rather than reads twice, so it stays short — anything longer than
+     * a breath is the wrong length for a scroll beat. The beat after it is the
+     * recently-added list, which carries its own copy below.
      */
     scene: {
       openTitle: "Open any volume.",
       openLead:
         "It opens in the browser — no app, no account, nothing to install.",
-      shelfTitle: "The whole collection, open.",
-      shelfLead:
-        "Thousands of titles in Bengali and English, every one free to read and free to keep.",
       scrollHint: "Scroll",
     },
     props: [
@@ -112,6 +110,8 @@ export const en = {
     categoriesTitle: "Browse by category",
     categoriesLead: "Six shelves. Every spine is a book you can open right now.",
     recentTitle: "Recently added",
+    recentLead:
+      "The newest arrivals on the shelf — open the record, or take the file.",
     ctaTitle: "Start reading in the next ten seconds.",
     ctaLead: "No sign-up. No paywall. Just open a book.",
     ctaButton: "Browse the library",
@@ -265,6 +265,7 @@ export const en = {
     pageOf: "Page {page} of {total}",
     zoomIn: "Zoom in",
     zoomOut: "Zoom out",
+    fitWidth: "Fit to width",
     sepia: "Sepia",
     loading: "Opening the book…",
     failed: "This book could not be opened.",
@@ -301,6 +302,19 @@ export const en = {
     errorEmailInvalid: "That does not look like an email address.",
     errorNotAdmin: "This email address is not authorized to sign in.",
     errorUnavailable: "Not available.",
+    /**
+     * The panel beside the card. It is not instructions — a reader who got
+     * here already knows what a sign-in form is — so it says what the library
+     * is instead, which is the one thing the form cannot.
+     */
+    sideEyebrow: "The reading room",
+    sideLead:
+      "Signing in is for the librarians. Everything on these shelves is free to read without an account.",
+    sideAlt:
+      "A reader sitting on a stack of colourful books with an open book, a pencil leaning against the pile and a tree behind.",
+    badgeFree: "Always free",
+    badgeBilingual: "Bangla & English",
+    badgeBrowser: "Reads in the browser",
   },
 
   admin: {

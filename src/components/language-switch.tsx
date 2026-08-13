@@ -85,8 +85,8 @@ function Switch({
             className={cn(
               "min-w-9 rounded-full px-2.5 py-1 text-center text-xs font-semibold transition-colors",
               active
-                ? "bg-ink text-bg"
-                : "text-ink-mute hover:bg-ink/5 hover:text-ink",
+                ? "bg-accent text-accent-ink"
+                : "text-ink-mute hover:bg-accent-soft hover:text-accent",
             )}
           >
             <span aria-hidden="true">{localeNames[locale].short}</span>

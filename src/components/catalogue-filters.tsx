@@ -170,13 +170,18 @@ function FilterChip({
         "rounded-full px-4 py-1.5 text-sm transition-all",
         textClass(lang),
         active
-          ? "bg-ink text-bg shadow-e1"
-          : "border border-line bg-surface text-ink-mute hover:border-ink/30 hover:text-ink",
+          ? "bg-accent text-accent-ink shadow-glow"
+          : "border border-line bg-surface text-ink-mute hover:border-accent/40 hover:text-accent",
       )}
     >
       {label}
       {count !== undefined && (
-        <span className={cn("ml-1.5", active ? "text-bg/60" : "text-ink-faint")}>
+        <span
+          className={cn(
+            "ml-1.5",
+            active ? "text-accent-ink/65" : "text-ink-faint",
+          )}
+        >
           {count}
         </span>
       )}

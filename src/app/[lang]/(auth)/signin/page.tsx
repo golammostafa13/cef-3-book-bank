@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowRight } from "lucide-react";
-import { BookStack3D } from "@/components/book-stack-3d";
+import { ArrowRight, BookOpen, Languages, Sparkles } from "lucide-react";
 import { DevSignIn } from "@/components/auth/dev-sign-in";
 import { GoogleSignIn } from "@/components/auth/google-sign-in";
+import { ReadingScene } from "@/components/auth/reading-scene";
 import {
   adminEmails,
   googleClientId,
@@ -51,26 +51,65 @@ export default async function SignInPage(props: PageProps<"/[lang]/signin">) {
 
   return (
     <div className="mx-auto grid w-full max-w-6xl items-center gap-16 px-5 pb-20 lg:grid-cols-[1fr_24rem] lg:gap-20 lg:px-8">
-      {/* Left: the library itself, in the same objects the catalogue uses — so
-          the door looks like the building. No copy: the card says everything
-          that needs saying. */}
+      {/* Left: the library itself, drawn. The illustration is built from the
+          same featured volumes the catalogue is showing today — their titles
+          are on the spines — so the door is made of the building rather than
+          of stock art. Desktop only: on a phone the form is the page, and
+          nothing should stand between the reader and it. */}
       <div className="hidden lg:block">
         <p
           className={cn(
-            "text-[clamp(1.6rem,2.6vw,2.2rem)] font-bold tracking-[-0.02em] text-ink",
+            "inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-mute",
+            bn,
+          )}
+        >
+          <span
+            aria-hidden="true"
+            className="brand-mark inline-block size-2 rounded-full"
+          />
+          {dict.auth.sideEyebrow}
+        </p>
+
+        <p
+          className={cn(
+            "mt-3 text-[clamp(1.6rem,2.6vw,2.2rem)] font-bold tracking-[-0.02em] text-ink",
             lang === "bn" ? "bn leading-[1.35]" : "leading-[1.15]",
           )}
         >
           {lang === "bn" ? site.taglineBn : site.tagline}
         </p>
-        <div className="relative mt-8 h-80 max-w-md">
-          <BookStack3D
-            books={pile}
-            lang={lang}
-            yaw={-30}
-            className="absolute inset-0"
-          />
-        </div>
+
+        <p className={cn("mt-3 max-w-md text-[0.95rem] text-ink-mute", bn)}>
+          {dict.auth.sideLead}
+        </p>
+
+        <ReadingScene
+          books={pile}
+          lang={lang}
+          label={dict.auth.sideAlt}
+          className="mt-1 -ml-3 max-w-[30rem]"
+        />
+
+        {/* Three facts about the library, one line, under the drawing. They
+            answer the question the sign-in card provokes — "do I need this?" —
+            without another paragraph of prose. */}
+        <ul
+          className={cn(
+            "-mt-3 flex max-w-md flex-wrap items-center gap-x-5 gap-y-2 text-[0.82rem] font-medium text-ink-mute",
+            bn,
+          )}
+        >
+          {[
+            { key: "free", Icon: Sparkles, label: dict.auth.badgeFree },
+            { key: "bi", Icon: Languages, label: dict.auth.badgeBilingual },
+            { key: "browser", Icon: BookOpen, label: dict.auth.badgeBrowser },
+          ].map(({ key, Icon, label }) => (
+            <li key={key} className="inline-flex items-center gap-1.5">
+              <Icon className="size-4 text-accent" aria-hidden="true" />
+              {label}
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* Right: the one thing to do. */}

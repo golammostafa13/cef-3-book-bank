@@ -171,7 +171,7 @@ export default async function AdminBooksPage(
           </select>
         </div>
 
-        <Button type="submit" variant="ink" size="md">
+        <Button type="submit" variant="primary" size="md">
           {dict.admin.apply}
         </Button>
         {(query.q || query.category || query.status) && (

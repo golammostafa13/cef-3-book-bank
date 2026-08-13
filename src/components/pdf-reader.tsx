@@ -52,14 +52,27 @@ export function PdfReader({
   const dict = getDictionary(lang);
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
   const [page, setPage] = useState(1);
-  const [scale, setScale] = useState(1.35);
+  /**
+   * `null` means "as wide as the column allows" and is the state the reader
+   * opens in. A fixed default cannot be right for both a phone and a desktop:
+   * 1.35 is a comfortable A4 on a laptop and about 800px wide, which on a
+   * 360px screen meant well over half of every page was outside the frame with
+   * no way to reach it. Resolved to a number in `fitScale` below, and replaced
+   * by a real number the moment the reader zooms.
+   */
+  const [scale, setScale] = useState<number | null>(null);
+  const [fitScale, setFitScale] = useState(1);
   const [sepia, setSepia] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const renderTask = useRef<RenderTask | null>(null);
   const storageKey = `cef3:progress:${book.slug}`;
+
+  /** What the page is actually drawn at: the fit width until asked otherwise. */
+  const effectiveScale = scale ?? fitScale;
 
   // --- Load the document -------------------------------------------------
   useEffect(() => {
@@ -103,6 +116,46 @@ export function PdfReader({
     };
   }, [book.fileUrl, storageKey, dict.reader.failed]);
 
+  /* --- Fit to width -----------------------------------------------------
+     The scale at which the current page exactly fills the stage. Measured
+     from the page's own unscaled width and the stage's client width, so it
+     is right for a landscape plate in a portrait book as much as for a
+     phone in a rotation, and recomputed whenever either could have changed:
+     a new document, a new page, a resize, an orientation change. ---------- */
+  useEffect(() => {
+    if (!doc) return;
+    let cancelled = false;
+
+    const measure = async () => {
+      const stage = stageRef.current;
+      if (!stage) return;
+      const pdfPage = await doc.getPage(page);
+      if (cancelled) return;
+      // scale: 1 gives the page's intrinsic CSS width in points.
+      const natural = pdfPage.getViewport({ scale: 1 }).width;
+      // `clientWidth` includes the stage's own padding, and a page fitted to
+      // that is exactly the gutter too wide — enough to leave the stage
+      // scrolling sideways by 12px at rest.
+      const pad = getComputedStyle(stage);
+      const room =
+        stage.clientWidth -
+        parseFloat(pad.paddingLeft) -
+        parseFloat(pad.paddingRight);
+      if (natural <= 0 || room <= 0) return;
+      // Never blown up past a comfortable reading size on a wide screen: a
+      // 1600px-wide page of body text is a worse read than a 1.6x one.
+      setFitScale(Math.min(1.6, Math.max(0.2, room / natural)));
+    };
+
+    void measure();
+    const ro = new ResizeObserver(() => void measure());
+    if (stageRef.current) ro.observe(stageRef.current);
+    return () => {
+      cancelled = true;
+      ro.disconnect();
+    };
+  }, [doc, page]);
+
   // --- Render the current page ------------------------------------------
   const renderPage = useCallback(async () => {
     if (!doc || !canvasRef.current) return;
@@ -112,7 +165,7 @@ export function PdfReader({
     renderTask.current?.cancel();
 
     const pdfPage = await doc.getPage(page);
-    const viewport = pdfPage.getViewport({ scale });
+    const viewport = pdfPage.getViewport({ scale: effectiveScale });
     const canvas = canvasRef.current;
 
     // Render at device resolution, lay out at CSS resolution, so the page
@@ -136,7 +189,7 @@ export function PdfReader({
     } catch {
       /* superseded by a newer render — expected */
     }
-  }, [doc, page, scale]);
+  }, [doc, page, effectiveScale]);
 
   useEffect(() => {
     void renderPage();
@@ -166,48 +219,74 @@ export function PdfReader({
 
   return (
     <div className="flex min-h-dvh flex-col bg-bg-deep">
-      {/* Toolbar */}
-      <header className="sticky top-0 z-40 border-b border-line/60 bg-bg/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
-          <Link
-            href={localePath(lang, `/books/${book.slug}`)}
-            className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute hover:bg-ink/5 hover:text-ink"
-            aria-label={dict.reader.backToBook}
-          >
-            <ArrowLeft className="size-[18px]" />
-          </Link>
+      {/* Toolbar
 
-          <div className="min-w-0 flex-1">
-            <p className={cn("truncate font-semibold text-ink", textClass(lang))}>
-              {bookTitle(book, lang)}
-            </p>
-            <p className={cn("truncate text-xs text-ink-faint", textClass(lang))}>
-              {bookAuthorName(book, lang)}
-            </p>
+          Two rows below `sm`, one from there up. Eight controls, a zoom
+          readout and a two-line title do not fit across 360px — squeezed onto
+          one row the title collapsed to nothing and the buttons overlapped —
+          so on a phone the book's name gets the first row and the controls get
+          the second, where they are still full-size tap targets. */}
+      <header className="sticky top-0 z-40 border-b border-line/60 bg-bg/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl flex-col gap-1 px-3 py-2 sm:h-16 sm:flex-row sm:items-center sm:gap-3 sm:px-4 sm:py-0">
+          <div className="flex min-w-0 items-center gap-2 sm:flex-1 sm:gap-3">
+            <Link
+              href={localePath(lang, `/books/${book.slug}`)}
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-ink-mute hover:bg-accent-soft hover:text-accent"
+              aria-label={dict.reader.backToBook}
+            >
+              <ArrowLeft className="size-[18px]" />
+            </Link>
+
+            <div className="min-w-0 flex-1">
+              <p
+                className={cn(
+                  "truncate text-sm font-semibold text-ink sm:text-base",
+                  textClass(lang),
+                )}
+              >
+                {bookTitle(book, lang)}
+              </p>
+              <p
+                className={cn("truncate text-xs text-ink-faint", textClass(lang))}
+              >
+                {bookAuthorName(book, lang)}
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center justify-end gap-0.5 sm:gap-1">
             <ToolButton
-              onClick={() => setScale((s) => Math.max(0.6, s - 0.2))}
+              onClick={() => setScale(Math.max(0.25, effectiveScale - 0.2))}
               label={dict.reader.zoomOut}
             >
               <ZoomOut className="size-[18px]" />
             </ToolButton>
-            <span className="w-12 text-center text-xs tabular-nums text-ink-mute">
-              {formatNumberIn(Math.round(scale * 100), lang)}%
+            {/* The readout is a label, not a control, and it is the first
+                thing to go when the row is short of room. */}
+            <span className="hidden w-12 text-center text-xs tabular-nums text-ink-mute sm:inline">
+              {formatNumberIn(Math.round(effectiveScale * 100), lang)}%
             </span>
             <ToolButton
-              onClick={() => setScale((s) => Math.min(3, s + 0.2))}
+              onClick={() => setScale(Math.min(4, effectiveScale + 0.2))}
               label={dict.reader.zoomIn}
             >
               <ZoomIn className="size-[18px]" />
             </ToolButton>
-            <ToolButton onClick={() => setScale(1.35)} label={dict.reader.sepia}>
+            {/* Back to fitting the column — the state the reader opened in, and
+                the way out of a zoom that has left the page wider than the
+                screen. It was previously labelled "Sepia", which is the button
+                beside it. */}
+            <ToolButton
+              onClick={() => setScale(null)}
+              label={dict.reader.fitWidth}
+              pressed={scale === null}
+            >
               <Maximize2 className="size-[18px]" />
             </ToolButton>
             <ToolButton
               onClick={() => setSepia((v) => !v)}
               label={dict.reader.sepia}
+              pressed={sepia}
             >
               {sepia ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
             </ToolButton>
@@ -217,7 +296,7 @@ export function PdfReader({
               aria-label={fill(lang, dict.common.downloadFormat, {
                 format: book.format.toUpperCase(),
               })}
-              className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute hover:bg-ink/5 hover:text-ink"
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-ink-mute hover:bg-accent-soft hover:text-accent"
             >
               <Download className="size-[18px]" />
             </a>
@@ -235,8 +314,21 @@ export function PdfReader({
         />
       </header>
 
-      {/* Page */}
-      <div className="flex flex-1 items-start justify-center px-4 py-10">
+      {/* Page
+
+          The stage scrolls in both directions rather than clipping. A page
+          zoomed past the fit width is wider than the frame by design, and
+          `overflow-hidden` on the wrapper below meant the part outside was
+          simply gone — which on a phone, where the old fixed 1.35 scale was
+          already twice the screen's width, was most of every page.
+
+          `overscroll-contain` so panning a zoomed page does not drag the
+          document behind it, and `touch-pan-x touch-pan-y` so the pan is the
+          browser's own — a compositor scroll, not a JS drag handler. */}
+      <div
+        ref={stageRef}
+        className="flex flex-1 touch-pan-x touch-pan-y justify-center overflow-auto overscroll-contain px-3 py-5 sm:px-4 sm:py-10"
+      >
         {loading && (
           <div className="flex flex-col items-center gap-3 py-32 text-ink-mute">
             <Loader2 className="size-7 animate-spin" aria-hidden="true" />
@@ -262,7 +354,10 @@ export function PdfReader({
         {!loading && !error && (
           <div
             className={cn(
-              "overflow-hidden rounded-lg shadow-e4 transition-all",
+              // `h-fit` so the page keeps its own height inside a stretching
+              // flex row, and `m-auto` so a page narrower than the stage is
+              // still centred in it.
+              "m-auto h-fit shrink-0 overflow-hidden rounded-lg shadow-e4 transition-[filter]",
               sepia && "sepia-[0.35] saturate-[0.9]",
             )}
           >
@@ -271,20 +366,35 @@ export function PdfReader({
         )}
       </div>
 
-      {/* Pager */}
+      {/* Pager
+
+          The labels are the icons' alone below `sm`. Spelled out, "Previous
+          page" and "Next page" each wrapped to two lines inside their pill and
+          squeezed the page count between them; the buttons stay 40px round
+          targets either way, and their names are still on them as `aria-label`
+          for anyone who cannot see the arrow. */}
       <footer className="sticky bottom-0 border-t border-line/60 bg-bg/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-center gap-4 px-4">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-center gap-3 px-3 sm:gap-4 sm:px-4">
           <button
             type="button"
             onClick={() => go(-1)}
             disabled={page <= 1}
-            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line px-4 text-sm text-ink-mute transition-colors hover:border-ink/30 hover:text-ink disabled:opacity-40"
+            aria-label={dict.reader.previousPage}
+            className={cn(
+              "inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-line text-sm text-ink-mute transition-colors hover:border-ink/30 hover:text-ink disabled:opacity-40 sm:size-auto sm:h-10 sm:gap-1.5 sm:px-4",
+              textClass(lang),
+            )}
           >
-            <ChevronLeft className="size-4" aria-hidden="true" />
-            {dict.reader.previousPage}
+            <ChevronLeft className="size-4 shrink-0" aria-hidden="true" />
+            <span className="hidden sm:inline">{dict.reader.previousPage}</span>
           </button>
 
-          <p className={cn("text-sm tabular-nums text-ink-mute", textClass(lang))}>
+          <p
+            className={cn(
+              "text-center text-sm tabular-nums text-ink-mute",
+              textClass(lang),
+            )}
+          >
             {fill(lang, dict.reader.pageOf, { page, total })}
           </p>
 
@@ -292,10 +402,14 @@ export function PdfReader({
             type="button"
             onClick={() => go(1)}
             disabled={page >= total}
-            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line px-4 text-sm text-ink-mute transition-colors hover:border-ink/30 hover:text-ink disabled:opacity-40"
+            aria-label={dict.reader.nextPage}
+            className={cn(
+              "inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-line text-sm text-ink-mute transition-colors hover:border-ink/30 hover:text-ink disabled:opacity-40 sm:size-auto sm:h-10 sm:gap-1.5 sm:px-4",
+              textClass(lang),
+            )}
           >
-            {dict.reader.nextPage}
-            <ChevronRight className="size-4" aria-hidden="true" />
+            <span className="hidden sm:inline">{dict.reader.nextPage}</span>
+            <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
           </button>
         </div>
       </footer>
@@ -307,18 +421,25 @@ function ToolButton({
   onClick,
   label,
   children,
+  pressed,
 }: {
   onClick: () => void;
   label: string;
   children: React.ReactNode;
+  /** For the two toggles, so their state is visible and announced. */
+  pressed?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
+      aria-pressed={pressed}
       title={label}
-      className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-ink/5 hover:text-ink"
+      className={cn(
+        "inline-flex size-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-accent-soft hover:text-accent",
+        pressed ? "bg-accent-soft text-accent" : "text-ink-mute",
+      )}
     >
       {children}
     </button>

@@ -269,7 +269,7 @@ export default async function BookDetailPage(
               {book.featured && (
                 <span
                   className={cn(
-                    "rounded-full bg-ink px-3 py-1 text-sm text-bg",
+                    "rounded-full bg-accent px-3 py-1 text-sm text-accent-ink",
                     textClass(lang),
                   )}
                 >

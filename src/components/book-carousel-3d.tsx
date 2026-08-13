@@ -42,9 +42,12 @@ import type { Book } from "@/types";
  * nothing but slivers at the edges, and each one is a full cover to lay out.
  */
 const WINGS = 2;
-/** Rings that get a name plate. Past this the plate is unreadable clutter. */
-const PLATED = 1;
-const INTERVAL_MS = 4200;
+/**
+ * How long a book holds the front. Short enough that the ring reads as alive,
+ * long enough to take in a cover and its name — and the active dot spends
+ * exactly this long filling, so the reader can see the change coming.
+ */
+const INTERVAL_MS = 3600;
 /** Pointer travel that counts as a swipe rather than a tap, in px. */
 const SWIPE_PX = 44;
 
@@ -132,15 +135,23 @@ export function BookCarousel3D({
    * Where a cover sits, given its distance from the middle. The first step out
    * is the big one: it has to clear a cover that is both full-size and
    * unturned, so anything evenly spaced leaves it hiding behind the front.
+   *
+   * The second ring steps further than the first *and* turns harder. Turning
+   * harder is what earns the room: a cover at 66° is barely a third of its own
+   * width on screen, so ring two lands shoulder-to-shoulder with ring one
+   * instead of peering out from behind it as a sliver.
    */
   const placeOf = (o: number) => {
     const a = Math.abs(o);
     const dir = Math.sign(o);
     return {
-      "--x": o === 0 ? 0 : dir * (92 + (a - 1) * 46),
-      "--ry": -dir * (44 + (a - 1) * 18),
+      "--x": o === 0 ? 0 : dir * (78 + (a - 1) * 58),
+      "--ry": -dir * (52 + (a - 1) * 14),
       "--a": a,
-      "--s": a === 0 ? 1 : Math.max(0.74, 0.9 - (a - 1) * 0.09),
+      // The front cover stands up out of the row; the turned ones settle back
+      // into it, further each ring out.
+      "--y": a === 0 ? -8 : 4 + (a - 1) * 9,
+      "--s": a === 0 ? 1 : Math.max(0.7, 0.86 - (a - 1) * 0.16),
       // Full opacity for every cover on stage. A partly transparent cover
       // reads as half-loaded rather than further back — and, more concretely,
       // any opacity below 1 flattens `preserve-3d`, which would collapse the
@@ -172,15 +183,21 @@ export function BookCarousel3D({
         onBlur={() => setEngaged(false)}
       >
         <div className="coverflow__stage">
+          <div className="coverflow__spot" aria-hidden="true" />
+
           {books.map((book, i) => {
             const o = offsetOf(i);
             const a = Math.abs(o);
             const isActive = o === 0;
-            const title = bookTitle(book, lang);
             const detail = localePath(lang, `/books/${book.slug}`);
 
             const cover = (
-              <div className="coverflow__board aspect-2/3 w-full">
+              <div
+                className={cn(
+                  "coverflow__board aspect-2/3 w-full",
+                  isActive && "coverflow__board--front",
+                )}
+              >
                 <CoverArt book={book} lang={lang} size="lg" />
                 <span className="coverflow__shade" aria-hidden="true" />
                 <span className="coverflow__gloss" aria-hidden="true" />
@@ -218,7 +235,7 @@ export function BookCarousel3D({
                 {isActive ? (
                   <Link
                     href={detail}
-                    className="block rounded-[1.15rem]"
+                    className="coverflow__link block rounded-[1.15rem]"
                     onClick={(e) => {
                       if (dragged.current) e.preventDefault();
                     }}
@@ -230,45 +247,17 @@ export function BookCarousel3D({
                     >
                       {cover}
                     </ViewTransition>
+                    {/* Appears under the pointer, on the object it acts on. */}
+                    <span className="coverflow__open" aria-hidden="true">
+                      <span className={textClass(lang)}>
+                        {dict.common.readOnline}
+                      </span>
+                    </span>
                   </Link>
                 ) : (
                   cover
                 )}
                 {edge}
-
-                {/* The plate. On the middle cover it is the accent block that
-                    names the featured book; on its neighbours it stays quiet so
-                    it reads as depth rather than five competing labels. */}
-                {a <= PLATED && (
-                  <div
-                    className={cn(
-                      // Sits mostly below the board, so it reads as a plaque in
-                      // front of the book rather than a sticker over the
-                      // author line the cover already prints.
-                      "absolute inset-x-3 bottom-0 translate-y-[62%] rounded-2xl px-3 py-2.5 text-center",
-                      isActive
-                        ? "bg-accent text-accent-ink shadow-e3"
-                        : "bg-ink/60 text-bg shadow-e2",
-                    )}
-                  >
-                    <p
-                      className={cn(
-                        "line-clamp-2 text-[0.9rem] font-semibold leading-tight",
-                        textClass(lang),
-                      )}
-                    >
-                      {title}
-                    </p>
-                    <p
-                      className={cn(
-                        "mt-0.5 line-clamp-1 text-[0.7rem] opacity-80",
-                        textClass(lang),
-                      )}
-                    >
-                      {bookAuthorName(book, lang)}
-                    </p>
-                  </div>
-                )}
               </div>
             );
           })}
@@ -284,7 +273,7 @@ export function BookCarousel3D({
                 key={`pick-${book.id}`}
                 type="button"
                 onClick={() => setActive(i)}
-                className="coverflow__panel cursor-pointer rounded-[1.15rem]"
+                className="coverflow__panel coverflow__pick cursor-pointer rounded-[1.15rem]"
                 style={placeOf(o)}
               >
                 {/* Matches the cover it sits on, so the hit area is the cover. */}
@@ -302,28 +291,68 @@ export function BookCarousel3D({
         <div className="coverflow__floor" aria-hidden="true" />
       </div>
 
+      {/* --- The featured book, named ----------------------------------- */}
+      {activeBook && (
+        <div
+          // Remounted per book, which is what replays the entry animation —
+          // the name arriving with the cover rather than swapping under it.
+          key={activeBook.id}
+          // The floor is set so a two-line title cannot shove the controls
+          // down as the ring turns.
+          className="coverflow__caption mx-auto mt-7 flex min-h-17 max-w-lg flex-col items-center justify-start px-5 text-center"
+        >
+          <Link
+            href={localePath(lang, `/books/${activeBook.slug}`)}
+            className={cn(
+              "text-[clamp(1.05rem,2vw,1.35rem)] font-semibold leading-tight tracking-tight text-ink transition-colors hover:text-accent",
+              textClass(lang),
+            )}
+          >
+            {bookTitle(activeBook, lang)}
+          </Link>
+          <p
+            className={cn(
+              "mt-1.5 text-[0.85rem] text-ink-mute",
+              textClass(lang),
+            )}
+          >
+            {bookAuthorName(activeBook, lang)}
+          </p>
+        </div>
+      )}
+
       {/* --- Controls -------------------------------------------------- */}
-      <div className="mt-9 flex items-center justify-center gap-3">
+      <div className="mt-5 flex items-center justify-center gap-3">
         <RingButton
           label={dict.carousel.previous}
           onClick={() => step(-1)}
           icon={<ChevronLeft className="size-4" aria-hidden="true" />}
         />
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {books.map((book, i) => (
             <button
               key={`dot-${book.id}`}
               type="button"
               onClick={() => setActive(i)}
               aria-current={i === active}
-              className={cn(
-                "h-1.5 rounded-full transition-all",
-                i === active
-                  ? "w-6 bg-accent"
-                  : "w-1.5 bg-line hover:bg-ink-faint",
-              )}
+              data-current={i === active}
+              className="coverflow__dot"
             >
+              {/* The clock. Keyed by the active index so each turn restarts
+                  it, and only timed while the ring is actually turning: a bar
+                  draining on a paused carousel is a lie. */}
+              {i === active && (
+                <span
+                  key={`clock-${active}-${String(rotating)}`}
+                  aria-hidden="true"
+                  className={cn(
+                    "coverflow__dot-fill",
+                    rotating && "coverflow__dot-fill--timed",
+                  )}
+                  style={{ animationDuration: `${INTERVAL_MS}ms` }}
+                />
+              )}
               <span className="sr-only">
                 {fill(lang, dict.carousel.show, {
                   title: bookTitle(book, lang),
@@ -357,6 +386,17 @@ export function BookCarousel3D({
         )}
       </div>
 
+      {/* Steering a ring of covers is not obvious from looking at it. Said
+          once, quietly, under the controls that prove it. */}
+      <p
+        className={cn(
+          "mt-4 text-center text-[0.72rem] text-ink-faint",
+          textClass(lang),
+        )}
+      >
+        {dict.carousel.hint}
+      </p>
+
       {/* Announced, not shown: sighted readers can see which cover is in front,
           screen-reader users are told when it changes. */}
       <p className="sr-only" aria-live="polite">
@@ -385,7 +425,7 @@ function RingButton({
       aria-label={label}
       title={label}
       className={cn(
-        "inline-flex size-9 items-center justify-center rounded-full border border-line bg-surface text-ink-mute shadow-e1 transition-all hover:-translate-y-px hover:border-accent/50 hover:text-accent hover:shadow-e2",
+        "inline-flex size-10 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink-mute shadow-e1 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:bg-accent-soft hover:text-accent hover:shadow-e2 active:translate-y-0",
         className,
       )}
     >

@@ -10,6 +10,7 @@ import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n";
+import { textClass } from "@/lib/i18n/content";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,10 @@ export function SiteHeader({
 
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
+      {/* Tighter gutter and gap below `sm`. The bar has to hold the wordmark
+          and up to four controls in 360px, and the 20px gutter plus a 16px gap
+          was 36px of the 40 it was short by. */}
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-5 lg:px-8">
         <Link
           href={href("/")}
           className="shrink-0"
@@ -69,15 +73,19 @@ export function SiteHeader({
         </nav>
 
         <div className="flex items-center gap-1.5">
+          {/* Out of the bar below `sm`, into the menu panel below. The switch
+              is 86px of a 360px header, and losing it is what buys the menu
+              button — which was rendering off-screen entirely — its place. It
+              is one tap away there, at a size worth tapping. */}
           <LanguageSwitch
             lang={lang}
             label={dict.common.switchLanguage}
-            className="mr-1"
+            className="mr-1 hidden sm:inline-flex"
           />
           <Link
             href={href("/search")}
             aria-label={dict.common.searchTheCatalogue}
-            className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-ink/5 hover:text-ink"
+            className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent"
           >
             <Search className="size-[18px]" />
           </Link>
@@ -85,14 +93,14 @@ export function SiteHeader({
             href={href("/signin")}
             aria-label={dict.common.signIn}
             title={dict.common.signIn}
-            className="hidden size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-ink/5 hover:text-ink sm:inline-flex"
+            className="hidden size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent sm:inline-flex"
           >
             <LogIn className="size-[18px]" />
           </Link>
           <ThemeToggle />
           <Button
             asChild
-            variant="ink"
+            variant="primary"
             size="sm"
             className="hidden lg:inline-flex"
           >
@@ -133,6 +141,15 @@ export function SiteHeader({
             <LogIn className="size-4" aria-hidden="true" />
             {dict.common.signIn}
           </Link>
+
+          {/* The language switch, for the phone widths where it is not in the
+              bar. Hidden from `sm` up so it is never in both places at once. */}
+          <div className="mt-3 flex items-center gap-3 border-t border-line/60 px-3 pt-4 sm:hidden">
+            <span className={cn("text-sm text-ink-faint", textClass(lang))}>
+              {dict.common.switchLanguage}
+            </span>
+            <LanguageSwitch lang={lang} label={dict.common.switchLanguage} />
+          </div>
         </nav>
       )}
     </header>

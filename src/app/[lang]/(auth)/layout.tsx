@@ -20,27 +20,34 @@ export default async function AuthLayout(props: LayoutProps<"/[lang]">) {
 
   return (
     <div className="paper-grain relative flex min-h-dvh flex-col">
-      <header className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-6 lg:px-8">
+      <header className="mx-auto flex w-full max-w-7xl items-center justify-between gap-2 px-4 py-6 sm:gap-4 sm:px-5 lg:px-8">
         <Link
           href={localePath(lang)}
+          className="min-w-0 shrink"
           aria-label={`${site.name} — ${dict.common.home}`}
         >
           <Brand />
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <LanguageSwitch lang={lang} label={dict.common.switchLanguage} />
           {/* "Browse", not "back": this is the first page of the site, so a
-              visitor here has nothing to go back to. */}
+              visitor here has nothing to go back to.
+
+              The label is the icon's alone below `sm`: spelled out it wrapped
+              to four lines in the corner of a 360px header and still pushed the
+              row past the viewport. The sign-in card below repeats the same
+              link in full, so nothing is lost on a phone. */}
           <Link
             href={localePath(lang)}
+            aria-label={dict.auth.freeBrowse}
             className={cn(
-              "inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink",
+              "inline-flex size-10 shrink-0 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-accent-soft hover:text-ink sm:size-auto sm:gap-2 sm:rounded-none sm:text-sm sm:hover:bg-transparent",
               textClass(lang),
             )}
           >
-            <BookOpen className="size-4" aria-hidden="true" />
-            {dict.auth.freeBrowse}
+            <BookOpen className="size-4 shrink-0" aria-hidden="true" />
+            <span className="hidden sm:inline">{dict.auth.freeBrowse}</span>
           </Link>
         </div>
       </header>

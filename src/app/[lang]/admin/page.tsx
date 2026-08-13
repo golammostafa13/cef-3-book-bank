@@ -342,7 +342,7 @@ export default async function AdminDashboardPage(
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-line/70">
                 <div
-                  className="h-full rounded-full bg-ink/70"
+                  className="h-full rounded-full bg-accent"
                   style={{
                     width: `${(cat.bookCount / biggestShelf) * 100}%`,
                   }}

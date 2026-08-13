@@ -127,4 +127,4 @@ export function BookRowActions({
 
 /** Shared 36px hit target for every row control. */
 const iconButton =
-  "inline-flex size-9 items-center justify-center rounded-lg text-ink-mute transition-colors hover:bg-ink/5 hover:text-ink disabled:opacity-50";
+  "inline-flex size-9 items-center justify-center rounded-lg text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent disabled:opacity-50";

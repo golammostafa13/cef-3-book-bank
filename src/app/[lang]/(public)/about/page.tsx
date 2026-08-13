@@ -131,7 +131,7 @@ export default async function AboutPage(props: PageProps<"/[lang]/about">) {
       </dl>
 
       <div className="reveal-3d mt-14">
-        <Button asChild size="lg" variant="ink">
+        <Button asChild size="lg" variant="primary">
           <Link href={localePath(lang, "/books")}>
             {dict.common.startBrowsing}
             <ArrowRight className="size-4" aria-hidden="true" />

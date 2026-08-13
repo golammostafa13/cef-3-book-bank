@@ -11,9 +11,21 @@ import { cn } from "@/lib/utils";
  * light/dark swap.
  */
 
+/**
+ * `md` — the header lockup — sets its name fluidly rather than at a fixed size.
+ * The wordmark is `whitespace-nowrap` and sits in a bar that also has to hold
+ * the language switch and three round controls; at a flat 1.2rem it is 177px
+ * wide, which on a 360px phone pushed the menu button clean off the screen.
+ * The clamp gives back ~27px there and is already at full size by ~440px, so
+ * every viewport that has the room is unchanged.
+ */
 const sizes = {
   sm: { tile: "size-8 rounded-[9px]", text: "text-[1.05rem]", bar: "h-3.5" },
-  md: { tile: "size-9 rounded-[10px]", text: "text-[1.2rem]", bar: "h-4" },
+  md: {
+    tile: "size-9 rounded-[10px]",
+    text: "text-[clamp(1rem,4.4vw,1.2rem)]",
+    bar: "h-4",
+  },
   lg: { tile: "size-11 rounded-xl", text: "text-[1.5rem]", bar: "h-5" },
 } as const;
 

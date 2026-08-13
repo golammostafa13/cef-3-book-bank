@@ -47,7 +47,7 @@ export default async function NotFound() {
       </p>
 
       <div className="mt-9 flex flex-wrap justify-center gap-3">
-        <Button asChild variant="ink" size="lg">
+        <Button asChild variant="primary" size="lg">
           <Link href={localePath(lang)}>
             <ArrowLeft className="size-4" aria-hidden="true" />
             {dict.notFound.back}

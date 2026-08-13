@@ -4,11 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  HeroRecent,
+  type HeroListBook,
+  type HeroRecentCopy,
+} from "@/components/hero-recent";
 import { defaultLocale, type Locale } from "@/lib/i18n/config";
 import { textClass } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
+// Type-only. The module itself is imported inside the effect below — see the
+// note there; a value import here would put three.js in the initial bundle.
 import type { HeroScene, SceneBook } from "@/lib/hero-scene";
-import { createHeroScene } from "@/lib/hero-scene";
 
 /**
  * The scrolling hero.
@@ -51,21 +57,26 @@ export interface Hero3DCopy {
   statDownloads: string;
   openTitle: string;
   openLead: string;
-  shelfTitle: string;
-  shelfLead: string;
   scrollHint: string;
 }
 
 interface Hero3DProps {
   /** The volume that opens, followed by the collection that arrives. */
   books: HeroBook[];
+  /**
+   * The same arrivals again, as records — the list the last beat resolves to.
+   * Same books in the same order as `books`, so the block reads out the shelf
+   * the reader just watched assemble rather than a different set of titles.
+   */
+  recent: HeroListBook[];
   lang: Locale;
   copy: Hero3DCopy;
+  recentCopy: HeroRecentCopy;
   /** Already formatted in the reader's numerals by the server. */
   stats: { books: string; authors: string; downloads: string };
   /** The wordmark, in the reader's language. */
   brand: string;
-  hrefs: { books: string; categories: string };
+  hrefs: { books: string; categories: string; recent: string };
   /** The static composition shown instead of the canvas when motion is off. */
   fallback: React.ReactNode;
 }
@@ -80,8 +91,10 @@ function window_(p: number, a: number, b: number, c: number, d: number) {
 
 export function Hero3D({
   books,
+  recent,
   lang = defaultLocale,
   copy,
+  recentCopy,
   stats,
   brand,
   hrefs,
@@ -146,11 +159,37 @@ export function Hero3D({
     measure();
     update();
 
+    /* --- Bringing up the scene -----------------------------------------
+       Nothing above this point needed three.js, and the page should not
+       have waited for it: it is by far the largest thing this route can
+       load, and until it has parsed, the browser is not hydrating the
+       header, the nav or anything else either. Imported here instead, it
+       is off the initial bundle entirely — the hero is interactive as
+       soon as the document is, and the scene fades in whenever it lands.
+
+       This is also why the book stack is hidden while we wait rather than
+       shown: it is the *substitute* hero, and flashing it up for a second
+       before replacing it is worse than the small gap.
+       ------------------------------------------------------------------ */
+    let ready = false;
+
+    // If the scene never arrives — a blocked chunk, a driver that hangs
+    // rather than throws — the hero must not stay empty. Falling back to
+    // the static composition is the recovery; an indefinite gap is not.
+    const giveUp = window.setTimeout(() => {
+      if (!cancelled && !ready) track!.dataset.static = "true";
+    }, 8000);
+
     (async () => {
       try {
-        // Cover art is typeset, so the textures have to be drawn with the real
-        // faces loaded — otherwise every board bakes in the fallback font.
-        if (document.fonts) await document.fonts.ready;
+        const [{ createHeroScene }] = await Promise.all([
+          import("@/lib/hero-scene"),
+          // Cover art is typeset, so the textures have to be drawn with the
+          // real faces loaded — otherwise every board bakes in the fallback
+          // font. Fetched alongside the module rather than before it, since
+          // neither waits on the other.
+          document.fonts?.ready,
+        ]);
         if (cancelled) return;
 
         scene = createHeroScene({
@@ -159,13 +198,21 @@ export function Hero3D({
           hero: books[0],
           field: books.slice(1),
           lang,
-          onReady: () => !cancelled && setLive(true),
+          onReady: () => {
+            if (cancelled) return;
+            ready = true;
+            window.clearTimeout(giveUp);
+            // Cleared in case the timeout above fired first and put the
+            // static hero up while the scene was still coming.
+            delete track!.dataset.static;
+            setLive(true);
+          },
         });
         sceneRef.current = scene;
         update();
       } catch {
         // No WebGL, a lost context, or a blocked chunk. The static hero is
-        // already on screen; leaving `live` false is the whole recovery.
+        // what the reader keeps; leaving `live` false is the whole recovery.
         if (!cancelled) track!.dataset.static = "true";
       }
     })();
@@ -183,6 +230,7 @@ export function Hero3D({
 
     return () => {
       cancelled = true;
+      window.clearTimeout(giveUp);
       if (frame) cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
@@ -202,7 +250,10 @@ export function Hero3D({
           className="pointer-events-none absolute -right-40 -top-40 size-[38rem] rounded-full opacity-25 blur-3xl"
           style={{
             background:
-              "radial-gradient(circle, var(--accent) 0%, transparent 65%)",
+              // `--accent-lit`, not `--accent`: a blurred blob of a colour dark
+              // enough for white button text reads as a smudge of shadow on the
+              // warm ground rather than as light coming through a window.
+              "radial-gradient(circle, var(--accent-lit) 0%, transparent 65%)",
           }}
         />
 
@@ -214,12 +265,19 @@ export function Hero3D({
           <div className="hero3d__copy">
             {/* --- Beat 0: the hero proper ------------------------------- */}
             <div className="hero3d__beat hero3d__beat--lead" data-b="0">
+              {/* Every step below is smaller on a phone than it was. The
+                  panel is one screen tall whatever the screen, and this block
+                  used to want more than all 780px of a phone's — which left
+                  the volume underneath it nowhere to stand and put it back
+                  behind the type the stacked layout exists to keep it out of.
+                  The clamp minimums are the mobile sizes; nothing changes from
+                  the width at which the old minimum was already in force. */}
               <h1
                 className={cn(
                   "font-bold text-ink",
                   bn
-                    ? "bn text-[clamp(1.85rem,3.9vw,3.1rem)] leading-[1.3]"
-                    : "text-[clamp(2.3rem,5.4vw,4.3rem)] leading-[1.03] tracking-[-0.03em]",
+                    ? "bn text-[clamp(1.55rem,3.9vw,3.1rem)] leading-[1.3]"
+                    : "text-[clamp(1.85rem,5.4vw,4.3rem)] leading-[1.06] tracking-[-0.03em]",
                 )}
               >
                 {copy.titleStart}{" "}
@@ -237,15 +295,15 @@ export function Hero3D({
 
               <p
                 className={cn(
-                  "mt-6 max-w-lg text-lg leading-relaxed text-ink-mute",
+                  "mt-4 max-w-lg text-[0.95rem] leading-relaxed text-ink-mute sm:mt-6 sm:text-lg",
                   textClass(lang),
                 )}
               >
                 {copy.lead}
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button asChild variant="ink" size="lg">
+              <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-8">
+                <Button asChild variant="primary" size="lg">
                   <Link href={hrefs.books}>
                     {copy.getStarted}
                     <ArrowRight className="size-4" aria-hidden="true" />
@@ -256,17 +314,22 @@ export function Hero3D({
                 </Button>
               </div>
 
-              <dl className="mt-10 grid max-w-md grid-cols-3 gap-6">
+              <dl className="mt-6 grid max-w-md grid-cols-3 gap-4 sm:mt-10 sm:gap-6">
                 {[
                   { label: copy.statBooks, value: stats.books },
                   { label: copy.statAuthors, value: stats.authors },
                   { label: copy.statDownloads, value: stats.downloads },
                 ].map((stat) => (
                   <div key={stat.label}>
-                    <dt className={cn("text-sm text-ink-faint", textClass(lang))}>
+                    <dt
+                      className={cn(
+                        "text-[0.8rem] text-ink-faint sm:text-sm",
+                        textClass(lang),
+                      )}
+                    >
                       {stat.label}
                     </dt>
-                    <dd className="mt-1 text-3xl font-bold tracking-tight text-ink">
+                    <dd className="mt-1 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
                       {stat.value}
                     </dd>
                   </div>
@@ -294,42 +357,42 @@ export function Hero3D({
               </p>
             </div>
 
-            {/* --- Beat 2: the shelf, and a way out of the hero ---------- */}
-            <div className="hero3d__beat hero3d__beat--centre" data-b="2">
-              <h2
-                className={cn(
-                  "text-[clamp(1.9rem,4.4vw,3.4rem)] font-bold tracking-tight text-ink",
-                  bn && "bn leading-[1.35] tracking-normal",
-                )}
-              >
-                {copy.shelfTitle}
-              </h2>
-              <p
-                className={cn(
-                  "mx-auto mt-4 max-w-lg text-lg text-ink-mute",
-                  textClass(lang),
-                )}
-              >
-                {copy.shelfLead}
-              </p>
-              <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <Button asChild variant="ink" size="lg">
-                  <Link href={hrefs.books}>
-                    {copy.getStarted}
-                    <ArrowRight className="size-4" aria-hidden="true" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href={hrefs.categories}>{copy.browseCategories}</Link>
-                </Button>
-              </div>
-            </div>
           </div>
 
           {/* The hero the page has before three.js arrives, and the hero it
               keeps for a reader who has asked for less motion. */}
           <div className="hero3d__fallback" aria-hidden="true">
             {fallback}
+          </div>
+        </div>
+
+        {/* --- Beat 2: the shelf, read out as records --------------------
+            Outside `hero3d__copy` rather than a third beat inside it, and
+            that placement is the whole reason this works in every mode. The
+            beats share one grid cell with the static composition, which is
+            fine for a headline and a button but not for a list this tall;
+            here the panel owns the pinned screen while the copy grid is
+            empty, and when the pin is not pinned at all — reduced motion, or
+            no WebGL — it simply flows as an ordinary block under the hero.
+            So the newest arrivals are on the page for every reader, not only
+            for the ones who get the scene. */}
+        <div className="hero3d__recent" data-b="2">
+          <HeroRecent
+            books={recent}
+            lang={lang}
+            copy={recentCopy}
+            href={hrefs.recent}
+          />
+          <div className="hero3d__recent-cta">
+            <Button asChild variant="primary" size="lg">
+              <Link href={hrefs.books}>
+                {copy.getStarted}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href={hrefs.categories}>{copy.browseCategories}</Link>
+            </Button>
           </div>
         </div>
 

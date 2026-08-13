@@ -105,7 +105,7 @@ export function AdminShell({
                   "inline-flex size-11 items-center justify-center rounded-xl transition-colors",
                   active
                     ? "bg-accent text-accent-ink shadow-e2"
-                    : "text-ink-mute hover:bg-ink/5 hover:text-ink",
+                    : "text-ink-mute hover:bg-accent-soft hover:text-accent",
                 )}
               >
                 <Icon className="size-[19px]" />
@@ -119,7 +119,7 @@ export function AdminShell({
             type="button"
             title={dict.admin.settings}
             aria-label={dict.admin.settings}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-ink-mute transition-colors hover:bg-ink/5 hover:text-ink"
+            className="inline-flex size-11 items-center justify-center rounded-xl text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent"
           >
             <Settings className="size-[19px]" />
           </button>
@@ -127,14 +127,14 @@ export function AdminShell({
             href={href("/books")}
             title={dict.admin.publicCatalogue}
             aria-label={dict.admin.publicCatalogue}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-ink-mute transition-colors hover:bg-ink/5 hover:text-ink"
+            className="inline-flex size-11 items-center justify-center rounded-xl text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent"
           >
             <Library className="size-[19px]" />
           </Link>
           <SignOutButton
             label=""
             icon
-            className="inline-flex size-11 items-center justify-center rounded-xl text-ink-mute hover:bg-ink/5 hover:text-ink"
+            className="inline-flex size-11 items-center justify-center rounded-xl text-ink-mute hover:bg-accent-soft hover:text-accent"
           />
         </div>
       </aside>
@@ -154,14 +154,14 @@ export function AdminShell({
             <button
               type="button"
               aria-label={dict.common.search}
-              className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute hover:bg-ink/5 hover:text-ink"
+              className="inline-flex size-10 items-center justify-center rounded-full text-ink-mute hover:bg-accent-soft hover:text-accent"
             >
               <Search className="size-[18px]" />
             </button>
             <button
               type="button"
               aria-label={dict.admin.notifications}
-              className="relative inline-flex size-10 items-center justify-center rounded-full text-ink-mute hover:bg-ink/5 hover:text-ink"
+              className="relative inline-flex size-10 items-center justify-center rounded-full text-ink-mute hover:bg-accent-soft hover:text-accent"
             >
               <Bell className="size-[18px]" />
               <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-accent ring-2 ring-surface" />

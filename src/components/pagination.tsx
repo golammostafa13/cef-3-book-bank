@@ -67,7 +67,7 @@ export function Pagination({
               "inline-flex size-10 items-center justify-center rounded-full text-sm transition-colors",
               p === page
                 ? "bg-accent font-semibold text-accent-ink shadow-e1"
-                : "text-ink-mute hover:bg-ink/5 hover:text-ink",
+                : "text-ink-mute hover:bg-accent-soft hover:text-accent",
             )}
           >
             {p}

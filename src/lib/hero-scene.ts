@@ -87,6 +87,10 @@ const noise = (i: number, salt: number) => {
 interface ThemeTokens {
   bg: THREE.Color;
   accent: THREE.Color;
+  /** `--accent-lit`: the brand green lifted to something that can act as a
+   *  light. `--accent` itself is dark enough to carry white button text, which
+   *  makes it far too dark to emit. */
+  accentLit: THREE.Color;
   dark: boolean;
 }
 
@@ -96,7 +100,8 @@ function readTheme(): ThemeTokens {
     new THREE.Color(root.getPropertyValue(name).trim() || fallback);
   return {
     bg: pick("--bg", "#e9e5e1"),
-    accent: pick("--accent", "#ff6b2c"),
+    accent: pick("--accent", "#047857"),
+    accentLit: pick("--accent-lit", "#34d399"),
     dark: document.documentElement.classList.contains("dark"),
   };
 }
@@ -142,7 +147,12 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // VSM rather than PCFSoft, for one reason: `shadow.radius` below is a no-op
+  // under PCFSoftShadowMap — its kernel is fixed in the shader — so the only
+  // shadow that type can throw off a hard-edged box is a hard-edged slab.
+  // VSM blurs the depth map itself, which is what makes the contact shadow
+  // read as one.
+  renderer.shadowMap.type = THREE.VSMShadowMap;
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
 
   const scene = new THREE.Scene();
@@ -160,20 +170,28 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   scene.add(ambient);
 
   const key = new THREE.DirectionalLight(0xfff4e8, 2.6);
-  key.position.set(4.2, 6.4, 6.2);
+  // Steep rather than raking. A low key throws the volume's shadow a long
+  // way across the ground plane, and a long shadow off a hard-edged box is
+  // a grey slab lying next to the book rather than a contact shadow under
+  // it. Lifting the light shortens the throw to something the volume looks
+  // like it is standing on.
+  key.position.set(2.4, 11, 4);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
   key.shadow.camera.near = 1;
-  key.shadow.camera.far = 22;
-  key.shadow.camera.left = -5;
-  key.shadow.camera.right = 5;
-  key.shadow.camera.top = 5;
-  key.shadow.camera.bottom = -5;
+  key.shadow.camera.far = 28;
+  // The frustum has to reach the volume in its new, further-right position.
+  key.shadow.camera.left = -7;
+  key.shadow.camera.right = 7;
+  key.shadow.camera.top = 7;
+  key.shadow.camera.bottom = -7;
   key.shadow.bias = -0.0016;
-  key.shadow.radius = 3;
+  // The edge is meant to be a gradient, not a cut line.
+  key.shadow.radius = 7;
+  key.shadow.blurSamples = 16;
   scene.add(key);
 
-  const rim = new THREE.PointLight(theme.accent, 26, 18, 2);
+  const rim = new THREE.PointLight(theme.accentLit, 26, 18, 2);
   rim.position.set(-4.4, 1.6, 3.2);
   scene.add(rim);
 
@@ -331,16 +349,32 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   /* --- Contact shadow ----------------------------------------------- *
    * A shadow-only plane. It catches the key light and nothing else, so
    * the volume sits on something without a floor ever being drawn.
+   *
+   * `depthWrite: false` is not an optimisation — it is the difference
+   * between a shadow and an invisible wall. The plane is 30 units across
+   * and sits just under the volume, so by the time the collection has
+   * squared up into its shelf the bottom row is *behind* it. Writing
+   * depth, it would quietly clip those covers off at the waterline while
+   * drawing nothing itself: the shadow has already faded to nothing by
+   * then, so there would be no shadow on screen to explain the missing
+   * halves. A shadow catcher darkens what is in front of it and occludes
+   * nothing.
    * ---------------------------------------------------------------- */
   const shadowMaterial = track(
-    new THREE.ShadowMaterial({ opacity: theme.dark ? 0.38 : 0.24 }),
+    new THREE.ShadowMaterial({
+      opacity: theme.dark ? 0.3 : 0.18,
+      depthWrite: false,
+    }),
   );
   const ground = new THREE.Mesh(
     track(new THREE.PlaneGeometry(30, 30)),
     shadowMaterial,
   );
   ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -BOOK_H / 2 - 0.55;
+  // Tucked close under the volume. Dropped further away the shadow detaches
+  // and reads as a separate object lying on a floor, which is the one thing
+  // a contact shadow must not do.
+  ground.position.y = -BOOK_H / 2 - 0.22;
   ground.receiveShadow = true;
   scene.add(ground);
 
@@ -439,7 +473,7 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   );
   const moteMaterial = track(
     new THREE.PointsMaterial({
-      color: theme.accent,
+      color: theme.accentLit,
       size: 0.045,
       transparent: true,
       opacity: theme.dark ? 0.5 : 0.32,
@@ -471,9 +505,24 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     camera.aspect = aspect;
     camera.updateProjectionMatrix();
 
-    // Wide: copy left, volume right. Narrow: copy below, volume lifted.
-    heroOffsetX = aspect >= 1.15 ? 1.3 : 0;
-    heroOffsetY = aspect >= 1.15 ? 0 : 1.15;
+    // Wide: copy left, volume right. Narrow: copy on top, volume below it.
+    //
+    // Far enough right to sit in the middle of the column the headline
+    // leaves it, rather than just clear of the last line of type. At 1.3
+    // the volume landed barely right of centre and the outer third of a
+    // wide viewport was empty, which read as the whole hero having drifted
+    // left rather than as a composition.
+    heroOffsetX = aspect >= 1.15 ? 2.6 : 0;
+    // Down, not up. A portrait hero stacks — the headline takes the top of the
+    // panel and the volume takes what is under it — so the volume has to clear
+    // the type rather than sit in it, which is what a positive offset did: on a
+    // phone the cover landed dead in the middle of a four-line headline and
+    // three lines of lead. The camera takes half of this back (see
+    // `cameraTarget` below), so the number is roughly twice the shift wanted,
+    // and it grows with how tall the viewport is because a taller panel gives
+    // the copy more of the frame to occupy.
+    heroOffsetY =
+      aspect >= 1.15 ? 0 : -Math.min(6.8, Math.max(2.2, 3.1 / aspect));
     fitDistance = Math.min(1.75, Math.max(1, 1.5 / aspect));
 
     const shelf = shelfLayout(items.length, aspect);
@@ -509,8 +558,13 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       mix(0.35, 0.1, opening) + mix(0, -0.1, settling),
       distance * fitDistance,
     );
+    // The camera follows the volume only part of the way: were it to look
+    // straight at it, the volume would sit dead centre and the offset above
+    // would buy nothing. This fraction is what actually decides how far
+    // right it lands on screen — `heroOffsetX` minus what the camera takes
+    // back — so the two are tuned together.
     cameraTarget.set(
-      mix(heroOffsetX * 0.55, 0, Math.max(leaving, arriving)),
+      mix(heroOffsetX * 0.28, 0, Math.max(leaving, arriving)),
       mix(heroOffsetY * 0.5, 0, Math.max(leaving, arriving)),
       0,
     );
@@ -562,7 +616,7 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       }
     }
 
-    shadowMaterial.opacity = (theme.dark ? 0.38 : 0.24) * (1 - leaving);
+    shadowMaterial.opacity = (theme.dark ? 0.3 : 0.18) * (1 - leaving);
 
     /* --- The collection -------------------------------------------- */
     fieldGroup.visible = arriving > 0.001;
@@ -661,8 +715,8 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     refreshTheme() {
       theme = readTheme();
       (scene.fog as THREE.Fog).color.copy(theme.bg);
-      rim.color.copy(theme.accent);
-      moteMaterial.color.copy(theme.accent);
+      rim.color.copy(theme.accentLit);
+      moteMaterial.color.copy(theme.accentLit);
       ambient.intensity = theme.dark ? 0.9 : 1.6;
       key.intensity = theme.dark ? 1.9 : 2.6;
       render();
