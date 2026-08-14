@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookOpen, Download, LayoutDashboard } from "lucide-react";
 import { BookCard } from "@/components/book-card";
+import { BookGrid3D } from "@/components/book-grid-3d";
 import { CatalogueFilters } from "@/components/catalogue-filters";
 import { Pagination } from "@/components/pagination";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -177,17 +178,12 @@ export default async function BooksPage(props: PageProps<"/[lang]/books">) {
           {dict.catalogue.empty}
         </p>
       ) : (
-        <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
-          {result.items.map((book, i) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              lang={lang}
-              dict={dict}
-              index={i}
-            />
-          ))}
-        </div>
+        <BookGrid3D
+          books={result.items}
+          lang={lang}
+          sectionLabel="Featured Books"
+          className="mt-12"
+        />
       )}
 
       <Pagination
