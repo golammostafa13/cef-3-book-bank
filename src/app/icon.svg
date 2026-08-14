@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Pediatric Book Bank">
+  <!--
+    The tab icon: the same drawing as `components/brand.tsx`, with the tile's
+    gradient baked in. A favicon cannot read the theme tokens, so the three
+    brand hues are written out at their light-mode values — the tile is a
+    saturated object either way, and it has to hold on whatever colour the
+    browser paints its own chrome. `favicon.ico` beside this file carries a
+    bolder cut of the same mark for the 16px slot, where these curves silt up.
+  -->
+  <defs>
+    <linearGradient id="tile" x1="4" y1="0" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#65a30d"/>
+      <stop offset="0.55" stop-color="#059669"/>
+      <stop offset="1" stop-color="#0e7490"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="48" height="48" rx="11" fill="url(#tile)"/>
+
+  <g transform="translate(24 24.4) scale(0.9) translate(-24 -25)">
+    <path d="M22.7 26c-1.8-2.6-4.8-4.2-8.2-4.2H9C7.9 21.8 7 22.7 7 23.8v11.8c0 1.1.9 2 2 2h5.6c3.4 0 6.4 1.6 8.2 4.2z" fill="#fff" fill-opacity="0.96"/>
+    <path d="M25.3 26c1.8-2.6 4.8-4.2 8.2-4.2H39c1.1 0 2 .9 2 2v11.8c0 1.1-.9 2-2 2h-5.6c-3.4 0-6.4 1.6-8.2 4.2z" fill="#fff" fill-opacity="0.96"/>
+    <g transform="translate(24 25.6)">
+      <path d="M0 0c-1.5-5.5-5.5-9.5-10.5-11-.3 5.5 3.5 10.2 10.5 11z" transform="translate(0 -3.4)" fill="#fff" fill-opacity="0.92"/>
+      <path d="M0 0c-3.1-5.5-2.4-12.6 0-16.2 2.4 3.6 3.1 10.7 0 16.2z" fill="#fff"/>
+      <path d="M0 0c1.5-5.5 5.5-9.5 10.5-11 .3 5.5-3.5 10.2-10.5 11z" transform="translate(0 -5.2)" fill="#fff" fill-opacity="0.8"/>
+    </g>
+  </g>
+</svg>

@@ -1,5 +1,5 @@
 /**
- * Domain types for the Cef 3 Book Bank catalogue.
+ * Domain types for the Pediatric Book Bank catalogue.
  *
  * These shapes are the contract between the data layer and every page.
  * When the mock fixtures are swapped for Postgres, only `lib/data/*`

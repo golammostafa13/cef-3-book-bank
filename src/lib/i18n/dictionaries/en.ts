@@ -18,6 +18,8 @@ export const en = {
     switchLanguage: "Switch language",
     signIn: "Sign in",
     signOut: "Sign out",
+    account: "Account",
+    signedInAs: "Signed in as",
     home: "Home",
     books: "Books",
     authors: "Authors",
@@ -71,7 +73,7 @@ export const en = {
     titleMiddle: "where every page",
     titleOpens: "opens",
     titleEnd: "a new world.",
-    lead: "Explore top reads, timeless classics and stories that inspire — read them right in your browser or download them free.",
+    lead: "Explore top reads, timeless classics and stories that inspire — read them right in your browser, or keep the file.",
     getStarted: "Get started",
     browseCategories: "Browse categories",
     statBooks: "Books",
@@ -86,13 +88,13 @@ export const en = {
     scene: {
       openTitle: "Open any volume.",
       openLead:
-        "It opens in the browser — no app, no account, nothing to install.",
+        "It opens in the browser — no app, no plugin, nothing to install.",
       scrollHint: "Scroll",
     },
     props: [
       {
         title: "Read in the browser",
-        body: "Open any book instantly — no app, no account, no waiting for a download to finish.",
+        body: "Open any book instantly — no app, no plugin, no waiting for a download to finish.",
       },
       {
         title: "Download and keep",
@@ -113,14 +115,14 @@ export const en = {
     recentLead:
       "The newest arrivals on the shelf — open the record, or take the file.",
     ctaTitle: "Start reading in the next ten seconds.",
-    ctaLead: "No sign-up. No paywall. Just open a book.",
+    ctaLead: "No paywall. No adverts. Just open a book.",
     ctaButton: "Browse the library",
   },
 
   catalogue: {
     eyebrow: "Catalogue",
     title: "Books collection",
-    lead: "Every title is free to read in your browser and free to download — no account, no waiting.",
+    lead: "Every title in the collection, ready to read in your browser or to keep as a file.",
     readInBrowser: "Read in the browser",
     orKeepTheFile: "Or keep the file",
     searchPlaceholder: "Search a book, author or ISBN…",
@@ -138,7 +140,7 @@ export const en = {
     adminTools: "Catalogue tools",
     metaTitle: "All books",
     metaDescription:
-      "Browse the complete catalogue — Bengali and English books, free to read online or download.",
+      "Browse the complete catalogue — Bengali and English books, ready to read online or download.",
   },
 
   book: {
@@ -160,7 +162,7 @@ export const en = {
     physicalCopies: "Physical copies",
     copiesLine: "{available} of {total} available on shelf {shelf}.",
     copiesLabel: "{available} of {total} copies available",
-    noAccountNeeded: "{mb} MB · no account needed",
+    fileSizeLine: "{mb} MB · yours to keep",
     alsoOpened: "Readers also opened",
     notFound: "Book not found",
     bengali: "বাংলা Bengali",
@@ -202,7 +204,7 @@ export const en = {
   about: {
     eyebrow: "About",
     title: "A library should be open to everyone.",
-    lead: "{name} exists for one reason: a catalogue of {books} books should be as easy to reach as a search box. No account. No paywall. No ten-step download that ends in an advert.",
+    lead: "{name} exists for one reason: a catalogue of {books} books should be as easy to reach as a search box. No paywall. No adverts. No ten-step download that ends in one.",
     body: "Every title here can be read directly in your browser, or downloaded and kept. The collection spans Bengali and English — literature, poetry, history, science, and books for children.",
     props: [
       {
@@ -223,7 +225,7 @@ export const en = {
     statCategories: "Categories",
     statDownloads: "Downloads",
     metaDescription:
-      "A free public digital library — no accounts, no paywalls, no tracking. Here is how it works and why it stays free.",
+      "A free digital library for readers holding a copy — no paywalls, no adverts, no tracking. Here is how it works and why it stays free.",
   },
 
   contact: {
@@ -288,7 +290,8 @@ export const en = {
     title: "Sign in",
     lead: "Continue with your Google account.",
     leadEmail: "Sign in with your admin email address.",
-    freeBrowse: "Browse without signing in",
+    needAccount: "Have a hard copy? Set up your account",
+    haveAccount: "Already set up? Sign in",
     notConfigured: "Sign-in is not available on this deployment.",
     devTitle: "Development sign-in",
     adminTitle: "Admin sign-in",
@@ -302,17 +305,53 @@ export const en = {
     errorEmailInvalid: "That does not look like an email address.",
     errorNotAdmin: "This email address is not authorized to sign in.",
     errorUnavailable: "Not available.",
+
+    /* The two printed codes ------------------------------------------- */
+    stepOne: "Step 1 of 2",
+    stepTwo: "Step 2 of 2",
+    signUpTitle: "Set up your account",
+    signUpLead:
+      "Your copy of the book carries the code. Fill this in once and the shelves are yours.",
+    metaSignUp: "Set up your account",
+    nameLabel: "Your name",
+    namePlaceholder: "Apu Roy",
+    codeLabel: "Code from your book",
+    codePlaceholder: "Cef-3",
+    codeHint: "Printed beside the first QR code inside the cover.",
+    signUpContinue: "Continue",
+    signingUp: "Setting up…",
+
+    unlockTitle: "One code to go",
+    unlockLead:
+      "The second QR code in your copy finishes the account and opens the library.",
+    metaUnlock: "Finish setting up",
+    unlockScanHint:
+      "Point your camera at the second QR code in the book. It will bring you straight in — nothing to type.",
+    unlockCodeLabel: "Or type the code",
+    unlockContinue: "Open the library",
+    unlocking: "Opening…",
+
+    errorNameEmpty: "Enter your name.",
+    errorCodeWrong: "That code does not match the one in your book.",
+    errorEmailReserved:
+      "That address belongs to a librarian. Sign in instead.",
+    errorScanFailed:
+      "That code did not match. Check you scanned the second code, not the first.",
+
     /**
      * The panel beside the card. It is not instructions — a reader who got
      * here already knows what a sign-in form is — so it says what the library
      * is instead, which is the one thing the form cannot.
      */
     sideEyebrow: "The reading room",
-    sideLead:
-      "Signing in is for the librarians. Everything on these shelves is free to read without an account.",
+    sideLead: "Sign in to open the shelves. Every book, in your browser.",
+    sideLeadSignUp:
+      "Two codes are printed in your copy. They are the key to the whole collection.",
+    sideLeadUnlock:
+      "One scan from the shelves. The second code is on the page after the first.",
     sideAlt:
       "A reader sitting on a stack of colourful books with an open book, a pencil leaning against the pile and a tree behind.",
-    badgeFree: "Always free",
+    badgeWithBook: "Yours with the book",
     badgeBilingual: "Bangla & English",
     badgeBrowser: "Reads in the browser",
   },

@@ -146,7 +146,7 @@ export function BookCard({
 
           {showActions && (
             <a
-              href={book.fileUrl}
+              href={`${book.fileUrl}?download=1`}
               download
               aria-label={fill(lang, dict.common.downloadOf, {
                 title,

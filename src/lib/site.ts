@@ -6,7 +6,7 @@
  * the sitemap and metadata builders need them without a locale in hand.
  */
 export const site = {
-  name: "Cef 3 Book Bank",
+  name: "Pediatric Book Bank",
   /**
    * The short form, for places the full name will not fit: the imprint line on
    * a grid-size cover, mostly. Not an abbreviation to use in prose.
@@ -15,10 +15,15 @@ export const site = {
   nameBn: "সেফ ৩ বুক ব্যাংক",
   tagline: "Every page opens a new world",
   taglineBn: "প্রতিটি পৃষ্ঠা খুলে দেয় নতুন এক জগৎ",
+  /**
+   * This is the description a search engine sees, and the only page it can
+   * reach is the sign-in form — so it describes what an account opens rather
+   * than promising shelves a visitor cannot get to yet.
+   */
   description:
-    "Cef 3 Book Bank is a free public digital library. Browse, read in your browser, and download thousands of Bengali and English books — no account, no paywall.",
+    "Pediatric Book Bank is a digital library for readers of the Cef 3 collection. Set up your account with the codes printed in your copy, then read or download thousands of Bengali and English books — free, in your browser.",
   descriptionBn:
-    "সেফ ৩ বুক ব্যাংক একটি উন্মুক্ত ডিজিটাল গ্রন্থাগার। হাজারো বাংলা ও ইংরেজি বই পড়ুন ও ডাউনলোড করুন — বিনামূল্যে, কোনো অ্যাকাউন্ট ছাড়াই।",
+    "সেফ ৩ বুক ব্যাংক সেফ ৩ সংগ্রহের পাঠকদের জন্য একটি ডিজিটাল গ্রন্থাগার। আপনার কপিতে ছাপা কোড দিয়ে অ্যাকাউন্ট তৈরি করুন, তারপর হাজারো বাংলা ও ইংরেজি বই পড়ুন বা ডাউনলোড করুন — বিনামূল্যে, ব্রাউজারেই।",
   url: "https://cef3.example.org",
   email: "hello@cef3.example.org",
   phone: "+880 1700 000000",

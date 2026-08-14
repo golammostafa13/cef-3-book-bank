@@ -1,7 +1,9 @@
 import {
   books,
   authors,
+  bookFiles,
   categories,
+  sampleFileName,
   shelfPrefix,
 } from "@/lib/fixtures/catalogue";
 import type {
@@ -102,6 +104,36 @@ export async function getBook(slug: string): Promise<Book | null> {
 
 export async function getBookById(id: string): Promise<Book | null> {
   return books.find((b) => b.id === id) ?? null;
+}
+
+/**
+ * Where a book's file actually is, and what to call it once it is handed over.
+ *
+ * Server-only by intent: this is the one fact about a book that never travels
+ * to the browser, which is why it is not a field on `Book`. Only the route
+ * handler at `/api/file/[slug]` asks for it, and only after it has satisfied
+ * itself that whoever is asking has an account.
+ *
+ * Returns null for a book that does not exist. A book that does but has no
+ * file of its own falls back to the sample, exactly as `fileSizeMb` and the
+ * rest of the demo metadata do.
+ */
+export async function getBookFile(slug: string): Promise<{
+  /** Name in private storage — never a path, so a slug cannot escape it. */
+  storageName: string;
+  /** What the reader's browser should save it as. */
+  downloadName: string;
+  format: Book["format"];
+} | null> {
+  const book = await getBook(slug);
+  if (!book) return null;
+
+  const storageName = bookFiles[book.slug] ?? sampleFileName;
+  return {
+    storageName,
+    downloadName: `${book.slug}.${book.format}`,
+    format: book.format,
+  };
 }
 
 export async function getFeatured(limit = 6): Promise<Book[]> {
@@ -289,10 +321,13 @@ export async function insertBook(input: NewBookInput): Promise<Book> {
   if (!category) throw new Error(`Unknown category: ${input.categoryId}`);
 
   const seq = books.length + 1;
+  // Hoisted: the file's address is built from it too, and the two must not be
+  // allowed to disagree.
+  const slug = uniqueSlug(slugify(input.title));
   const book: Book = {
     id: `bk-${String(seq).padStart(3, "0")}-${Date.now().toString(36)}`,
     code: nextAccessionCode(),
-    slug: uniqueSlug(slugify(input.title)),
+    slug,
     title: input.title,
     titleBn: input.titleBn || undefined,
     authorId: author.id,
@@ -316,8 +351,10 @@ export async function insertBook(input: NewBookInput): Promise<Book> {
     coverHue: input.coverHue,
     format: input.format,
     fileSizeMb: input.fileSizeMb,
-    // Until R2 is wired up every book streams the same sample file.
-    fileUrl: "/samples/sample.pdf",
+    // Until R2 is wired up every book streams the same sample file — but it
+    // streams it through the gate like every other book, so a new record is
+    // no more downloadable to a stranger than an old one.
+    fileUrl: `/api/file/${slug}`,
     downloads: 0,
     rating: 0,
     featured: input.featured,

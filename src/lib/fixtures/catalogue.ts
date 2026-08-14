@@ -1,7 +1,7 @@
 import type { Author, Book, BookStatus, Category } from "@/types";
 
 /**
- * Demo fixtures for the Cef 3 Book Bank catalogue.
+ * Demo fixtures for the Pediatric Book Bank catalogue.
  *
  * A compact seed list is expanded into full `Book` records by `buildBook`
  * below, so the interesting data stays readable and the derived fields
@@ -239,7 +239,12 @@ export const authors: Author[] = [
  * absent means demo.
  */
 interface SeedFile {
-  /** Served from `public/` in development, an R2 URL in production. */
+  /**
+   * The file's name in private storage — `private/books/` in development, an
+   * R2 key in production. Never a URL a browser could ask for: the file is
+   * reached only through `/api/file/[slug]`, which checks for an account
+   * first. See `bookFiles` at the foot of this module.
+   */
   url: string;
   sizeMb: number;
   isbn: string;
@@ -850,12 +855,16 @@ function buildBook(seed: Seed, i: number): Book {
     ).padStart(2, "0")}`,
     coverHue: seed.hue,
     // `format` describes the file that is actually served, and the only sample
-    // in public/ is a PDF — so every seeded book is a PDF. Labelling one in
-    // seven as EPUB would put "Download EPUB" on a button that hands over a
-    // .pdf. The admin form still offers both for real uploads.
+    // in private storage is a PDF — so every seeded book is a PDF. Labelling
+    // one in seven as EPUB would put "Download EPUB" on a button that hands
+    // over a .pdf. The admin form still offers both for real uploads.
     format: "pdf",
     fileSizeMb: seed.file?.sizeMb ?? Math.round((1.4 + ((i * 17) % 90) / 10) * 10) / 10,
-    fileUrl: seed.file?.url ?? `/samples/sample.pdf`,
+    // Not a path to the file — a request for it. Every book is served by the
+    // same route, which checks for an account before it opens anything. What
+    // is behind this address is in `bookFiles` below, and never leaves the
+    // server.
+    fileUrl: `/api/file/${slug}`,
     downloads: 480 + ((i * 613) % 9200),
     rating: Math.round((3.6 + ((i * 7) % 14) / 10) * 10) / 10,
     featured: seed.featured ?? false,
@@ -869,6 +878,25 @@ function buildBook(seed: Seed, i: number): Book {
 }
 
 export const books: Book[] = seeds.map(buildBook);
+
+/** The demo file every book without one of its own is served from. */
+export const sampleFileName = "sample.pdf";
+
+/**
+ * Slug → the file's name in private storage.
+ *
+ * Kept apart from `Book` deliberately. A `Book` is handed to Client
+ * Components and therefore to the browser, and the one thing about a book that
+ * must not travel with it is where the file actually is. The route handler
+ * looks the name up here, on the server, after it has decided the reader is
+ * entitled to it.
+ */
+export const bookFiles: Record<string, string> = Object.fromEntries(
+  books.map((book, i) => [
+    book.slug,
+    seeds[i].file?.url.split("/").pop() ?? sampleFileName,
+  ]),
+);
 
 // Backfill the denormalised counts now that every book exists.
 for (const c of categories) {

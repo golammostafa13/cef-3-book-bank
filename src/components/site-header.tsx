@@ -6,8 +6,14 @@ import { usePathname } from "next/navigation";
 import { LogIn, Menu, Search, X } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
+import {
+  AccountMenu,
+  AccountPanel,
+  SignInLink,
+} from "@/components/auth/account-menu";
 import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useSession } from "@/lib/auth/use-session";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n";
 import { textClass } from "@/lib/i18n/content";
@@ -19,8 +25,13 @@ import { cn } from "@/lib/utils";
  *
  * A Client Component (the mobile menu holds state), so it cannot read the
  * locale from the server — the layout passes `lang` and the strings it needs.
- * Nothing here reads the session: doing so would make every static page render
- * per request. The staff entrance is a plain link.
+ *
+ * The session is not read on the server either, for the same reason it never
+ * was: doing so would make every static page render per request, for one name
+ * in one corner of one bar. It is fetched from `/api/session` after paint
+ * instead, and until it answers the bar shows neither the account nor the
+ * sign-in link — a control that changes under the reader's finger is worse
+ * than one that arrives a moment late.
  */
 export function SiteHeader({
   lang,
@@ -31,6 +42,13 @@ export function SiteHeader({
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const href = (path: string) => localePath(lang, path);
+  const { session, loading } = useSession();
+
+  const accountStrings = {
+    account: dict.common.account,
+    signedInAs: dict.common.signedInAs,
+    signOut: dict.common.signOut,
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/80 backdrop-blur-xl">
@@ -89,14 +107,26 @@ export function SiteHeader({
           >
             <Search className="size-[18px]" />
           </Link>
-          <Link
-            href={href("/signin")}
-            aria-label={dict.common.signIn}
-            title={dict.common.signIn}
-            className="hidden size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent sm:inline-flex"
-          >
-            <LogIn className="size-[18px]" />
-          </Link>
+          {/* The empty slot is the same 40px the sign-in link and the collapsed
+              account button occupy, so the controls beside it are in their
+              final position from first paint and nothing moves under a finger
+              already on its way to the theme toggle. */}
+          {loading ? (
+            <span className="hidden size-10 sm:block" aria-hidden="true" />
+          ) : session ? (
+            <AccountMenu
+              lang={lang}
+              session={session}
+              strings={accountStrings}
+              className="hidden sm:block"
+            />
+          ) : (
+            <SignInLink
+              href={href("/signin")}
+              label={dict.common.signIn}
+              className="hidden size-10 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-accent-soft hover:text-accent sm:inline-flex"
+            />
+          )}
           <ThemeToggle />
           <Button
             asChild
@@ -133,14 +163,25 @@ export function SiteHeader({
               {dict.nav[item.key]}
             </Link>
           ))}
-          <Link
-            href={href("/signin")}
-            onClick={() => setOpen(false)}
-            className="mt-1 flex items-center gap-2 rounded-xl px-3 py-3 text-lg text-ink-mute hover:bg-surface"
-          >
-            <LogIn className="size-4" aria-hidden="true" />
-            {dict.common.signIn}
-          </Link>
+          {session ? (
+            <AccountPanel
+              lang={lang}
+              session={session}
+              strings={accountStrings}
+              onSignOut={() => setOpen(false)}
+            />
+          ) : (
+            !loading && (
+              <Link
+                href={href("/signin")}
+                onClick={() => setOpen(false)}
+                className="mt-1 flex items-center gap-2 rounded-xl px-3 py-3 text-lg text-ink-mute hover:bg-surface"
+              >
+                <LogIn className="size-4" aria-hidden="true" />
+                {dict.common.signIn}
+              </Link>
+            )
+          )}
 
           {/* The language switch, for the phone widths where it is not in the
               bar. Hidden from `sm` up so it is never in both places at once. */}

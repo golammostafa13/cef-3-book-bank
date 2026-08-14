@@ -248,7 +248,7 @@ export default async function BookDetailPage(
                   textClass(lang),
                 )}
               >
-                {fill(lang, dict.book.noAccountNeeded, { mb: book.fileSizeMb })}
+                {fill(lang, dict.book.fileSizeLine, { mb: book.fileSizeMb })}
               </p>
             </div>
           </div>

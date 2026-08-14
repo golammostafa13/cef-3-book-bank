@@ -1,7 +1,7 @@
-# Cef 3 Book Bank — a free public digital library
+# Pediatric Book Bank — a digital library for the Cef 3 collection
 
-A bilingual (বাংলা / English) book catalogue that anyone can read from or
-download, plus a private admin for the one librarian who maintains it.
+A bilingual (বাংলা / English) book catalogue, opened by the two codes printed
+in a hard copy, plus a private admin for the one librarian who maintains it.
 
 Built to the design in [`docs/choosen.webp`](docs/choosen.webp) and the
 architecture in [`docs/Library_Platform_Brief.pdf`](docs/Library_Platform_Brief.pdf):
@@ -15,8 +15,9 @@ npm run dev                  # http://localhost:3000 → /en/signin or /bn/signi
 ```
 
 The bare domain opens the door rather than the library: `/` lands on sign-in,
-which offers **Browse without signing in** — straight through to the shelves, no
-account, nothing withheld.
+and there is no way past it. Nothing on this site opens without an account —
+not a book page, not the reader, not a file. See **Getting in** below for the
+two ways to get one.
 
 ## Languages
 
@@ -45,15 +46,39 @@ the other language, so it works without JavaScript and can be shared.
 - **Adding a third language** means: add it to `locales`, add a dictionary file,
   and fill in the Bengali-equivalent fields on the data. No page changes.
 
-## Sign-in
+## Getting in
 
-Two separate questions, deliberately:
+Three separate questions, deliberately:
 
 **Signing in** is open. Anyone with a Google account can, in one step: Google
 returns an ID token, it is verified server-side against Google's published keys
 ([`src/lib/auth/google.ts`](src/lib/auth/google.ts)), and the verified address
 becomes the session. No allowlist, no second factor, nothing to be approved for.
-Nobody has to sign in at all — reading and downloading never ask.
+This is the librarians' door; readers come in through the printed codes.
+
+**Registering** is for whoever is holding a hard copy. Two QR codes are printed
+in the book. The first goes to `/signup`, which asks for a name, an address and
+`SIGNUP_CODE` — and issues a session that can see exactly one page: the one
+asking for the second code. The second QR goes to `/api/unlock?k=<UNLOCK_CODE>`,
+which finishes the account and lands the reader in the library. One scan,
+nothing typed; [`/[lang]/unlock`](src/app/[lang]/(auth)/unlock/page.tsx) has a
+form for when the camera will not focus.
+
+Stopping halfway is the point of two codes rather than one — otherwise the
+first would be the whole gate and the second would be ceremony. A route handler
+does the scan ([`src/app/api/unlock/route.ts`](src/app/api/unlock/route.ts))
+because a Server Component cannot set a cookie.
+
+Nothing is stored. There is no users table: the name and address go straight
+into the signed cookie, which *is* the account. A reader on a new device
+registers again — the codes are in their book.
+
+Be clear-eyed about what those codes are. They are printed, in circulation, and
+identical in every copy of the run, so anyone who photographs the page can pass
+on what they saw. That is inherent to a static print run, and it is why nothing
+that matters hangs on them: a QR account can never administer the library
+([`canAdminister`](src/lib/auth/session.ts)) no matter whose address it was
+registered with, and `/signup` refuses an address in `ADMIN_EMAILS` outright.
 
 **Administering** is a short list of addresses. `ADMIN_EMAILS` — one or more,
 comma-separated — is compared against the signed-in address every time it
@@ -76,11 +101,39 @@ address directly so a fresh clone can sign in. What it cannot do is *prove* the
 address belongs to whoever typed it, which is why the branch is compiled out of
 a production build.
 
-The guard is layered: [`src/proxy.ts`](src/proxy.ts) keeps everyone who is not
-the administrator off admin screens, and every Server Action calls
-`requireAdmin()` itself, because a POST never passes through a page. A signed-in
-reader who asks for `/admin` is sent to the catalogue rather than to a sign-in
-form they have already used.
+The guard is layered: [`src/proxy.ts`](src/proxy.ts) turns away anonymous
+requests for anything but the three door pages, holds half-finished
+registrations at the second code, and keeps everyone who is not the
+administrator off admin screens. Every Server Action calls `requireAdmin()`
+itself, because a POST never passes through a page. A signed-in reader who asks
+for `/admin` is sent to the catalogue rather than to a sign-in form they have
+already used.
+
+### The book files
+
+They are not in `public/`. They were, and that made the gate on the pages
+decoration: the proxy's matcher has to skip anything with a file extension, so
+anyone with a URL could take a PDF without ever meeting the sign-in form.
+
+They live in `private/books/` now, and
+[`src/app/api/file/[slug]/route.ts`](src/app/api/file/[slug]/route.ts) is the
+only way to them. It checks the same signed cookie the proxy would have, serves
+`inline` for the reader and `attachment` for the download button, and supports
+range requests — without which opening the 36MB handbook would pull the whole
+file before drawing page one.
+
+Because that path is assembled from a slug at runtime, the build's file tracer
+cannot see it; `outputFileTracingIncludes` in
+[`next.config.ts`](next.config.ts) is what keeps the books in the deployed
+bundle.
+
+### Search engines
+
+The catalogue is behind an account, so it is invisible to search — every book,
+author and category URL answers a crawler with a redirect to sign-in. The
+sitemap lists the sign-in page and nothing else, and `robots.txt` disallows the
+rest rather than spending crawl budget rediscovering the same redirect. That is
+the cost of gating the shelves, not an oversight.
 
 ## How it is put together
 

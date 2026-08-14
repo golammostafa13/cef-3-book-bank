@@ -1,6 +1,7 @@
 import {
   adminEmails,
   authSecret,
+  isAdminEmail,
   sessionCookieName,
   sessionTtlSeconds,
 } from "@/lib/auth/config";
@@ -17,12 +18,36 @@ import {
  * verification runs in the proxy runtime as in Server Actions.
  */
 
+/**
+ * How the account was obtained. This is not a role — see the note below — it
+ * records *what was proved* at the door, which is a fact about the past and so
+ * is safe to carry in the token.
+ *
+ *   • `google` — an ID token verified against Google's published keys.
+ *   • `email`  — an address typed into the direct sign-in form.
+ *   • `qr`     — the codes printed in a hard copy. Proves possession of a book
+ *                and nothing whatever about the address that was typed.
+ */
+export type SignInMethod = "google" | "email" | "qr";
+
+/**
+ * How far through the printed-code flow this account is.
+ *
+ * `registered` has passed the first code and may see exactly one page: the one
+ * asking for the second. `unlocked` has passed both and reads the library.
+ * Sessions from `google` and `email` sign-in carry no gate at all — they never
+ * entered the flow, and an absent gate reads as open.
+ */
+export type Gate = "registered" | "unlocked";
+
 export interface Session {
   /** Verified, and the only thing that decides whether this account is admin. */
   email: string;
   /** Display name — Google's profile name, or the address for a local sign-in. */
   name: string;
   picture?: string;
+  via?: SignInMethod;
+  gate?: Gate;
   /** Seconds since the epoch. */
   exp: number;
 }
@@ -35,7 +60,41 @@ export interface Session {
  * (`isAdminEmail`). Stamping a role into an eight-hour cookie would mean an
  * env change took eight hours to take effect — and that revoking an admin
  * would not revoke the sessions already carrying the claim.
+ *
+ * `via` and `gate` are not counter-examples. Neither grants anything: `via`
+ * only ever *withholds* administration (below), and `gate` only ever withholds
+ * the catalogue. A forged token cannot be produced without the signing key, and
+ * one that sets them to their most permissive values still gets no further than
+ * an honest sign-in would.
  */
+
+/**
+ * Whether a session may read the library at all.
+ *
+ * Everything except the door is behind this: the catalogue, the book pages,
+ * the reader and the files. Half-finished registrations are held back so that
+ * scanning only the first of the two printed codes is not enough.
+ */
+export function hasLibraryAccess(
+  session: Session | null | undefined,
+): session is Session {
+  return session != null && session.gate !== "registered";
+}
+
+/**
+ * Whether a session may administer the library.
+ *
+ * The `via` check is the point of this function. The printed codes are public
+ * — they are on paper, in circulation — and the sign-up form takes whatever
+ * address it is given, so without this a reader could register as the
+ * librarian's address and walk into /admin. A QR session is never an
+ * administrator no matter whose address it carries; administration is reached
+ * by proving an identity, and a code from a book proves possession of a book.
+ */
+export function canAdminister(session: Session | null | undefined): boolean {
+  if (!session || session.via === "qr") return false;
+  return isAdminEmail(session.email);
+}
 
 /**
  * Signing key. A missing AUTH_SECRET in development falls back to a fixed

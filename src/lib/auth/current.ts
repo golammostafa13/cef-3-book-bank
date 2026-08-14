@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
-import { isAdminEmail } from "@/lib/auth/config";
 import {
+  canAdminister,
+  hasLibraryAccess,
   readSessionToken,
   sessionCookieName,
   type Session,
@@ -24,7 +25,19 @@ export async function getSession(): Promise<Session | null> {
  */
 export async function getAdmin(): Promise<Session | null> {
   const session = await getSession();
-  return session && isAdminEmail(session.email) ? session : null;
+  return canAdminister(session) ? session : null;
+}
+
+/**
+ * The session of someone entitled to read the library, or null.
+ *
+ * Distinct from `getSession` by the half-finished registration: someone who has
+ * scanned the first printed code has a perfectly valid session and no business
+ * seeing a book with it. Callers that render catalogue content want this one.
+ */
+export async function getReader(): Promise<Session | null> {
+  const session = await getSession();
+  return hasLibraryAccess(session) ? session : null;
 }
 
 /**

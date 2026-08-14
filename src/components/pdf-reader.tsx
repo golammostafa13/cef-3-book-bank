@@ -291,7 +291,7 @@ export function PdfReader({
               {sepia ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
             </ToolButton>
             <a
-              href={book.fileUrl}
+              href={`${book.fileUrl}?download=1`}
               download
               aria-label={fill(lang, dict.common.downloadFormat, {
                 format: book.format.toUpperCase(),
