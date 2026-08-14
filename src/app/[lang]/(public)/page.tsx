@@ -66,6 +66,7 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
    */
   const sceneBooks: HeroBook[] = recent.map((book) => ({
     id: book.id,
+    slug: book.slug,
     title: book.title,
     titleBn: book.titleBn,
     authorName: book.authorName,

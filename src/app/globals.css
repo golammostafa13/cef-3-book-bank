@@ -1962,8 +1962,67 @@ body {
   color: var(--accent-ink);
 }
 
-.hero3d__hint {
+/* --- Floating 3D books in beat-0 ----------------------------------
+   Absolutely positioned in the right half of the pinned panel, behind
+   the canvas (z-index 1) until WebGL loads, at which point the canvas
+   fades in over them. Each book drifts on its own clock so they never
+   fall into step with each other. Only shown on desktop — below lg there
+   is no room beside the headline without overlapping the text.
+   ------------------------------------------------------------------- */
+.hero3d__floaters {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .hero3d__floaters {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    transition: opacity 700ms ease;
+  }
+}
+
+.hero3d__floater {
   position: absolute;
+  left: var(--fx, 60%);
+  top: var(--fy, 20%);
+  width: var(--fw, 140px);
+  pointer-events: auto;
+  /* Gentle float: up-down on one period, slight tilt on another prime — the
+     two periods are coprime so the books never sync. */
+  animation:
+    floater-bob var(--fdur, 14s) ease-in-out var(--fdelay, 0s) infinite alternate,
+    floater-sway calc(var(--fdur, 14s) * 1.37) ease-in-out var(--fdelay, 0s) infinite alternate;
+}
+
+@keyframes floater-bob {
+  from { transform: translateY(0);    }
+  to   { transform: translateY(-18px); }
+}
+
+@keyframes floater-sway {
+  from { transform: rotate(-1.5deg); }
+  to   { transform: rotate(1.5deg);  }
+}
+
+/* When WebGL canvas is live, float behind it. The canvas fades in to 1
+   over the books, which effectively dims them — they become part of the
+   scene depth rather than competing with it. */
+.hero3d[data-live="true"] .hero3d__floaters {
+  z-index: 0;
+}
+
+/* Kill the float animation under reduced motion. The books still show
+   as static covers (Book3D degrades to a flat face). */
+@media (prefers-reduced-motion: reduce) {
+  .hero3d__floaters {
+    display: none;
+  }
+}
+
+.hero3d__hint {  position: absolute;
   bottom: 1.75rem;
   left: 50%;
   z-index: 3;
