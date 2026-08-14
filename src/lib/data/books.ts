@@ -42,7 +42,7 @@ function matches(book: Book, q: string): boolean {
     book.authorNameBn ?? "",
     book.publisher,
     book.categoryName,
-    book.isbn,
+    book.isbn ?? "",
     book.code,
   ].some((field) => normalise(field).includes(needle));
 }

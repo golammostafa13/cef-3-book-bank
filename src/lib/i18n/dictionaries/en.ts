@@ -266,6 +266,9 @@ export const en = {
     previousPage: "Previous page",
     nextPage: "Next page",
     pageOf: "Page {page} of {total}",
+    /** The field in the footer, and the label on each page in the column. */
+    jumpToPage: "Jump to page",
+    pageLabel: "Page {page}",
     zoomIn: "Zoom in",
     zoomOut: "Zoom out",
     fitWidth: "Fit to width",

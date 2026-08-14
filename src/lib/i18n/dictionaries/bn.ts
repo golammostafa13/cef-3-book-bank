@@ -263,6 +263,8 @@ export const bn: Dictionary = {
     previousPage: "আগের পৃষ্ঠা",
     nextPage: "পরের পৃষ্ঠা",
     pageOf: "{total}-এর {page} নং পৃষ্ঠা",
+    jumpToPage: "নির্দিষ্ট পৃষ্ঠায় যান",
+    pageLabel: "{page} নং পৃষ্ঠা",
     zoomIn: "বড় করুন",
     zoomOut: "ছোট করুন",
     fitWidth: "পর্দার প্রস্থে মেলান",
