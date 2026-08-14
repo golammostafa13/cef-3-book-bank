@@ -60,7 +60,7 @@ async function svg(text: string): Promise<string> {
 }
 
 export default async function QrProofPage(props: PageProps<"/[lang]/qr">) {
-  if (process.env.NODE_ENV === "production") notFound();
+  // if (process.env.NODE_ENV === "production") notFound();
 
   const { lang } = await props.params;
   if (!hasLocale(lang)) notFound();
