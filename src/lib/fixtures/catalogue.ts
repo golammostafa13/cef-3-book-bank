@@ -938,8 +938,6 @@ function buildBook(seed: Seed, i: number): Book {
     coverImage: seed.coverImage,
     format: "pdf",
     fileSizeMb: seed.file.sizeMb,
-    // Not a path to the file — a request for it. Checked against an account
-    // before the stream opens. What is behind this address is in `bookFiles`.
     fileUrl: `/api/file/${slug}`,
     downloads: 480 + ((i * 613) % 9200),
     rating: Math.round((3.6 + ((i * 7) % 14) / 10) * 10) / 10,

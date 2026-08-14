@@ -181,7 +181,7 @@ export function HeroRecent({
                   <ArrowRight className="size-3" aria-hidden="true" />
                 </Link>
                 <a
-                  href={`${book.fileUrl}?download=1`}
+                  href={book.fileUrl}
                   download
                   aria-label={fill(lang, copy.downloadOf, {
                     title,

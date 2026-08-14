@@ -77,16 +77,6 @@ const nextConfig: NextConfig = {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
 
-  /**
-   * The book files live outside `public/` so that nothing can reach them
-   * except the route handler that checks for an account first. The cost of
-   * that is this stanza: the build's file tracer follows `fs` calls with
-   * literal paths, and the handler's path is assembled at runtime from a slug,
-   * so the tracer cannot see it and would ship a bundle with no books in it.
-   */
-  outputFileTracingIncludes: {
-    "/api/file/[slug]": ["./private/books/**"],
-  },
 };
 
 export default nextConfig;

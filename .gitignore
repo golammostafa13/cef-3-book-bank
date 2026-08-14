@@ -42,3 +42,4 @@ next-env.d.ts
 /docs/book_images/*
 /docs/books_files/*
 /private/
+/public/books/

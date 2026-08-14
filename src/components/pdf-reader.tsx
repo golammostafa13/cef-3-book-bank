@@ -489,7 +489,7 @@ export function PdfReader({ book, lang }: { book: Book; lang: Locale }) {
               {sepia ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
             </ToolButton>
             <a
-              href={`${book.fileUrl}?download=1`}
+              href={book.fileUrl}
               download
               aria-label={fill(lang, dict.common.downloadFormat, {
                 format: book.format.toUpperCase(),
