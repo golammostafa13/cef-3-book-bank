@@ -16,7 +16,7 @@ import { Book3D } from "@/components/book-3d";
 import { BookCarousel3D } from "@/components/book-carousel-3d";
 import { BookStack3D } from "@/components/book-stack-3d";
 import { Hero3D, type HeroBook } from "@/components/hero-3d";
-import type { HeroListBook } from "@/components/hero-recent";
+import { HeroRecent, type HeroListBook } from "@/components/hero-recent";
 import { Shelf3D } from "@/components/shelf-3d";
 import { Button } from "@/components/ui/button";
 import {
@@ -133,20 +133,11 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
       ---------------------------------------------------------------- */}
       <Hero3D
         books={sceneBooks}
-        recent={recentList}
         lang={lang}
         brand={lang === "bn" ? site.nameBn : site.name}
         hrefs={{
           books: href("/books"),
           categories: href("/categories"),
-          recent: href("/books?sort=recent"),
-        }}
-        recentCopy={{
-          title: dict.home.recentTitle,
-          lead: dict.home.recentLead,
-          seeEverything: dict.common.seeEverything,
-          details: dict.book.details,
-          downloadOf: dict.common.downloadOf,
         }}
         copy={{
           titleStart: dict.home.titleStart,
@@ -174,6 +165,26 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
           />
         }
       />
+
+      {/* ---------------------------------------------------------------
+          Recently added — a plain section below the hero, no overlay
+      ---------------------------------------------------------------- */}
+      <section className="border-b border-line/60 bg-surface/50">
+        <div className="mx-auto max-w-3xl px-5 py-14 lg:px-8">
+          <HeroRecent
+            books={recentList}
+            lang={lang}
+            copy={{
+              title: dict.home.recentTitle,
+              lead: dict.home.recentLead,
+              seeEverything: dict.common.seeEverything,
+              details: dict.book.details,
+              downloadOf: dict.common.downloadOf,
+            }}
+            href={href("/books?sort=recent")}
+          />
+        </div>
+      </section>
 
       {/* ---------------------------------------------------------------
           Value props

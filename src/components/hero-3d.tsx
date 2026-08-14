@@ -3,13 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  HeroRecent,
-  type HeroListBook,
-  type HeroRecentCopy,
-} from "@/components/hero-recent";
-import { defaultLocale, type Locale } from "@/lib/i18n/config";
+import { Button } from "@/components/ui/button";import { defaultLocale, type Locale } from "@/lib/i18n/config";
 import { textClass } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
 // Type-only. The module itself is imported inside the effect below — see the
@@ -63,20 +57,13 @@ export interface Hero3DCopy {
 interface Hero3DProps {
   /** The volume that opens, followed by the collection that arrives. */
   books: HeroBook[];
-  /**
-   * The same arrivals again, as records — the list the last beat resolves to.
-   * Same books in the same order as `books`, so the block reads out the shelf
-   * the reader just watched assemble rather than a different set of titles.
-   */
-  recent: HeroListBook[];
   lang: Locale;
   copy: Hero3DCopy;
-  recentCopy: HeroRecentCopy;
   /** Already formatted in the reader's numerals by the server. */
   stats: { books: string; authors: string; downloads: string };
   /** The wordmark, in the reader's language. */
   brand: string;
-  hrefs: { books: string; categories: string; recent: string };
+  hrefs: { books: string; categories: string };
   /** The static composition shown instead of the canvas when motion is off. */
   fallback: React.ReactNode;
 }
@@ -91,10 +78,8 @@ function window_(p: number, a: number, b: number, c: number, d: number) {
 
 export function Hero3D({
   books,
-  recent,
   lang = defaultLocale,
   copy,
-  recentCopy,
   stats,
   brand,
   hrefs,
@@ -363,36 +348,6 @@ export function Hero3D({
               keeps for a reader who has asked for less motion. */}
           <div className="hero3d__fallback" aria-hidden="true">
             {fallback}
-          </div>
-        </div>
-
-        {/* --- Beat 2: the shelf, read out as records --------------------
-            Outside `hero3d__copy` rather than a third beat inside it, and
-            that placement is the whole reason this works in every mode. The
-            beats share one grid cell with the static composition, which is
-            fine for a headline and a button but not for a list this tall;
-            here the panel owns the pinned screen while the copy grid is
-            empty, and when the pin is not pinned at all — reduced motion, or
-            no WebGL — it simply flows as an ordinary block under the hero.
-            So the newest arrivals are on the page for every reader, not only
-            for the ones who get the scene. */}
-        <div className="hero3d__recent" data-b="2">
-          <HeroRecent
-            books={recent}
-            lang={lang}
-            copy={recentCopy}
-            href={hrefs.recent}
-          />
-          <div className="hero3d__recent-cta">
-            <Button asChild variant="primary" size="lg">
-              <Link href={hrefs.books}>
-                {copy.getStarted}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href={hrefs.categories}>{copy.browseCategories}</Link>
-            </Button>
           </div>
         </div>
 

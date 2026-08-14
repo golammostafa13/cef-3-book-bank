@@ -1848,17 +1848,12 @@ body {
 .hero-recent {
   width: 100%;
   max-width: 46rem;
-  padding: 1.25rem;
-  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
-  border-radius: 1.5rem;
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
-  box-shadow: var(--e3, 0 18px 40px -24px rgb(0 0 0 / 0.45));
-  backdrop-filter: blur(14px);
+  padding: 0;
 }
 
 @media (min-width: 640px) {
   .hero-recent {
-    padding: 1.5rem 1.75rem;
+    padding: 0;
   }
 }
 
