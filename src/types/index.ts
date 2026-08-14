@@ -55,7 +55,14 @@ export interface Book {
   publisher: string;
   year: number;
   language: BookLanguage;
-  isbn: string;
+  /**
+   * ISBN-13 or equivalent accession reference. Optional — four of the twenty
+   * real titles have no readable ISBN; a fabricated one on a downloadable file
+   * is worse than none. The detail page hides the row when absent.
+   */
+  isbn?: string;
+  /** Edition label as printed, e.g. "Twenty-second edition" or "8th". */
+  edition?: string;
   pages: number;
 
   description: string;
@@ -68,10 +75,19 @@ export interface Book {
   shelf: string;
 
   /**
-   * Base hue (degrees) for the generated cover art. Real covers will be
-   * R2 image URLs later; until then every cover is drawn from this.
+   * Base hue (degrees) for the generated cover art when no real cover exists.
+   * The 3D spine and the search index both read this, so it is always present
+   * even when `coverImage` is set.
    */
   coverHue: number;
+
+  /**
+   * Path to the real cover image served from `public/covers/`, e.g.
+   * `/covers/nelson-textbook-of-pediatrics.webp`. When present, `CoverArt`
+   * renders this instead of the generated art. When absent, the generated art
+   * is used as before.
+   */
+  coverImage?: string;
 
   /** File metadata. `fileUrl` points at R2 in production. */
   format: BookFormat;
@@ -98,7 +114,15 @@ export interface NewBookInput {
   publisher: string;
   year: number;
   language: BookLanguage;
-  isbn: string;
+  /** Optional — works without a readable ISBN leave this absent. */
+  isbn?: string;
+  /** Edition label, e.g. "9th" or "Twenty-second edition". */
+  edition?: string;
+  /**
+   * Served path to a real cover image, e.g. `/covers/<slug>.webp`.
+   * Set by the seed / build script, not by the admin form.
+   */
+  coverImage?: string;
   pages: number;
   description: string;
   descriptionBn?: string;

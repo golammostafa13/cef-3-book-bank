@@ -40,4 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /docs/book_images/*
-/docs/book_files/*
+/docs/books_files/*
+/private/

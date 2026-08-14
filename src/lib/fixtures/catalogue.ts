@@ -1,79 +1,90 @@
 import type { Author, Book, BookStatus, Category } from "@/types";
 
 /**
- * Demo fixtures for the Pediatric Book Bank catalogue.
+ * Catalogue fixtures for the Pediatric Book Bank.
  *
  * A compact seed list is expanded into full `Book` records by `buildBook`
- * below, so the interesting data stays readable and the derived fields
+ * below, so the verified metadata stays readable and the derived fields
  * (codes, shelves, counts) stay internally consistent.
  *
  * Everything here is deterministic — no Math.random — so server and client
  * renders always agree and there are no hydration mismatches.
+ *
+ * All metadata was read off the files themselves (pdfinfo + the copyright page
+ * via pdftotext), not from the file names — several file names are wrong. The
+ * discrepancy is noted per book where it matters.
  */
 
 export const categories: Category[] = [
   {
-    id: "cat-fiction",
-    slug: "fiction",
-    name: "Fiction",
-    nameBn: "কথাসাহিত্য",
+    id: "cat-general-pediatrics",
+    slug: "general-pediatrics",
+    name: "General Pediatrics",
+    nameBn: "সাধারণ শিশুরোগবিদ্যা",
     description:
-      "Novels and novellas — the long-form storytelling at the heart of the collection.",
+      "Comprehensive textbooks covering the full breadth of clinical paediatrics — diagnosis, management and the evidence behind it.",
     descriptionBn:
-      "উপন্যাস ও উপন্যাসিকা — সংগ্রহের কেন্দ্রে থাকা দীর্ঘ আখ্যানের ধারা।",
-    icon: "BookOpen",
+      "শিশুরোগবিদ্যার সামগ্রিক পাঠ্যপুস্তক — রোগনির্ণয়, চিকিৎসা ব্যবস্থাপনা ও তার প্রমাণভিত্তি।",
+    icon: "Stethoscope",
     bookCount: 0,
   },
   {
-    id: "cat-poetry",
-    slug: "poetry",
-    name: "Poetry",
-    nameBn: "কবিতা",
-    description: "Verse collections, from classical forms to modern free verse.",
+    id: "cat-neonatology",
+    slug: "neonatology",
+    name: "Neonatology",
+    nameBn: "নবজাতক চিকিৎসা",
+    description:
+      "Clinical references for the newborn — intensive care, pharmacology and the first year of life.",
     descriptionBn:
-      "কাব্যসংকলন — ধ্রুপদী ছন্দ থেকে আধুনিক মুক্তছন্দ পর্যন্ত।",
-    icon: "Feather",
-    bookCount: 0,
-  },
-  {
-    id: "cat-history",
-    slug: "history",
-    name: "History",
-    nameBn: "ইতিহাস",
-    description: "Political, social and cultural history of Bengal and beyond.",
-    descriptionBn:
-      "বাংলা ও বাংলার বাইরের রাজনৈতিক, সামাজিক ও সাংস্কৃতিক ইতিহাস।",
-    icon: "Landmark",
-    bookCount: 0,
-  },
-  {
-    id: "cat-science",
-    slug: "science",
-    name: "Science",
-    nameBn: "বিজ্ঞান",
-    description: "Popular science, mathematics and the history of ideas.",
-    descriptionBn: "জনপ্রিয় বিজ্ঞান, গণিত এবং চিন্তার ইতিহাস।",
-    icon: "Atom",
-    bookCount: 0,
-  },
-  {
-    id: "cat-children",
-    slug: "children",
-    name: "Children",
-    nameBn: "শিশুসাহিত্য",
-    description: "Picture books, fables and early readers for young borrowers.",
-    descriptionBn:
-      "ছোট পাঠকদের জন্য ছবির বই, রূপকথা আর প্রথম পাঠের বই।",
+      "নবজাতকের জন্য চিকিৎসা তথ্যসূত্র — নিবিড় পরিচর্যা, ওষুধবিদ্যা ও জীবনের প্রথম বছর।",
     icon: "Baby",
     bookCount: 0,
   },
   {
-    id: "cat-reference",
-    slug: "reference",
-    name: "Reference",
-    nameBn: "তথ্যসূত্র",
-    description: "Dictionaries, encyclopaedias and scholarly reference works.",
-    descriptionBn: "অভিধান, বিশ্বকোষ ও গবেষণার তথ্যসূত্র।",
+    id: "cat-infectious-disease",
+    slug: "infectious-disease",
+    name: "Infectious Disease",
+    nameBn: "সংক্রামক ব্যাধি",
+    description:
+      "Antimicrobial therapy and the full reference for paediatric infectious diseases.",
+    descriptionBn:
+      "অ্যান্টিমাইক্রোবিয়াল চিকিৎসা এবং শিশুদের সংক্রামক রোগের সম্পূর্ণ তথ্যসূত্র।",
+    icon: "Bug",
+    bookCount: 0,
+  },
+  {
+    id: "cat-subspecialties",
+    slug: "subspecialties",
+    name: "Subspecialties & Atlases",
+    nameBn: "বিশেষায়িত শাখা ও চিত্রকোষ",
+    description:
+      "Nephrology, ophthalmology, dermatology, neurology and visual atlases across the paediatric subspecialties.",
+    descriptionBn:
+      "বৃক্করোগ, চক্ষুরোগ, চর্মরোগ, স্নায়ুরোগ এবং শিশুরোগের বিশেষায়িত শাখার চিত্রকোষ।",
+    icon: "Microscope",
+    bookCount: 0,
+  },
+  {
+    id: "cat-reviews",
+    slug: "reviews",
+    name: "Reviews, Cases & Exam Prep",
+    nameBn: "রিভিউ, কেস ও পরীক্ষা প্রস্তুতি",
+    description:
+      "Question banks, case-based learning and exam-preparation tools for paediatric trainees.",
+    descriptionBn:
+      "প্রশ্নসংকলন, কেস-ভিত্তিক শিক্ষা ও শিশুরোগ প্রশিক্ষণার্থীদের পরীক্ষা প্রস্তুতির সরঞ্জাম।",
+    icon: "ClipboardList",
+    bookCount: 0,
+  },
+  {
+    id: "cat-clinical-reference",
+    slug: "clinical-reference",
+    name: "Clinical Reference",
+    nameBn: "চিকিৎসা তথ্যসূত্র",
+    description:
+      "Broad clinical references for internal medicine and general practice — the bedside companions.",
+    descriptionBn:
+      "অভ্যন্তরীণ চিকিৎসা ও সাধারণ অনুশীলনের জন্য বিস্তৃত ক্লিনিক্যাল তথ্যসূত্র।",
     icon: "Library",
     bookCount: 0,
   },
@@ -81,173 +92,229 @@ export const categories: Category[] = [
 
 export const authors: Author[] = [
   {
-    id: "a-tagore",
-    slug: "rabindranath-tagore",
-    name: "Rabindranath Tagore",
-    nameBn: "রবীন্দ্রনাথ ঠাকুর",
-    era: "1861–1941",
-    bio: "Poet, novelist and composer; the first non-European to be awarded the Nobel Prize in Literature, in 1913.",
+    id: "a-kliegman",
+    slug: "robert-kliegman",
+    name: "Robert M. Kliegman",
+    nameBn: "রবার্ট এম. ক্লিগম্যান",
+    bio: "Professor and former Chair of Pediatrics at the Medical College of Wisconsin and lead editor of Nelson Textbook of Pediatrics across multiple editions.",
     bioBn:
-      "কবি, ঔপন্যাসিক ও সঙ্গীতস্রষ্টা; ১৯১৩ সালে সাহিত্যে নোবেল পুরস্কার লাভকারী প্রথম অ-ইউরোপীয়।",
-    bookCount: 0,
-  },
-  {
-    id: "a-nazrul",
-    slug: "kazi-nazrul-islam",
-    name: "Kazi Nazrul Islam",
-    nameBn: "কাজী নজরুল ইসলাম",
-    era: "1899–1976",
-    bio: "The rebel poet, whose verse fused revolutionary politics with devotional lyricism.",
-    bioBn: "বিদ্রোহী কবি, যাঁর কবিতায় বিপ্লবী চেতনা ও ভক্তিরস একসূত্রে গাঁথা।",
-    bookCount: 0,
-  },
-  {
-    id: "a-bibhuti",
-    slug: "bibhutibhushan-bandyopadhyay",
-    name: "Bibhutibhushan Bandyopadhyay",
-    nameBn: "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
-    era: "1894–1950",
-    bio: "Novelist of rural Bengal, best known for the Apu trilogy that Satyajit Ray brought to the screen.",
-    bioBn:
-      "গ্রামবাংলার ঔপন্যাসিক; সত্যজিৎ রায়ের চলচ্চিত্রে রূপ পাওয়া অপু ত্রয়ীর জন্য সবচেয়ে পরিচিত।",
-    bookCount: 0,
-  },
-  {
-    id: "a-sarat",
-    slug: "sarat-chandra-chattopadhyay",
-    name: "Sarat Chandra Chattopadhyay",
-    nameBn: "শরৎচন্দ্র চট্টোপাধ্যায়",
-    era: "1876–1938",
-    bio: "Chronicler of domestic life and social reform, and among the most widely read Bengali novelists.",
-    bioBn:
-      "সংসারজীবন ও সমাজসংস্কারের রূপকার; বাংলা সাহিত্যের সর্বাধিক পঠিত ঔপন্যাসিকদের একজন।",
-    bookCount: 0,
-  },
-  {
-    id: "a-humayun",
-    slug: "humayun-ahmed",
-    name: "Humayun Ahmed",
-    nameBn: "হুমায়ূন আহমেদ",
-    era: "1948–2012",
-    bio: "Bangladesh's most popular modern novelist and dramatist; creator of Himu and Misir Ali.",
-    bioBn:
-      "বাংলাদেশের সর্বাধিক জনপ্রিয় আধুনিক ঔপন্যাসিক ও নাট্যকার; হিমু ও মিসির আলির স্রষ্টা।",
-    bookCount: 0,
-  },
-  {
-    id: "a-manik",
-    slug: "manik-bandyopadhyay",
-    name: "Manik Bandyopadhyay",
-    nameBn: "মানিক বন্দ্যোপাধ্যায়",
-    era: "1908–1956",
-    bio: "Modernist novelist whose work turned an unsentimental eye on poverty and labour.",
-    bioBn:
-      "আধুনিক ঔপন্যাসিক; দারিদ্র্য ও শ্রমজীবী মানুষের জীবনকে আবেগহীন সত্যদৃষ্টিতে দেখেছেন।",
-    bookCount: 0,
-  },
-  {
-    id: "a-bankim",
-    slug: "bankim-chandra-chattopadhyay",
-    name: "Bankim Chandra Chattopadhyay",
-    nameBn: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
-    era: "1838–1894",
-    bio: "Author of the first major Bengali novels and of the poem 'Vande Mataram'.",
-    bioBn:
-      "বাংলা ভাষার প্রথম বড় উপন্যাসগুলোর রচয়িতা এবং ‘বন্দে মাতরম্‌’ কবিতার কবি।",
-    bookCount: 0,
-  },
-  {
-    id: "a-jibanananda",
-    slug: "jibanananda-das",
-    name: "Jibanananda Das",
-    nameBn: "জীবনানন্দ দাশ",
-    era: "1899–1954",
-    bio: "The most quietly influential Bengali poet after Tagore; a founder of Bengali modernism.",
-    bioBn:
-      "রবীন্দ্রনাথের পরে বাংলা কবিতার সবচেয়ে নিঃশব্দ প্রভাবশালী কবি; বাংলা আধুনিকতার এক প্রতিষ্ঠাতা।",
-    bookCount: 0,
-  },
-  {
-    id: "a-carroll",
-    slug: "lewis-carroll",
-    name: "Lewis Carroll",
-    nameBn: "লুইস ক্যারল",
-    era: "1832–1898",
-    bio: "Mathematician and author whose nonsense fiction reshaped children's literature.",
-    bioBn:
-      "গণিতজ্ঞ ও লেখক; তাঁর ননসেন্স সাহিত্য শিশুসাহিত্যের ধারা বদলে দিয়েছে।",
-    bookCount: 0,
-  },
-  {
-    id: "a-austen",
-    slug: "jane-austen",
-    name: "Jane Austen",
-    nameBn: "জেন অস্টেন",
-    era: "1775–1817",
-    bio: "Novelist of manners whose six major novels remain continuously in print.",
-    bioBn:
-      "সমাজ-আচারের ঔপন্যাসিক; তাঁর ছয়টি প্রধান উপন্যাস আজও অবিরাম মুদ্রিত হয়ে চলেছে।",
-    bookCount: 0,
-  },
-  {
-    id: "a-sagan",
-    slug: "carl-sagan",
-    name: "Carl Sagan",
-    nameBn: "কার্ল সেগান",
-    era: "1934–1996",
-    bio: "Astronomer and science communicator who brought cosmology to a general readership.",
-    bioBn:
-      "জ্যোতির্বিজ্ঞানী ও বিজ্ঞান-লেখক; মহাবিশ্বতত্ত্বকে সাধারণ পাঠকের কাছে পৌঁছে দিয়েছেন।",
-    bookCount: 0,
-  },
-  {
-    id: "a-hossain",
-    slug: "begum-rokeya",
-    name: "Begum Rokeya",
-    nameBn: "বেগম রোকেয়া",
-    era: "1880–1932",
-    bio: "Writer and pioneering advocate for women's education in Bengal.",
-    bioBn: "লেখিকা এবং বাংলায় নারীশিক্ষার অগ্রপথিক।",
+      "উইসকনসিন মেডিকেল কলেজের শিশুরোগবিদ্যার অধ্যাপক ও সাবেক বিভাগীয় প্রধান এবং নেলসন টেক্সটবুক অব পেডিয়াট্রিক্স-এর একাধিক সংস্করণের প্রধান সম্পাদক।",
     bookCount: 0,
   },
   /**
-   * A corporate author, which is how reference works of this kind are actually
-   * catalogued: the handbook has been compiled by the hospital's house officers
-   * across twenty-three editions, and each edition's editors are credited in
-   * the book's own description rather than standing in as its author. No `era`
-   * for the same reason — an institution has no dates in the sense the author
-   * pages mean them.
+   * Corporate author. The Harriet Lane Handbook has been compiled by the
+   * paediatric house staff at Johns Hopkins across twenty-four editions; no
+   * single editor stands in as the author. No `era` — an institution has no
+   * birth or death dates.
    */
   {
     id: "a-jhh",
     slug: "johns-hopkins-hospital",
     name: "Johns Hopkins Hospital",
     nameBn: "জনস হপকিন্স হসপিটাল",
-    bio: "The Baltimore teaching hospital whose paediatric house staff have compiled the Harriet Lane Handbook since 1953.",
+    bio: "The Baltimore teaching hospital whose paediatric house staff have compiled the Harriet Lane Handbook since 1953. The twenty-fourth edition (2027) was edited by Tolulope Fatola, Jillian Heckman and Nathaniel Silvestri.",
     bioBn:
-      "বাল্টিমোরের শিক্ষাদানকারী হাসপাতাল, যার শিশুরোগ বিভাগের চিকিৎসকেরা ১৯৫৩ সাল থেকে হ্যারিয়েট লেন হ্যান্ডবুক সংকলন করে আসছেন।",
+      "বাল্টিমোরের শিক্ষাদানকারী হাসপাতাল, যার শিশুরোগ বিভাগের চিকিৎসকেরা ১৯৫৩ সাল থেকে হ্যারিয়েট লেন হ্যান্ডবুক সংকলন করে আসছেন। চব্বিশতম সংস্করণ (২০২৭) সম্পাদনা করেছেন তোলুলোপে ফাতোলা, জিলিয়ান হেকম্যান ও নাথানিয়েল সিলভেস্ট্রি।",
+    bookCount: 0,
+  },
+  {
+    id: "a-gomella",
+    slug: "tricia-lacy-gomella",
+    name: "Tricia Lacy Gomella",
+    nameBn: "ট্রিসিয়া লেসি গোমেল্লা",
+    bio: "Neonatologist at Johns Hopkins and primary author of Gomella's Neonatology, the standard clinical reference for newborn intensive care.",
+    bioBn:
+      "জনস হপকিন্সের নিওনাটোলজিস্ট এবং গোমেল্লার নিওনাটোলজির প্রধান লেখক, যা নবজাতক নিবিড় পরিচর্যার মানক ক্লিনিক্যাল তথ্যসূত্র।",
+    bookCount: 0,
+  },
+  {
+    id: "a-hay",
+    slug: "william-hay",
+    name: "William W. Hay Jr",
+    nameBn: "উইলিয়াম ডব্লিউ. হেই জুনিয়র",
+    bio: "Professor of Paediatrics at the University of Colorado and lead editor of CURRENT Diagnosis & Treatment: Pediatrics.",
+    bioBn:
+      "কলোরাডো বিশ্ববিদ্যালয়ের শিশুরোগবিদ্যার অধ্যাপক এবং CURRENT ডায়াগনোসিস ও ট্রিটমেন্ট: পেডিয়াট্রিক্স-এর প্রধান সম্পাদক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-eichenwald",
+    slug: "eric-eichenwald",
+    name: "Eric C. Eichenwald",
+    nameBn: "এরিক সি. আইখেনওয়াল্ড",
+    bio: "Chief of Newborn Services at Children's Hospital of Philadelphia and lead editor of Cloherty and Stark's Manual of Neonatal Care.",
+    bioBn:
+      "ফিলাডেলফিয়া চিলড্রেন্স হাসপাতালের নবজাতক বিভাগের প্রধান এবং ক্লোহার্টি ও স্টার্কের ম্যানুয়াল অব নিওনেটাল কেয়ার-এর প্রধান সম্পাদক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-strachan",
+    slug: "mark-strachan",
+    name: "Mark W. J. Strachan",
+    nameBn: "মার্ক ডব্লিউ. জে. স্ট্রাচান",
+    bio: "Consultant physician and endocrinologist at the Western General Hospital, Edinburgh, and co-editor of Davidson's Principles and Practice of Medicine.",
+    bioBn:
+      "এডিনবরার ওয়েস্টার্ন জেনারেল হাসপাতালের পরামর্শদাতা চিকিৎসক ও এন্ডোক্রিনোলজিস্ট এবং ডেভিডসনের প্রিন্সিপলস অ্যান্ড প্র্যাকটিস অব মেডিসিন-এর সহ-সম্পাদক।",
+    bookCount: 0,
+  },
+  /**
+   * Corporate author. AAP publishes both the PREP self-assessment series and
+   * Nelson's Pediatric Antimicrobial Therapy under its own name.
+   */
+  {
+    id: "a-aap",
+    slug: "american-academy-of-pediatrics",
+    name: "American Academy of Pediatrics",
+    nameBn: "আমেরিকান একাডেমি অব পেডিয়াট্রিক্স",
+    bio: "The professional organisation representing 67,000 paediatricians in the United States. Publisher of the PREP self-assessment series and Nelson's Pediatric Antimicrobial Therapy.",
+    bioBn:
+      "মার্কিন যুক্তরাষ্ট্রের ৬৭,০০০ শিশুরোগ বিশেষজ্ঞের পেশাদার সংস্থা। PREP স্ব-মূল্যায়ন সিরিজ এবং নেলসনের পেডিয়াট্রিক অ্যান্টিমাইক্রোবিয়াল থেরাপির প্রকাশক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-marcdante",
+    slug: "karen-marcdante",
+    name: "Karen J. Marcdante",
+    nameBn: "কারেন জে. মার্কড্যান্টে",
+    bio: "Professor of Paediatrics at the Medical College of Wisconsin and lead editor of Nelson Essentials of Pediatrics.",
+    bioBn:
+      "উইসকনসিন মেডিকেল কলেজের শিশুরোগবিদ্যার অধ্যাপক এবং নেলসন এসেনশিয়ালস অব পেডিয়াট্রিক্স-এর প্রধান সম্পাদক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-kher",
+    slug: "kanwal-kher",
+    name: "Kanwal K. Kher",
+    nameBn: "কানওয়াল কে. খের",
+    bio: "Paediatric nephrologist and lead editor of Clinical Pediatric Nephrology, the standard reference in the subspecialty.",
+    bioBn:
+      "শিশু বৃক্করোগ বিশেষজ্ঞ এবং ক্লিনিক্যাল পেডিয়াট্রিক নেফ্রোলজির প্রধান সম্পাদক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-zitelli",
+    slug: "basil-zitelli",
+    name: "Basil J. Zitelli",
+    nameBn: "বাসিল জে. জিটেলি",
+    bio: "Emeritus professor of paediatrics at the University of Pittsburgh and founding editor of the Atlas of Pediatric Physical Diagnosis.",
+    bioBn:
+      "পিটসবার্গ বিশ্ববিদ্যালয়ের শিশুরোগবিদ্যার ইমেরিটাস অধ্যাপক এবং অ্যাটলাস অব পেডিয়াট্রিক ফিজিক্যাল ডায়াগনোসিসের প্রতিষ্ঠাতা সম্পাদক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-kristal",
+    slug: "leonard-kristal",
+    name: "Leonard Kristal",
+    nameBn: "লিওনার্ড ক্রিস্টাল",
+    bio: "Clinical associate professor of dermatology at SUNY Stony Brook and co-author of Weinberg's Color Atlas of Pediatric Dermatology.",
+    bioBn:
+      "SUNY স্টোনি ব্রুকের চর্মরোগবিদ্যার ক্লিনিক্যাল সহযোগী অধ্যাপক এবং ওয়েইনবার্গের কালার অ্যাটলাস অব পেডিয়াট্রিক ডার্মাটোলজির সহ-লেখক।",
+    bookCount: 0,
+  },
+  /**
+   * Corporate author. AAO's BCSC series is produced under the Academy's name
+   * with rotating editorial committees; no individual editor is credited on
+   * the cover.
+   */
+  {
+    id: "a-aao",
+    slug: "american-academy-of-ophthalmology",
+    name: "American Academy of Ophthalmology",
+    nameBn: "আমেরিকান একাডেমি অব অপথালমোলজি",
+    bio: "Publisher of the Basic and Clinical Science Course (BCSC), the ophthalmic residency curriculum. Section 6 covers Pediatric Ophthalmology and Strabismus.",
+    bioBn:
+      "বেসিক অ্যান্ড ক্লিনিক্যাল সায়েন্স কোর্সের (BCSC) প্রকাশক, যা চক্ষুরোগ রেসিডেন্সি পাঠ্যক্রম। সেকশন ৬ পেডিয়াট্রিক অপথালমোলজি ও স্ট্র্যাবিসমাস বিষয়ক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-hasan",
+    slug: "rashed-hasan",
+    name: "Rashed A. Hasan",
+    nameBn: "রাশেদ এ. হাসান",
+    bio: "Paediatric intensivist and lead author of Pediatric Critical Care Review, a case-based board preparation text.",
+    bioBn:
+      "শিশু ক্রিটিক্যাল কেয়ার বিশেষজ্ঞ এবং পেডিয়াট্রিক ক্রিটিক্যাল কেয়ার রিভিউ-এর প্রধান লেখক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-cheung",
+    slug: "ronny-cheung",
+    name: "Ronny Cheung",
+    nameBn: "রনি চেউং",
+    bio: "Paediatric consultant and lead author of 100 Cases in Paediatrics, a case-based learning resource for undergraduates and junior doctors.",
+    bioBn:
+      "শিশুরোগ পরামর্শদাতা এবং ১০০ কেসেস ইন পেডিয়াট্রিক্স-এর প্রধান লেখক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-ainsworth",
+    slug: "sean-ainsworth",
+    name: "Sean Ainsworth",
+    nameBn: "শন এইনসওয়ার্থ",
+    bio: "Consultant neonatologist at Victoria Hospital, Kirkcaldy, and lead editor of Neonatal Formulary, the reference for drug use in pregnancy and the first year of life.",
+    bioBn:
+      "কিরকালডির ভিক্টোরিয়া হাসপাতালের পরামর্শদাতা নিওনাটোলজিস্ট এবং নিওনেটাল ফর্মুলারির প্রধান সম্পাদক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-cherry",
+    slug: "james-cherry",
+    name: "James D. Cherry",
+    nameBn: "জেমস ডি. চেরি",
+    bio: "Distinguished professor of paediatric infectious diseases at UCLA and founding editor of Feigin and Cherry's Textbook of Pediatric Infectious Diseases.",
+    bioBn:
+      "UCLA-র শিশু সংক্রামক রোগবিদ্যার বিশিষ্ট অধ্যাপক এবং ফেইগিন ও চেরির টেক্সটবুক অব পেডিয়াট্রিক ইনফেকশাস ডিজিজেস-এর প্রতিষ্ঠাতা সম্পাদক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-bale",
+    slug: "james-bale",
+    name: "James F. Bale Jr",
+    nameBn: "জেমস এফ. বেল জুনিয়র",
+    bio: "Professor of paediatric neurology at the University of Utah and lead author of Pediatric Neurology: A Color Handbook.",
+    bioBn:
+      "ইউটা বিশ্ববিদ্যালয়ের শিশু স্নায়ুরোগবিদ্যার অধ্যাপক এবং পেডিয়াট্রিক নিউরোলজি: এ কালার হ্যান্ডবুকের প্রধান লেখক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-passi",
+    slug: "gouri-rao-passi",
+    name: "Gouri Rao Passi",
+    nameBn: "গৌরী রাও পাসি",
+    bio: "Paediatric neurologist at Choithram Hospital, Indore, and author of Algorithms in Pediatric Neurology, a decision-tree guide for trainees.",
+    bioBn:
+      "ইন্দোরের চৈতরাম হাসপাতালের শিশু স্নায়ুরোগ বিশেষজ্ঞ এবং অ্যালগরিদমস ইন পেডিয়াট্রিক নিউরোলজির লেখক।",
+    bookCount: 0,
+  },
+  {
+    id: "a-loscalzo",
+    slug: "joseph-loscalzo",
+    name: "Joseph Loscalzo",
+    nameBn: "জোসেফ লোসকালজো",
+    bio: "Hersey Professor of the Theory and Practice of Medicine at Harvard Medical School and editor-in-chief of Harrison's Principles of Internal Medicine.",
+    bioBn:
+      "হার্ভার্ড মেডিকেল স্কুলের চিকিৎসাবিদ্যার অধ্যাপক এবং হ্যারিসনস প্রিন্সিপলস অব ইন্টার্নাল মেডিসিনের প্রধান সম্পাদক।",
     bookCount: 0,
   },
 ];
 
 /**
- * A book that has a real file behind it rather than the shared sample.
+ * A book that has a real file behind it.
  *
- * Everything `buildBook` would otherwise invent — ISBN, file size, the date it
- * arrived — has a true value for these, and a made-up ISBN on a book someone
- * can actually download is worse than no fixture at all. Present means real;
- * absent means demo.
+ * All fields are present for every one of the 20 real titles.
+ * `isbn` is optional because four books have no readable ISBN, and a
+ * fabricated one on a downloadable file is worse than none.
  */
 interface SeedFile {
   /**
-   * The file's name in private storage — `private/books/` in development, an
-   * R2 key in production. Never a URL a browser could ask for: the file is
+   * The file's name in private storage — the slug-named symlink in
+   * `private/books/`. Never a URL a browser could ask for: the file is
    * reached only through `/api/file/[slug]`, which checks for an account
-   * first. See `bookFiles` at the foot of this module.
+   * first.
    */
   url: string;
   sizeMb: number;
-  isbn: string;
+  isbn?: string;
   /** ISO date. Real uploads sort by when they actually landed. */
   addedAt: string;
   uploadedBy?: string;
@@ -266,534 +333,546 @@ interface Seed {
   descriptionBn?: string;
   featured?: boolean;
   status?: BookStatus;
-  /** Cover hue in degrees; drives the generated cover art. */
+  /** Cover hue in degrees; drives the 3D spine and fallback generated art. */
   hue: number;
-  file?: SeedFile;
+  /** Edition label as printed on the copyright page. */
+  edition?: string;
+  /**
+   * Served path to the real cover WebP built by `scripts/build-covers.mjs`.
+   * Present for all 20 real books.
+   */
+  coverImage?: string;
+  /**
+   * Language is always explicit here — `buildBook` no longer infers it from
+   * `titleBn`. These are English-language books that happen to have Bengali
+   * display titles. The `?language=bn` filter legitimately returns nothing.
+   */
+  language: "bn" | "en";
+  file: SeedFile;
 }
 
 const seeds: Seed[] = [
+  // ── 01 Nelson Textbook of Pediatrics ─────────────────────────────────────
   {
-    title: "Gitanjali",
-    titleBn: "গীতাঞ্জলি",
-    authorId: "a-tagore",
-    categoryId: "cat-poetry",
-    year: 1910,
-    publisher: "Indian Press",
-    pages: 168,
+    title: "Nelson Textbook of Pediatrics",
+    titleBn: "নেলসন টেক্সটবুক অব পেডিয়াট্রিক্স",
+    authorId: "a-kliegman",
+    categoryId: "cat-general-pediatrics",
+    year: 2025,
+    publisher: "Elsevier",
+    pages: 4535,
+    edition: "22nd",
+    coverImage: "/covers/nelson-textbook-of-pediatrics.webp",
+    language: "en",
     description:
-      "The song-offerings that carried Bengali verse to a world audience, in the poet's own English rendering.",
+      "The definitive two-volume reference in paediatrics, covering every subspecialty from neonatology to adolescent medicine. Twenty-second edition, edited by Kliegman, St Geme, Blum, Tasker, Wilson, Schuh and Mack.",
     descriptionBn:
-      "গীতাঞ্জলি রবীন্দ্রনাথ ঠাকুরের কাব্যগ্রন্থ, যার ইংরেজি অনুবাদের জন্য তিনি নোবেল পুরস্কার লাভ করেন।",
-    featured: true,
-    hue: 28,
-  },
-  {
-    title: "Shesher Kobita",
-    titleBn: "শেষের কবিতা",
-    authorId: "a-tagore",
-    categoryId: "cat-fiction",
-    year: 1929,
-    publisher: "Visva-Bharati",
-    pages: 214,
-    description:
-      "A late, unusually modern novel about love that argues with itself in essays and verse.",
-    descriptionBn:
-      "রবীন্দ্রনাথের অন্যতম আধুনিক উপন্যাস, যেখানে প্রেম ও যুক্তি পরস্পরের মুখোমুখি।",
-    featured: true,
-    hue: 340,
-  },
-  {
-    title: "Gora",
-    titleBn: "গোরা",
-    authorId: "a-tagore",
-    categoryId: "cat-fiction",
-    year: 1909,
-    publisher: "Indian Press",
-    pages: 476,
-    description:
-      "A sprawling novel of identity, orthodoxy and nationalism in colonial Bengal.",
-    hue: 18,
-  },
-  {
-    title: "Chokher Bali",
-    titleBn: "চোখের বালি",
-    authorId: "a-tagore",
-    categoryId: "cat-fiction",
-    year: 1903,
-    publisher: "Indian Press",
-    pages: 288,
-    description:
-      "One of the first psychological novels in Bengali, centred on widowhood and desire.",
-    status: "borrowed",
-    hue: 4,
-  },
-  {
-    title: "Agnibina",
-    titleBn: "অগ্নিবীণা",
-    authorId: "a-nazrul",
-    categoryId: "cat-poetry",
-    year: 1922,
-    publisher: "Arya Publishing",
-    pages: 96,
-    description:
-      "The collection that opens with 'Bidrohi' and announced a new voice in Bengali poetry.",
-    descriptionBn:
-      "‘বিদ্রোহী’ কবিতা দিয়ে শুরু হওয়া এই সংকলন বাংলা কাব্যে নতুন কণ্ঠস্বরের ঘোষণা।",
-    featured: true,
-    hue: 12,
-  },
-  {
-    title: "Bisher Banshi",
-    titleBn: "বিষের বাঁশি",
-    authorId: "a-nazrul",
-    categoryId: "cat-poetry",
-    year: 1924,
-    publisher: "Arya Publishing",
-    pages: 88,
-    description:
-      "Banned on publication for its politics; a poison flute aimed squarely at empire.",
-    hue: 350,
-  },
-  {
-    title: "Pather Panchali",
-    titleBn: "পথের পাঁচালী",
-    authorId: "a-bibhuti",
-    categoryId: "cat-fiction",
-    year: 1929,
-    publisher: "Ranjan Publishing",
-    pages: 352,
-    description:
-      "Apu and Durga's childhood in a Bengal village, told with almost documentary tenderness.",
-    descriptionBn:
-      "অপু ও দুর্গার শৈশব, বাংলার গ্রামজীবনের এক অনন্য চিত্র।",
-    featured: true,
-    hue: 96,
-  },
-  {
-    title: "Aranyak",
-    titleBn: "আরণ্যক",
-    authorId: "a-bibhuti",
-    categoryId: "cat-fiction",
-    year: 1939,
-    publisher: "Ranjan Publishing",
-    pages: 264,
-    description:
-      "A forest officer watches the wilderness he is paid to parcel out disappear.",
-    hue: 128,
-  },
-  {
-    title: "Devdas",
-    titleBn: "দেবদাস",
-    authorId: "a-sarat",
-    categoryId: "cat-fiction",
-    year: 1917,
-    publisher: "Gurudas Chattopadhyay & Sons",
-    pages: 186,
-    description:
-      "The short novel of thwarted love that has been filmed more often than any other Bengali book.",
-    hue: 264,
-  },
-  {
-    title: "Srikanta",
-    titleBn: "শ্রীকান্ত",
-    authorId: "a-sarat",
-    categoryId: "cat-fiction",
-    year: 1917,
-    publisher: "Gurudas Chattopadhyay & Sons",
-    pages: 420,
-    description:
-      "A wandering narrator's four-part account of the people he meets and fails to hold onto.",
-    status: "damaged",
-    hue: 200,
-  },
-  {
-    title: "Nondito Noroke",
-    titleBn: "নন্দিত নরকে",
-    authorId: "a-humayun",
-    categoryId: "cat-fiction",
-    year: 1972,
-    publisher: "Khan Brothers",
-    pages: 104,
-    description:
-      "The debut novella that introduced a plain, devastating new register to Bangladeshi fiction.",
-    descriptionBn:
-      "হুমায়ূন আহমেদের প্রথম উপন্যাস, যা বাংলা কথাসাহিত্যে সহজ অথচ মর্মভেদী ভাষা এনেছিল।",
-    featured: true,
-    hue: 216,
-  },
-  {
-    title: "Himu",
-    titleBn: "হিমু",
-    authorId: "a-humayun",
-    categoryId: "cat-fiction",
-    year: 1993,
-    publisher: "Anyaprokash",
-    pages: 142,
-    description:
-      "The barefoot young man in a yellow panjabi who refuses every sensible thing.",
-    hue: 44,
-  },
-  {
-    title: "Misir Ali",
-    titleBn: "মিসির আলি",
-    authorId: "a-humayun",
-    categoryId: "cat-fiction",
-    year: 1985,
-    publisher: "Anyaprokash",
-    pages: 158,
-    description:
-      "A psychology lecturer applies pure logic to problems that decline to stay rational.",
-    status: "borrowed",
-    hue: 172,
-  },
-  {
-    title: "Padma Nadir Majhi",
-    titleBn: "পদ্মা নদীর মাঝি",
-    authorId: "a-manik",
-    categoryId: "cat-fiction",
-    year: 1936,
-    publisher: "Bengal Publishers",
-    pages: 232,
-    description:
-      "Fishermen on the Padma, drawn without a trace of romance about poverty.",
-    descriptionBn: "পদ্মা নদীর জেলেজীবনের নির্মম ও বাস্তব চিত্র।",
-    featured: true,
-    hue: 188,
-  },
-  {
-    title: "Putul Nacher Itikatha",
-    titleBn: "পুতুল নাচের ইতিকথা",
-    authorId: "a-manik",
-    categoryId: "cat-fiction",
-    year: 1936,
-    publisher: "Bengal Publishers",
-    pages: 276,
-    description:
-      "A village doctor discovers how little of his own life he actually directs.",
-    hue: 288,
-  },
-  {
-    title: "Anandamath",
-    titleBn: "আনন্দমঠ",
-    authorId: "a-bankim",
-    categoryId: "cat-history",
-    year: 1882,
-    publisher: "Bangadarshan",
-    pages: 208,
-    description:
-      "The novel of the sannyasi rebellion that gave the subcontinent 'Vande Mataram'.",
-    hue: 36,
-  },
-  {
-    title: "Kapalkundala",
-    titleBn: "কপালকুণ্ডলা",
-    authorId: "a-bankim",
-    categoryId: "cat-fiction",
-    year: 1866,
-    publisher: "Bangadarshan",
-    pages: 164,
-    description:
-      "An early Bengali romance, part gothic and part folk tale, set on the Bay coast.",
-    hue: 312,
-  },
-  {
-    title: "Banalata Sen",
-    titleBn: "বনলতা সেন",
-    authorId: "a-jibanananda",
-    categoryId: "cat-poetry",
-    year: 1942,
-    publisher: "Kabita Bhavan",
-    pages: 72,
-    description:
-      "Bengali modernism's quietest and most quoted book; a thousand years of walking the earth.",
-    descriptionBn:
-      "‘হাজার বছর ধরে আমি পথ হাঁটিতেছি পৃথিবীর পথে’ — বাংলা আধুনিক কবিতার মাইলফলক।",
-    featured: true,
-    hue: 152,
-  },
-  {
-    title: "Rupasi Bangla",
-    titleBn: "রূপসী বাংলা",
-    authorId: "a-jibanananda",
-    categoryId: "cat-poetry",
-    year: 1957,
-    publisher: "Signet Press",
-    pages: 84,
-    description:
-      "Sonnets to a countryside the poet did not live to see published.",
-    hue: 108,
-  },
-  {
-    title: "Sultana's Dream",
-    titleBn: "সুলতানার স্বপ্ন",
-    authorId: "a-hossain",
-    categoryId: "cat-fiction",
-    year: 1905,
-    publisher: "The Indian Ladies' Magazine",
-    pages: 48,
-    description:
-      "A feminist utopia written in English in 1905, in which men are the ones kept indoors.",
-    featured: true,
-    hue: 300,
-  },
-  {
-    title: "Aborodhbasini",
-    titleBn: "অবরোধবাসিনী",
-    authorId: "a-hossain",
-    categoryId: "cat-history",
-    year: 1931,
-    publisher: "Mohammadi Press",
-    pages: 96,
-    description:
-      "Forty-seven short, furious sketches of life in seclusion.",
-    hue: 328,
-  },
-  {
-    title: "Alice's Adventures in Wonderland",
-    authorId: "a-carroll",
-    categoryId: "cat-children",
-    year: 1865,
-    publisher: "Macmillan",
-    pages: 192,
-    description:
-      "A girl follows a waistcoated rabbit underground and logic stops applying.",
-    featured: true,
-    hue: 320,
-  },
-  {
-    title: "Through the Looking-Glass",
-    authorId: "a-carroll",
-    categoryId: "cat-children",
-    year: 1871,
-    publisher: "Macmillan",
-    pages: 208,
-    description: "The sequel, arranged as a chess problem that Alice wins by promotion.",
-    hue: 232,
-  },
-  {
-    title: "Pride and Prejudice",
-    authorId: "a-austen",
-    categoryId: "cat-fiction",
-    year: 1813,
-    publisher: "T. Egerton",
-    pages: 432,
-    description:
-      "Elizabeth Bennet, Fitzwilliam Darcy, and the slow correction of two first impressions.",
+      "শিশুরোগবিদ্যার নির্ধারক দুই-খণ্ডের তথ্যসূত্র — নবজাতক থেকে কিশোর চিকিৎসা পর্যন্ত প্রতিটি বিশেষায়িত শাখা অন্তর্ভুক্ত। বাইশতম সংস্করণ।",
     featured: true,
     hue: 210,
+    file: {
+      url: "/books/nelson-textbook-of-pediatrics.pdf",
+      sizeMb: 154.1,
+      isbn: "978-0-323-88305-4",
+      addedAt: "2026-08-14",
+    },
   },
-  {
-    title: "Emma",
-    authorId: "a-austen",
-    categoryId: "cat-fiction",
-    year: 1815,
-    publisher: "John Murray",
-    pages: 474,
-    description:
-      "A heroine 'whom no one but myself will much like', and a village she keeps rearranging.",
-    status: "borrowed",
-    hue: 164,
-  },
-  {
-    title: "Sense and Sensibility",
-    authorId: "a-austen",
-    categoryId: "cat-fiction",
-    year: 1811,
-    publisher: "T. Egerton",
-    pages: 384,
-    description: "Two sisters test opposite theories of how much feeling to show.",
-    hue: 276,
-  },
-  {
-    title: "Cosmos",
-    authorId: "a-sagan",
-    categoryId: "cat-science",
-    year: 1980,
-    publisher: "Random House",
-    pages: 396,
-    description:
-      "Thirteen chapters on the universe and our very short time paying attention to it.",
-    featured: true,
-    hue: 240,
-  },
-  {
-    title: "The Demon-Haunted World",
-    authorId: "a-sagan",
-    categoryId: "cat-science",
-    year: 1995,
-    publisher: "Random House",
-    pages: 458,
-    description:
-      "Science as a candle in the dark, and a toolkit for detecting baloney.",
-    hue: 256,
-  },
-  {
-    title: "Pale Blue Dot",
-    authorId: "a-sagan",
-    categoryId: "cat-science",
-    year: 1994,
-    publisher: "Random House",
-    pages: 384,
-    description: "A vision of the human future in space, starting from one pixel.",
-    status: "lost",
-    hue: 220,
-  },
-  {
-    title: "Sanchayita",
-    titleBn: "সঞ্চয়িতা",
-    authorId: "a-tagore",
-    categoryId: "cat-poetry",
-    year: 1931,
-    publisher: "Visva-Bharati",
-    pages: 812,
-    description: "The poet's own selection from fifty years of verse.",
-    hue: 20,
-  },
-  {
-    title: "Galpaguchchha",
-    titleBn: "গল্পগুচ্ছ",
-    authorId: "a-tagore",
-    categoryId: "cat-fiction",
-    year: 1912,
-    publisher: "Indian Press",
-    pages: 640,
-    description:
-      "The collected short stories — arguably where Tagore's prose is at its sharpest.",
-    hue: 60,
-  },
-  {
-    title: "Sonar Tori",
-    titleBn: "সোনার তরী",
-    authorId: "a-tagore",
-    categoryId: "cat-poetry",
-    year: 1894,
-    publisher: "Indian Press",
-    pages: 128,
-    description: "The golden boat takes the harvest and leaves the farmer behind.",
-    hue: 48,
-  },
-  {
-    title: "Sanchita",
-    titleBn: "সঞ্চিতা",
-    authorId: "a-nazrul",
-    categoryId: "cat-poetry",
-    year: 1928,
-    publisher: "D. M. Library",
-    pages: 320,
-    description: "Nazrul's own anthology of his best-known poems.",
-    hue: 8,
-  },
-  {
-    title: "Chandranath",
-    titleBn: "চন্দ্রনাথ",
-    authorId: "a-sarat",
-    categoryId: "cat-fiction",
-    year: 1916,
-    publisher: "Gurudas Chattopadhyay & Sons",
-    pages: 148,
-    description: "Caste, pride and a marriage that neither party can quite abandon.",
-    hue: 292,
-  },
-  {
-    title: "Parineeta",
-    titleBn: "পরিণীতা",
-    authorId: "a-sarat",
-    categoryId: "cat-fiction",
-    year: 1914,
-    publisher: "Gurudas Chattopadhyay & Sons",
-    pages: 132,
-    description: "A childhood attachment quietly hardens into an unspoken marriage.",
-    hue: 336,
-  },
-  {
-    title: "Ichhapuran",
-    titleBn: "ইচ্ছাপূরণ",
-    authorId: "a-tagore",
-    categoryId: "cat-children",
-    year: 1895,
-    publisher: "Indian Press",
-    pages: 64,
-    description:
-      "A father and son swap ages for a day and both regret it by evening.",
-    hue: 76,
-  },
-  {
-    title: "Thakurmar Jhuli",
-    titleBn: "ঠাকুরমার ঝুলি",
-    authorId: "a-bibhuti",
-    categoryId: "cat-children",
-    year: 1907,
-    publisher: "Bhattacharya & Sons",
-    pages: 176,
-    description:
-      "Grandmother's bag of Bengali folk tales — princes, rakkhoshes and talking birds.",
-    descriptionBn: "বাংলার রূপকথার সংকলন — রাজপুত্র, রাক্ষস আর কথা বলা পাখির গল্প।",
-    featured: true,
-    hue: 140,
-  },
-  {
-    title: "Bangla Bhashar Abhidhan",
-    titleBn: "বাংলা ভাষার অভিধান",
-    authorId: "a-bankim",
-    categoryId: "cat-reference",
-    year: 1917,
-    publisher: "Bangiya Sahitya Parishad",
-    pages: 1240,
-    description: "A standard reference dictionary of the Bengali language.",
-    hue: 200,
-  },
-  {
-    title: "Bharatbarsher Itihas",
-    titleBn: "ভারতবর্ষের ইতিহাস",
-    authorId: "a-bankim",
-    categoryId: "cat-history",
-    year: 1888,
-    publisher: "Bangadarshan",
-    pages: 528,
-    description: "An early attempt at a history of India written from within it.",
-    status: "damaged",
-    hue: 32,
-  },
-  {
-    title: "Jibansmriti",
-    titleBn: "জীবনস্মৃতি",
-    authorId: "a-tagore",
-    categoryId: "cat-history",
-    year: 1912,
-    publisher: "Indian Press",
-    pages: 244,
-    description: "Reminiscences of a Jorasanko childhood, written at fifty.",
-    hue: 88,
-  },
-  /**
-   * The one book on the shelf with a real file behind it. Appended rather than
-   * slotted in: `buildBook` derives ids, codes and shelf positions from array
-   * position, so inserting anywhere else would renumber every book after it and
-   * break links people may already have.
-   *
-   * Page count, file size, ISBN, edition, year and editors are all read off the
-   * file itself rather than from its file name, which credited the editors of a
-   * different edition.
-   */
+
+  // ── 02 The Harriet Lane Handbook ─────────────────────────────────────────
   {
     title: "The Harriet Lane Handbook",
+    titleBn: "হ্যারিয়েট লেন হ্যান্ডবুক",
     authorId: "a-jhh",
-    categoryId: "cat-reference",
-    year: 2024,
+    categoryId: "cat-clinical-reference",
+    year: 2027,
     publisher: "Elsevier",
-    pages: 1512,
+    pages: 1549,
+    edition: "24th",
+    coverImage: "/covers/the-harriet-lane-handbook.webp",
+    language: "en",
     description:
-      "The paediatric house officer's pocket reference, compiled at the Johns Hopkins Children's Center since 1953 and named for the Harriet Lane Home: assessment and procedures, emergency management, growth and development, and a full drug formulary. Twenty-third edition, edited by Camille C. Anderson, Sunaina Kapoor and Tiffany E. Mark.",
+      "The paediatric house officer's pocket reference, compiled at the Johns Hopkins Children's Center since 1953. Twenty-fourth edition (© 2027), edited by Tolulope Fatola, Jillian Heckman and Nathaniel Silvestri. Covers assessment and procedures, emergency management, growth and development, and a full drug formulary.",
     descriptionBn:
-      "শিশুরোগ চিকিৎসকদের জন্য হাতের কাছে রাখার তথ্যসূত্র — ১৯৫৩ সাল থেকে জনস হপকিন্স চিলড্রেন্স সেন্টারে সংকলিত। রোগনির্ণয় ও চিকিৎসাপদ্ধতি, আপৎকালীন ব্যবস্থাপনা, শিশুর বৃদ্ধি ও বিকাশ এবং সম্পূর্ণ ওষুধপঞ্জি এখানে আছে। ২৩তম সংস্করণ।",
-    // Slate: the one cool scheme in the set, which is where a clinical
-    // reference belongs on a shelf of warm literary covers.
+      "শিশুরোগ চিকিৎসকদের হাতের কাছে রাখার তথ্যসূত্র — ১৯৫৩ সাল থেকে জনস হপকিন্স চিলড্রেন্স সেন্টারে সংকলিত। চব্বিশতম সংস্করণ (© ২০২৭)।",
+    featured: true,
     hue: 337,
     file: {
-      url: "/books/harriet-lane-handbook.pdf",
-      sizeMb: 35,
-      isbn: "978-0-323-87698-8",
-      addedAt: "2026-08-12",
+      url: "/books/the-harriet-lane-handbook.pdf",
+      sizeMb: 17.1,
+      isbn: "978-0-443-28751-0",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 03 Gomella's Neonatology ──────────────────────────────────────────────
+  {
+    title: "Gomella's Neonatology",
+    titleBn: "গোমেল্লার নিওনাটোলজি",
+    authorId: "a-gomella",
+    categoryId: "cat-neonatology",
+    year: 2020,
+    publisher: "McGraw Hill",
+    pages: 1474,
+    edition: "8th",
+    coverImage: "/covers/gomellas-neonatology.webp",
+    language: "en",
+    description:
+      "The standard clinical reference for neonatal intensive care, covering diagnosis, management and pharmacology of newborn conditions. Eighth edition in the LANGE series.",
+    descriptionBn:
+      "নবজাতক নিবিড় পরিচর্যার মানক ক্লিনিক্যাল তথ্যসূত্র — নবজাতকের রোগনির্ণয়, চিকিৎসা ও ওষুধবিদ্যা। LANGE সিরিজের অষ্টম সংস্করণ।",
+    featured: true,
+    hue: 96,
+    file: {
+      url: "/books/gomellas-neonatology.pdf",
+      sizeMb: 30.2,
+      isbn: "978-1-259-64481-8",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 04 CURRENT Diagnosis & Treatment: Pediatrics ──────────────────────────
+  // File name says "CURRENT Diagnosis and Treatment of Pediatric".
+  // The PDF is the 23rd edition (2016). The supplied cover image shows the
+  // 27th edition — cover was rendered from the PDF instead.
+  {
+    title: "CURRENT Diagnosis & Treatment: Pediatrics",
+    titleBn: "কারেন্ট ডায়াগনোসিস ও ট্রিটমেন্ট: পেডিয়াট্রিক্স",
+    authorId: "a-hay",
+    categoryId: "cat-general-pediatrics",
+    year: 2016,
+    publisher: "McGraw-Hill Education",
+    pages: 1504,
+    edition: "23rd",
+    coverImage: "/covers/current-diagnosis-treatment-pediatrics.webp",
+    language: "en",
+    description:
+      "A comprehensive single-volume clinical reference for paediatric diagnosis and management across all organ systems. Twenty-third edition (2016); note the cover was rendered from the PDF — the file name and supplied image both reference a different edition.",
+    descriptionBn:
+      "শিশুরোগ নির্ণয় ও চিকিৎসার সামগ্রিক একক-খণ্ড তথ্যসূত্র। তেইশতম সংস্করণ (২০১৬)।",
+    hue: 28,
+    file: {
+      url: "/books/current-diagnosis-treatment-pediatrics.pdf",
+      sizeMb: 212.7,
+      isbn: "978-1-259-25125-2",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 05 Cloherty and Stark's Manual of Neonatal Care ──────────────────────
+  {
+    title: "Cloherty and Stark's Manual of Neonatal Care",
+    titleBn: "ক্লোহার্টি ও স্টার্কের ম্যানুয়াল অব নিওনেটাল কেয়ার",
+    authorId: "a-eichenwald",
+    categoryId: "cat-neonatology",
+    year: 2023,
+    publisher: "Wolters Kluwer",
+    pages: 1183,
+    edition: "9th",
+    coverImage: "/covers/cloherty-and-starks-manual-of-neonatal-care.webp",
+    language: "en",
+    description:
+      "The practical bedside manual for neonatal intensive care, covering every common and complex newborn problem. Ninth edition, edited by Eichenwald, Hansen, Martin and Stark.",
+    descriptionBn:
+      "নবজাতক নিবিড় পরিচর্যার ব্যবহারিক হ্যান্ডবুক — সাধারণ ও জটিল সব নবজাতকের সমস্যার সমাধান। নবম সংস্করণ।",
+    featured: true,
+    hue: 172,
+    file: {
+      url: "/books/cloherty-and-starks-manual-of-neonatal-care.pdf",
+      sizeMb: 16.0,
+      isbn: "978-1-9751-5952-8",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 06 Davidson's Principles and Practice of Medicine ────────────────────
+  {
+    title: "Davidson's Principles and Practice of Medicine",
+    titleBn: "ডেভিডসনের প্রিন্সিপলস অ্যান্ড প্র্যাকটিস অব মেডিসিন",
+    authorId: "a-strachan",
+    categoryId: "cat-clinical-reference",
+    year: 2027,
+    publisher: "Elsevier",
+    pages: 1412,
+    edition: "25th",
+    coverImage: "/covers/davidsons-principles-and-practice-of-medicine.webp",
+    language: "en",
+    description:
+      "The leading single-volume textbook of internal medicine for undergraduates and junior doctors, covering pathophysiology, clinical features and management across all systems. Twenty-fifth edition (© 2027).",
+    descriptionBn:
+      "মেডিকেল শিক্ষার্থী ও জুনিয়র চিকিৎসকদের জন্য অভ্যন্তরীণ চিকিৎসার শীর্ষস্থানীয় পাঠ্যপুস্তক। পঁচিশতম সংস্করণ (© ২০২৭)।",
+    hue: 240,
+    file: {
+      url: "/books/davidsons-principles-and-practice-of-medicine.pdf",
+      sizeMb: 245.6,
+      isbn: "978-0-443-28760-2",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 07 PREP 2026 — Self-Assessment ────────────────────────────────────────
+  // File name: "American association of pediatric 2026".
+  // This is the AAP PREP 2026 Self-Assessment (200 questions).
+  // No readable ISBN in the file.
+  {
+    title: "PREP 2026 — Self-Assessment",
+    titleBn: "PREP ২০২৬ — স্ব-মূল্যায়ন",
+    authorId: "a-aap",
+    categoryId: "cat-reviews",
+    year: 2026,
+    publisher: "AAP",
+    pages: 975,
+    edition: "2026",
+    coverImage: "/covers/prep-2026-self-assessment.webp",
+    language: "en",
+    description:
+      "The American Academy of Pediatrics annual self-assessment programme — 200 board-style questions with detailed critiques covering the full paediatric curriculum.",
+    descriptionBn:
+      "আমেরিকান একাডেমি অব পেডিয়াট্রিক্সের বার্ষিক স্ব-মূল্যায়ন কার্যক্রম — বোর্ড-স্টাইলের ২০০টি প্রশ্ন ও বিস্তারিত ব্যাখ্যা।",
+    hue: 44,
+    // isbn absent — no readable ISBN in this file
+    file: {
+      url: "/books/prep-2026-self-assessment.pdf",
+      sizeMb: 13.1,
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 08 Nelson's Pediatric Antimicrobial Therapy ───────────────────────────
+  // File name says "29th Edition"; the PDF is indeed the 29th (2023).
+  // The supplied cover image shows the 2026/32nd edition — cover was rendered
+  // from the PDF instead.
+  {
+    title: "Nelson's Pediatric Antimicrobial Therapy",
+    titleBn: "নেলসনের পেডিয়াট্রিক অ্যান্টিমাইক্রোবিয়াল থেরাপি",
+    authorId: "a-aap",
+    categoryId: "cat-infectious-disease",
+    year: 2023,
+    publisher: "AAP",
+    pages: 401,
+    edition: "29th",
+    coverImage: "/covers/nelsons-pediatric-antimicrobial-therapy.webp",
+    language: "en",
+    description:
+      "The annual AAP pocket guide to antimicrobial selection and dosing for paediatric infections. Twenty-ninth edition (2023); note the supplied cover image shows the 32nd — the cover here was rendered from the PDF.",
+    descriptionBn:
+      "শিশুদের সংক্রামক রোগে অ্যান্টিমাইক্রোবিয়াল নির্বাচন ও মাত্রা নির্ধারণের AAP পকেট গাইড। উনত্রিশতম সংস্করণ (২০২৩)।",
+    hue: 8,
+    file: {
+      url: "/books/nelsons-pediatric-antimicrobial-therapy.pdf",
+      sizeMb: 4.5,
+      isbn: "978-1-61002-650-5",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 09 Nelson Essentials of Pediatrics ───────────────────────────────────
+  {
+    title: "Nelson Essentials of Pediatrics",
+    titleBn: "নেলসন এসেনশিয়ালস অব পেডিয়াট্রিক্স",
+    authorId: "a-marcdante",
+    categoryId: "cat-general-pediatrics",
+    year: 2023,
+    publisher: "Elsevier",
+    pages: 1010,
+    edition: "9th",
+    coverImage: "/covers/nelson-essentials-of-pediatrics.webp",
+    language: "en",
+    description:
+      "The concise companion to the full Nelson Textbook, designed for medical students and residents. Covers the core paediatric curriculum in a single readable volume. Ninth edition.",
+    descriptionBn:
+      "মেডিকেল শিক্ষার্থী ও রেসিডেন্টদের জন্য নেলসনের সংক্ষিপ্ত সংস্করণ — মূল শিশুরোগ পাঠ্যক্রম একটি পাঠযোগ্য খণ্ডে। নবম সংস্করণ।",
+    hue: 188,
+    file: {
+      url: "/books/nelson-essentials-of-pediatrics.pdf",
+      sizeMb: 68.8,
+      isbn: "978-0-323-77562-5",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 10 Clinical Pediatric Nephrology ─────────────────────────────────────
+  // No readable ISBN in the file.
+  {
+    title: "Clinical Pediatric Nephrology",
+    titleBn: "ক্লিনিক্যাল পেডিয়াট্রিক নেফ্রোলজি",
+    authorId: "a-kher",
+    categoryId: "cat-subspecialties",
+    year: 2017,
+    publisher: "CRC Press",
+    pages: 1110,
+    edition: "3rd",
+    coverImage: "/covers/clinical-pediatric-nephrology.webp",
+    language: "en",
+    description:
+      "The comprehensive reference for paediatric kidney disease — glomerulonephritis, tubular disorders, hypertension, transplantation and dialysis. Third edition.",
+    descriptionBn:
+      "শিশুদের বৃক্করোগের সামগ্রিক তথ্যসূত্র — গ্লোমেরুলোনেফ্রাইটিস, টিউবুলার ডিজঅর্ডার, উচ্চ রক্তচাপ, প্রতিস্থাপন ও ডায়ালাইসিস। তৃতীয় সংস্করণ।",
+    hue: 200,
+    // isbn absent — no readable ISBN in this file
+    file: {
+      url: "/books/clinical-pediatric-nephrology.pdf",
+      sizeMb: 50.1,
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 11 Zitelli and Davis' Atlas of Pediatric Physical Diagnosis ───────────
+  {
+    title: "Zitelli and Davis' Atlas of Pediatric Physical Diagnosis",
+    titleBn: "জিটেলি ও ডেভিসের অ্যাটলাস অব পেডিয়াট্রিক ফিজিক্যাল ডায়াগনোসিস",
+    authorId: "a-zitelli",
+    categoryId: "cat-subspecialties",
+    year: 2023,
+    publisher: "Elsevier",
+    pages: 1032,
+    edition: "8th",
+    coverImage: "/covers/zitelli-and-davis-atlas-of-pediatric-physical-diagnosis.webp",
+    language: "en",
+    description:
+      "The atlas of clinical signs and physical findings in paediatrics — over 5,000 photographs covering the full spectrum of childhood illness. Eighth edition.",
+    descriptionBn:
+      "শিশুরোগের ক্লিনিক্যাল চিহ্ন ও শারীরিক অনুসন্ধানের চিত্রকোষ — শৈশব রোগের পূর্ণ পরিসরে ৫,০০০-এরও বেশি ছবি। অষ্টম সংস্করণ।",
+    featured: true,
+    hue: 280,
+    file: {
+      url: "/books/zitelli-and-davis-atlas-of-pediatric-physical-diagnosis.pdf",
+      sizeMb: 121.7,
+      isbn: "978-0-323-77788-9",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 12 Weinberg's Color Atlas of Pediatric Dermatology ───────────────────
+  {
+    title: "Weinberg's Color Atlas of Pediatric Dermatology",
+    titleBn: "ওয়েইনবার্গের কালার অ্যাটলাস অব পেডিয়াট্রিক ডার্মাটোলজি",
+    authorId: "a-kristal",
+    categoryId: "cat-subspecialties",
+    year: 2017,
+    publisher: "McGraw-Hill Education",
+    pages: 287,
+    edition: "5th",
+    coverImage: "/covers/weinbergs-color-atlas-of-pediatric-dermatology.webp",
+    language: "en",
+    description:
+      "A photographic reference for paediatric skin conditions — over 1,000 colour images covering rashes, infections, tumours and congenital disorders. Fifth edition.",
+    descriptionBn:
+      "শিশুদের চর্মরোগের ফটোগ্রাফিক তথ্যসূত্র — ফুসকুড়ি, সংক্রমণ, টিউমার ও জন্মগত ব্যাধির ১,০০০-এরও বেশি রঙিন ছবি। পঞ্চম সংস্করণ।",
+    hue: 12,
+    file: {
+      url: "/books/weinbergs-color-atlas-of-pediatric-dermatology.pdf",
+      sizeMb: 274.0,
+      isbn: "978-0-07-179225-7",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 13 Pediatric Ophthalmology and Strabismus (BCSC Section 6) ───────────
+  // File name: "Pediatric Ophthalmology". This is BCSC Section 6, 2024–2025,
+  // a 52-page section excerpt, not a full book. Cover rendered from the PDF.
+  // No readable ISBN.
+  {
+    title: "Pediatric Ophthalmology and Strabismus",
+    titleBn: "পেডিয়াট্রিক অপথালমোলজি ও স্ট্র্যাবিসমাস",
+    authorId: "a-aao",
+    categoryId: "cat-subspecialties",
+    year: 2024,
+    publisher: "AAO",
+    pages: 52,
+    edition: "2024–25",
+    coverImage: "/covers/pediatric-ophthalmology-and-strabismus.webp",
+    language: "en",
+    description:
+      "Basic and Clinical Science Course (BCSC) Section 6, 2024–2025 edition. This file is a 52-page section excerpt from the AAO ophthalmic residency curriculum, not a standalone full-length book.",
+    descriptionBn:
+      "বেসিক অ্যান্ড ক্লিনিক্যাল সায়েন্স কোর্স (BCSC) সেকশন ৬, ২০২৪–২০২৫। এটি AAO-র চক্ষুরোগ রেসিডেন্সি পাঠ্যক্রমের একটি ৫২ পৃষ্ঠার অংশ।",
+    hue: 164,
+    // isbn absent — no readable ISBN in this section excerpt
+    file: {
+      url: "/books/pediatric-ophthalmology-and-strabismus.pdf",
+      sizeMb: 2.0,
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 14 Pediatric Critical Care Review ────────────────────────────────────
+  {
+    title: "Pediatric Critical Care Review",
+    titleBn: "পেডিয়াট্রিক ক্রিটিক্যাল কেয়ার রিভিউ",
+    authorId: "a-hasan",
+    categoryId: "cat-reviews",
+    year: 2006,
+    publisher: "Humana Press",
+    pages: 180,
+    edition: "1st",
+    coverImage: "/covers/pediatric-critical-care-review.webp",
+    language: "en",
+    description:
+      "A case-based board review of paediatric critical care — respiratory, cardiovascular, neurological and metabolic emergencies. First edition.",
+    descriptionBn:
+      "শিশু ক্রিটিক্যাল কেয়ারের কেস-ভিত্তিক বোর্ড রিভিউ — শ্বাসযন্ত্র, হৃদ্‌রোগ, স্নায়বিক ও বিপাকীয় জরুরি অবস্থা। প্রথম সংস্করণ।",
+    hue: 36,
+    file: {
+      url: "/books/pediatric-critical-care-review.pdf",
+      sizeMb: 0.9,
+      isbn: "1-58829-829-9",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 15 100 Cases in Paediatrics ───────────────────────────────────────────
+  // No readable ISBN in the file.
+  {
+    title: "100 Cases in Paediatrics",
+    titleBn: "১০০ কেসেস ইন পেডিয়াট্রিক্স",
+    authorId: "a-cheung",
+    categoryId: "cat-reviews",
+    year: 2017,
+    publisher: "CRC Press",
+    pages: 350,
+    edition: "2nd",
+    coverImage: "/covers/100-cases-in-paediatrics.webp",
+    language: "en",
+    description:
+      "One hundred clinical cases covering the breadth of paediatric practice — structured for self-assessment and problem-based learning. Second edition.",
+    descriptionBn:
+      "স্ব-মূল্যায়ন ও সমস্যা-ভিত্তিক শিক্ষার জন্য শিশুরোগ অনুশীলনের পরিসর জুড়ে একশটি ক্লিনিক্যাল কেস। দ্বিতীয় সংস্করণ।",
+    hue: 52,
+    // isbn absent — no readable ISBN in this file
+    file: {
+      url: "/books/100-cases-in-paediatrics.pdf",
+      sizeMb: 11.6,
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 16 Neonatal Formulary ─────────────────────────────────────────────────
+  {
+    title: "Neonatal Formulary",
+    titleBn: "নিওনেটাল ফর্মুলারি",
+    authorId: "a-ainsworth",
+    categoryId: "cat-neonatology",
+    year: 2026,
+    publisher: "Oxford University Press",
+    pages: 1041,
+    edition: "9th",
+    coverImage: "/covers/neonatal-formulary.webp",
+    language: "en",
+    description:
+      "Drug use in pregnancy and the first year of life — dosing, safety data and clinical guidance for over 250 drugs. Ninth edition, subtitled Drug Use in Pregnancy and the First Year of Life.",
+    descriptionBn:
+      "গর্ভাবস্থা ও জীবনের প্রথম বছরে ওষুধ ব্যবহার — ২৫০-এরও বেশি ওষুধের মাত্রা, নিরাপত্তা তথ্য ও ক্লিনিক্যাল নির্দেশনা। নবম সংস্করণ।",
+    hue: 128,
+    file: {
+      url: "/books/neonatal-formulary.pdf",
+      sizeMb: 279.3,
+      isbn: "978-0-19-887721-9",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 17 Feigin and Cherry's Textbook of Pediatric Infectious Diseases ──────
+  // File name: "Textbpook of Infectous Disease" (sic). The PDF is Feigin
+  // and Cherry's, 8th edition.
+  {
+    title: "Feigin and Cherry's Textbook of Pediatric Infectious Diseases",
+    titleBn: "ফেইগিন ও চেরির টেক্সটবুক অব পেডিয়াট্রিক ইনফেকশাস ডিজিজেস",
+    authorId: "a-cherry",
+    categoryId: "cat-infectious-disease",
+    year: 2019,
+    publisher: "Elsevier",
+    pages: 3992,
+    edition: "8th",
+    coverImage: "/covers/feigin-and-cherrys-textbook-of-pediatric-infectious-diseases.webp",
+    language: "en",
+    description:
+      "The comprehensive two-volume reference for paediatric infectious diseases — microbiology, epidemiology, clinical features and management of every major pathogen. Eighth edition.",
+    descriptionBn:
+      "শিশুদের সংক্রামক রোগের সামগ্রিক দুই-খণ্ডের তথ্যসূত্র — প্রতিটি প্রধান রোগজীবাণুর মাইক্রোবায়োলজি, মহামারিবিদ্যা ও চিকিৎসা ব্যবস্থাপনা। অষ্টম সংস্করণ।",
+    hue: 348,
+    file: {
+      url: "/books/feigin-and-cherrys-textbook-of-pediatric-infectious-diseases.pdf",
+      sizeMb: 103.0,
+      isbn: "978-0-323-37692-1",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 18 Pediatric Neurology: A Color Handbook ──────────────────────────────
+  {
+    title: "Pediatric Neurology: A Color Handbook",
+    titleBn: "পেডিয়াট্রিক নিউরোলজি: এ কালার হ্যান্ডবুক",
+    authorId: "a-bale",
+    categoryId: "cat-subspecialties",
+    year: 2012,
+    publisher: "Manson Publishing",
+    pages: 353,
+    edition: "1st",
+    coverImage: "/covers/pediatric-neurology-a-color-handbook.webp",
+    language: "en",
+    description:
+      "A photographic colour handbook of paediatric neurological conditions — seizures, cerebrovascular disease, metabolic disorders and neuromuscular disease. First edition.",
+    descriptionBn:
+      "শিশু স্নায়বিক রোগের ফটোগ্রাফিক কালার হ্যান্ডবুক — খিঁচুনি, সেরিব্রোভাসকুলার রোগ, বিপাকীয় ব্যাধি ও নিউরোমাসকুলার রোগ। প্রথম সংস্করণ।",
+    hue: 264,
+    file: {
+      url: "/books/pediatric-neurology-a-color-handbook.pdf",
+      sizeMb: 10.0,
+      isbn: "978-1-84076-134-4",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 19 Algorithms in Pediatric Neurology ─────────────────────────────────
+  {
+    title: "Algorithms in Pediatric Neurology",
+    titleBn: "অ্যালগরিদমস ইন পেডিয়াট্রিক নিউরোলজি",
+    authorId: "a-passi",
+    categoryId: "cat-subspecialties",
+    year: 2011,
+    publisher: "Jaypee Brothers",
+    pages: 85,
+    edition: "1st",
+    coverImage: "/covers/algorithms-in-pediatric-neurology.webp",
+    language: "en",
+    description:
+      "A decision-tree guide for trainees approaching paediatric neurological presentations — headache, seizures, weakness, movement disorders. First edition subtitled A Beginner's Guide.",
+    descriptionBn:
+      "শিশু স্নায়বিক উপস্থাপনায় প্রশিক্ষণার্থীদের জন্য সিদ্ধান্ত-বৃক্ষ গাইড। প্রথম সংস্করণ।",
+    hue: 68,
+    file: {
+      url: "/books/algorithms-in-pediatric-neurology.pdf",
+      sizeMb: 3.1,
+      isbn: "978-93-5025-250-5",
+      addedAt: "2026-08-14",
+    },
+  },
+
+  // ── 20 Harrison's Principles of Internal Medicine ─────────────────────────
+  // File name: "Harrison Internal Medicicne" (sic). The PDF is the 22nd
+  // edition (2025), a two-volume set.
+  {
+    title: "Harrison's Principles of Internal Medicine",
+    titleBn: "হ্যারিসনস প্রিন্সিপলস অব ইন্টার্নাল মেডিসিন",
+    authorId: "a-loscalzo",
+    categoryId: "cat-clinical-reference",
+    year: 2025,
+    publisher: "McGraw Hill",
+    pages: 4273,
+    edition: "22nd",
+    coverImage: "/covers/harrisons-principles-of-internal-medicine.webp",
+    language: "en",
+    description:
+      "The definitive two-volume reference in internal medicine, covering pathophysiology, clinical presentation and management across all specialties. Twenty-second edition (2025), edited by Loscalzo, Fauci, Kasper, Hauser, Longo, Jameson, Holland and Langford.",
+    descriptionBn:
+      "অভ্যন্তরীণ চিকিৎসার নির্ধারক দুই-খণ্ডের তথ্যসূত্র। বাইশতম সংস্করণ (২০২৫)।",
+    featured: true,
+    hue: 220,
+    file: {
+      url: "/books/harrisons-principles-of-internal-medicine.pdf",
+      sizeMb: 276.7,
+      isbn: "978-1-265-97387-2",
+      addedAt: "2026-08-14",
     },
   },
 ];
@@ -801,31 +880,30 @@ const seeds: Seed[] = [
 /** Shelf-code prefix per category. Exported because newly catalogued books
  *  have to be given a shelf position by the same rule as the seed data. */
 export const shelfPrefix: Record<string, string> = {
-  "cat-fiction": "F1-FICT",
-  "cat-poetry": "F2-POET",
-  "cat-history": "F3-HIST",
-  "cat-science": "F4-SCIE",
-  "cat-children": "F5-CHLD",
-  "cat-reference": "F6-REFR",
+  "cat-general-pediatrics": "F1-GENP",
+  "cat-neonatology": "F2-NEON",
+  "cat-infectious-disease": "F3-INFD",
+  "cat-subspecialties": "F4-SUBS",
+  "cat-reviews": "F5-REVW",
+  "cat-clinical-reference": "F6-REFR",
 };
 
-const uploaders = ["Sylvia North", "Apu Roy", "Noah Tanaka", "Mira Sen"];
+const uploaders = ["Apu Roy"];
 
 function buildBook(seed: Seed, i: number): Book {
   const author = authors.find((a) => a.id === seed.authorId)!;
   const category = categories.find((c) => c.id === seed.categoryId)!;
   const status: BookStatus = seed.status ?? "available";
 
-  // Deterministic pseudo-variation so the demo data looks alive without
-  // Math.random (which would break SSR/CSR agreement).
-  const spin = (i * 37) % 100;
-  const copiesTotal = status === "lost" ? 1 : (spin % 3) + 1;
-  const copiesAvailable =
-    status === "available" ? copiesTotal : status === "borrowed" ? 0 : 0;
+  // Real files — every one of these 20 has a single physical copy (the file).
+  // Borrowed/damaged/lost states still work; they just aren't pre-salted here.
+  const copiesTotal = 1;
+  const copiesAvailable = status === "available" ? 1 : 0;
 
   const slug = seed.title
     .toLowerCase()
-    .replace(/['’]/g, "")
+    .replace(/['']/g, "")
+    .replace(/[&]/g, "and")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
@@ -842,8 +920,11 @@ function buildBook(seed: Seed, i: number): Book {
     categoryName: category.name,
     publisher: seed.publisher,
     year: seed.year,
-    language: seed.titleBn ? "bn" : "en",
-    isbn: seed.file?.isbn ?? `978-984-${String(10000 + i * 131).slice(0, 5)}-${(i % 9) + 1}`,
+    // Explicit: these are English-language books with Bengali *display* titles.
+    // Inferring language from titleBn would label them all Bengali.
+    language: seed.language,
+    isbn: seed.file.isbn,
+    edition: seed.edition,
     pages: seed.pages,
     description: seed.description,
     descriptionBn: seed.descriptionBn,
@@ -854,32 +935,23 @@ function buildBook(seed: Seed, i: number): Book {
       (i % 12) + 1,
     ).padStart(2, "0")}`,
     coverHue: seed.hue,
-    // `format` describes the file that is actually served, and the only sample
-    // in private storage is a PDF — so every seeded book is a PDF. Labelling
-    // one in seven as EPUB would put "Download EPUB" on a button that hands
-    // over a .pdf. The admin form still offers both for real uploads.
+    coverImage: seed.coverImage,
     format: "pdf",
-    fileSizeMb: seed.file?.sizeMb ?? Math.round((1.4 + ((i * 17) % 90) / 10) * 10) / 10,
-    // Not a path to the file — a request for it. Every book is served by the
-    // same route, which checks for an account before it opens anything. What
-    // is behind this address is in `bookFiles` below, and never leaves the
-    // server.
+    fileSizeMb: seed.file.sizeMb,
+    // Not a path to the file — a request for it. Checked against an account
+    // before the stream opens. What is behind this address is in `bookFiles`.
     fileUrl: `/api/file/${slug}`,
     downloads: 480 + ((i * 613) % 9200),
     rating: Math.round((3.6 + ((i * 7) % 14) / 10) * 10) / 10,
     featured: seed.featured ?? false,
-    addedAt:
-      seed.file?.addedAt ??
-      new Date(Date.UTC(2025, (i * 5) % 12, ((i * 3) % 27) + 1))
-        .toISOString()
-        .slice(0, 10),
-    uploadedBy: seed.file?.uploadedBy ?? uploaders[i % uploaders.length],
+    addedAt: seed.file.addedAt,
+    uploadedBy: seed.file.uploadedBy ?? uploaders[i % uploaders.length],
   };
 }
 
 export const books: Book[] = seeds.map(buildBook);
 
-/** The demo file every book without one of its own is served from. */
+/** The demo file served if a slug has no entry in `bookFiles`. */
 export const sampleFileName = "sample.pdf";
 
 /**
@@ -894,7 +966,7 @@ export const sampleFileName = "sample.pdf";
 export const bookFiles: Record<string, string> = Object.fromEntries(
   books.map((book, i) => [
     book.slug,
-    seeds[i].file?.url.split("/").pop() ?? sampleFileName,
+    seeds[i].file.url.split("/").pop() ?? sampleFileName,
   ]),
 );
 

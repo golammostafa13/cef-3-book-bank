@@ -150,6 +150,7 @@ export const bn: Dictionary = {
     details: "বিবরণ",
     publisher: "প্রকাশক",
     published: "প্রকাশকাল",
+    edition: "সংস্করণ",
     pages: "পৃষ্ঠা",
     language: "ভাষা",
     isbn: "ISBN",

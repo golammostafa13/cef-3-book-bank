@@ -153,6 +153,7 @@ export const en = {
     details: "Details",
     publisher: "Publisher",
     published: "Published",
+    edition: "Edition",
     pages: "Pages",
     language: "Language",
     isbn: "ISBN",
