@@ -402,22 +402,17 @@ export function Hero3D({
 
           {/* Final Featured Books title */}
           <div
-            className="absolute inset-x-0 bottom-[8%] z-20 flex justify-center"
+            className="pointer-events-none absolute inset-x-0 bottom-[8%] z-20 flex justify-center"
             style={{ opacity: "var(--b2)" }}
           >
-            <Link
-              href={hrefs.books}
-              className="group inline-block"
+            <h2
+              className={cn(
+                "text-[clamp(2rem,4vw,3rem)] font-bold tracking-tight text-ink",
+                textClass(lang)
+              )}
             >
-              <h2
-                className={cn(
-                  "text-[clamp(2rem,4vw,3rem)] font-bold tracking-tight text-ink transition-colors group-hover:text-accent",
-                  textClass(lang)
-                )}
-              >
-                {copy.featuredTitle}
-              </h2>
-            </Link>
+              {copy.featuredTitle}
+            </h2>
           </div>
 
           {/* The hero the page has before three.js arrives, and the hero it

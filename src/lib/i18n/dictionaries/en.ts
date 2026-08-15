@@ -106,7 +106,7 @@ export const en = {
       },
     ],
     featuredEyebrow: "Featured",
-    featuredTitle: "The best reading books",
+    featuredTitle: "Featured Books",
     featuredLead:
       "Discover a world where imagination comes alive and knowledge knows no bounds.",
     categoriesTitle: "Browse by category",
