@@ -1,14 +1,14 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 
 /**
  * Theme toggle.
  *
  * Both icons are always rendered and CSS picks the visible one from the `.dark`
- * class that next-themes writes onto <html> before first paint. That keeps the
- * markup identical on the server and the client — no mount flag, no effect, and
+ * class that the theme provider writes onto <html>. That keeps the markup
+ * identical on the server and the client — no mount flag, no effect, and
  * nothing for React to report as a hydration mismatch.
  *
  * The label stays constant for the same reason; "Switch theme" is accurate in

@@ -21,7 +21,7 @@
   --bg-deep: #ded9d3;
   --surface: #f7f6f4;
   --surface-2: #fffefd;
-  --ink: #111111;
+  --ink: #064e3b;
   --ink-mute: #6b6560;
   --ink-faint: #9c948c;
   --line: #d6d0c9;
@@ -97,7 +97,7 @@
   --bg-deep: #0d0c0a;
   --surface: #1e1b17;
   --surface-2: #262119;
-  --ink: #f5f2ee;
+  --ink: #d1fae5;
   --ink-mute: #a8a099;
   --ink-faint: #736c65;
   --line: #332e28;
@@ -214,11 +214,15 @@ html {
 
 body {
   background: var(--bg);
-  color: var(--ink);
+  color: #111111;
   font-family: var(--font-display), var(--font-bengali), ui-sans-serif, system-ui,
     sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+.dark body {
+  color: #f5f2ee;
 }
 
 /* Bengali text runs taller; opt in with .bn rather than globally
@@ -1763,6 +1767,7 @@ body {
 .hero3d__pin[data-beat="2"] .hero3d__beat[data-b="2"] {
   visibility: visible;
   pointer-events: auto;
+  cursor: pointer;
 }
 
 .hero3d__beat[data-b="0"] {
@@ -1873,12 +1878,17 @@ body {
 }
 
 .hero-recent__row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 0.5rem;
   border-radius: 0.85rem;
-  transition: background-color 160ms ease;
+  cursor: pointer;
+  transition:
+    background-color 220ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
 }
 
 .hero-recent__row + .hero-recent__row {
@@ -1886,7 +1896,29 @@ body {
 }
 
 .hero-recent__row:hover {
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  transform: translateX(4px);
+  box-shadow:
+    -3px 0 0 0 var(--accent),
+    0 2px 12px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Spine glows in its own colour on hover */
+.hero-recent__row:hover .hero-recent__spine {
+  box-shadow: 0 0 8px 2px var(--spine-glow, rgba(100,80,60,0.45));
+  transition: box-shadow 220ms ease;
+}
+
+/* Row number shifts to accent on hover */
+.hero-recent__row:hover .hero-recent__n {
+  color: var(--accent);
+  transition: color 220ms ease;
+}
+
+/* Title shifts to accent on hover */
+.hero-recent__row:hover .hero-recent__title {
+  color: var(--accent);
+  transition: color 220ms ease;
 }
 
 .hero-recent__n {
@@ -1920,13 +1952,17 @@ body {
   align-items: center;
   gap: 0.3rem;
   border-radius: 999px;
-  padding: 0.35rem 0.7rem;
-  font-size: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: var(--ink-mute);
+  color: var(--accent);
+  background: var(--accent-soft);
+  opacity: 0;
   transition:
-    color 160ms ease,
-    background-color 160ms ease;
+    opacity 180ms ease,
+    transform 180ms ease;
+  transform: translateX(-4px);
+  pointer-events: none;
 }
 
 /* Below `sm` the row has no width for a second control; the title is
@@ -1937,9 +1973,10 @@ body {
   }
 }
 
-.hero-recent__details:hover {
-  background: var(--accent-soft);
-  color: var(--accent);
+/* Reveal the details badge when the row is hovered */
+.hero-recent__row:hover .hero-recent__details {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .hero-recent__download {
@@ -1978,7 +2015,7 @@ body {
     display: block;
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 10; /* above the canvas (z-index: 1) and the stage (z-index: 2) so floater <Link>s receive clicks */
     pointer-events: none;
     transition: opacity 700ms ease;
   }
@@ -2007,12 +2044,10 @@ body {
   to   { transform: rotate(1.5deg);  }
 }
 
-/* When WebGL canvas is live, float behind it. The canvas fades in to 1
-   over the books, which effectively dims them — they become part of the
-   scene depth rather than competing with it. */
-.hero3d[data-live="true"] .hero3d__floaters {
-  z-index: 0;
-}
+/* When WebGL canvas is live, the floaters stay above the canvas (z-index: 2)
+   so their <Link> elements can still receive pointer events. The canvas fades
+   in over the scene; the floater opacity transition handles their visual
+   fade-out as scroll progress advances past beat-0. */
 
 /* Kill the float animation under reduced motion. The books still show
    as static covers (Book3D degrades to a flat face). */

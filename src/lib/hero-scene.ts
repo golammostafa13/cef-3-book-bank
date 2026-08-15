@@ -36,13 +36,14 @@ export type SceneBook = CoverBook & { pages: number };
 
 export interface HeroSceneOptions {
   canvas: HTMLCanvasElement;
-  /** Measured for size and for pausing the loop when it leaves the viewport. */
   container: HTMLElement;
-  /** The volume that opens. */
   hero: SceneBook;
-  /** The covers that arrive once it has. */
   field: SceneBook[];
   lang?: Locale;
+
+  /** Fired when a settled field book is clicked. */
+  onBookClick?: (book: SceneBook) => void;
+
   /** Fired after textures are drawn and the first frame is on screen. */
   onReady?: () => void;
 }
@@ -194,6 +195,16 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   const rim = new THREE.PointLight(theme.accentLit, 26, 18, 2);
   rim.position.set(-4.4, 1.6, 3.2);
   scene.add(rim);
+
+  const hoverLight = new THREE.PointLight(
+    theme.accentLit,
+    0,
+    4,
+    2,
+  );
+
+  hoverLight.position.set(0, 1.5, 2.5);
+  scene.add(hoverLight);
 
   const fill = new THREE.DirectionalLight(0xdfe6ef, 0.7);
   fill.position.set(-3, -2, 4);
@@ -386,15 +397,27 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     new THREE.BoxGeometry(COVER_W, COVER_H, COVER_T),
   );
 
-  interface FieldItem {
-    object: THREE.Object3D;
-    scatter: THREE.Vector3;
-    helix: THREE.Vector3;
-    shelf: THREE.Vector3;
-    scatterSpin: THREE.Euler;
-    helixSpin: THREE.Euler;
-    materials: THREE.Material[];
-  }
+ interface FieldItem {
+  book: SceneBook;
+  object: THREE.Object3D;
+
+  scatter: THREE.Vector3;
+  helix: THREE.Vector3;
+  shelf: THREE.Vector3;
+
+  scatterSpin: THREE.Euler;
+  helixSpin: THREE.Euler;
+
+  materials: THREE.Material[];
+
+  // Smooth hover animation state.
+  hover: number;
+  hoverTarget: number;
+
+  // Mouse position relative to the book.
+  pointerX: number;
+  pointerY: number;
+}
 
   const items: FieldItem[] = field.map((book, i) => {
     const colours = bookColours(book);
@@ -430,6 +453,7 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     const spread = field.length > 1 ? i / (field.length - 1) : 0.5;
 
     return {
+      book,
       object: mesh,
       // Far out in the fog, tumbled, at the edge of the far plane.
       scatter: new THREE.Vector3(
@@ -452,8 +476,132 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       // catch the key light rather than presenting an edge to it.
       helixSpin: new THREE.Euler(-0.12, -angle + Math.PI / 2, 0.05),
       materials,
+      hover: 0,
+      hoverTarget: 0,
+      pointerX: 0,
+      pointerY: 0,
     };
   });
+/* --- Interactive settled books ------------------------------------ */
+
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+
+  let hoveredItem: FieldItem | null = null;
+  let pointerInside = false;
+
+  const pointerWorld = new THREE.Vector3();
+
+  function updatePointer(event: PointerEvent) {
+    const rect = canvas.getBoundingClientRect();
+
+    pointer.x =
+      ((event.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1;
+
+    pointer.y =
+      -((event.clientY - rect.top) / Math.max(rect.height, 1)) * 2 + 1;
+
+    pointerInside = true;
+  }
+
+  function clearHover() {
+    pointerInside = false;
+
+    if (hoveredItem) {
+      hoveredItem.hoverTarget = 0;
+      hoveredItem = null;
+    }
+
+    items.forEach((item) => {
+      item.hoverTarget = 0;
+    });
+
+    canvas.style.cursor = "default";
+  }
+
+  function findHoveredBook() {
+    // Do not allow interaction while the collection is arriving.
+    if (progress < 0.86 || progress > 1.001 || !fieldGroup.visible) {
+      clearHover();
+      return;
+    }
+
+    raycaster.setFromCamera(pointer, camera);
+
+    const intersections = raycaster.intersectObjects(
+      items.map((item) => item.object),
+      false,
+    );
+
+    const hit = intersections[0];
+
+    if (!hit) {
+      clearHover();
+      return;
+    }
+
+    const item = items.find((entry) => entry.object === hit.object);
+
+    if (!item) {
+      clearHover();
+      return;
+    }
+
+    if (hoveredItem !== item) {
+      if (hoveredItem) {
+        hoveredItem.hoverTarget = 0;
+      }
+
+      hoveredItem = item;
+    }
+
+    item.hoverTarget = 1;
+
+    // Store where the pointer is relative to the viewport.
+    // This is later used to tilt the book toward the cursor.
+    item.pointerX = pointer.x;
+    item.pointerY = pointer.y;
+
+    canvas.style.cursor = "pointer";
+  }
+
+  function onPointerMove(event: PointerEvent) {
+    updatePointer(event);
+    findHoveredBook();
+  }
+
+  function onPointerLeave() {
+    clearHover();
+  }
+
+  function onPointerDown(event: PointerEvent) {
+    updatePointer(event);
+
+    if (progress < 0.86 || progress > 1.001) {
+      return;
+    }
+
+    raycaster.setFromCamera(pointer, camera);
+
+    const intersections = raycaster.intersectObjects(
+      items.map((item) => item.object),
+      false,
+    );
+
+    const hit = intersections[0];
+
+    if (!hit) return;
+
+    const item = items.find((entry) => entry.object === hit.object);
+
+    if (!item) return;
+
+    options.onBookClick?.(item.book);
+  }
+
+  canvas.addEventListener("pointermove", onPointerMove);
+  canvas.addEventListener("pointerleave", onPointerLeave);
+  canvas.addEventListener("pointerdown", onPointerDown);
 
   /* --- Motes --------------------------------------------------------- *
    * Dust in the light. Three hundred points cost nothing and are the
@@ -616,6 +764,27 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       }
     }
 
+    if (hoveredItem) {
+      hoverLight.intensity = mix(
+        hoverLight.intensity,
+        hoveredItem.hover * 2.2,
+        0.12,
+      );
+
+      hoverLight.position.lerp(
+        hoveredItem.object.position,
+        0.12,
+      );
+
+      hoverLight.position.z += 1.4;
+    } else {
+      hoverLight.intensity = mix(
+        hoverLight.intensity,
+        0,
+        0.12,
+      );
+    }
+
     shadowMaterial.opacity = (theme.dark ? 0.3 : 0.18) * (1 - leaving);
 
     /* --- The collection -------------------------------------------- */
@@ -628,17 +797,106 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
 
       const opacity = clamp01(arriving * 1.6) * mix(1, 1, settling);
 
-      items.forEach((item) => {
+      items.forEach((item, i) => {
         scratch.copy(item.scatter).lerp(item.helix, arriving);
         scratch.lerp(item.shelf, settling);
+
+        /* ---------------------------------------------------------------
+        * Smooth hover
+        * --------------------------------------------------------------- */
+
+        const isSettled = settling > 0.88;
+
+        item.hoverTarget =
+          isSettled && hoveredItem === item ? 1 : 0;
+
+        // Smooth interpolation — no clock.getDelta() here.
+        item.hover = mix(
+          item.hover,
+          item.hoverTarget,
+          0.14,
+        );
+
+        /* ---------------------------------------------------------------
+        * Very subtle continuous floating
+        * --------------------------------------------------------------- */
+
+        const phase = i * 1.73;
+
+        const wave =
+          Math.sin(elapsed * 0.9 + phase) *
+          0.018 *
+          (settling * settling);
+
+        const bob =
+          Math.sin(elapsed * 0.65 + phase * 1.7) *
+          0.012 *
+          settling;
+
+        /* ---------------------------------------------------------------
+        * Hover lift
+        * --------------------------------------------------------------- */
+
+        scratch.y += bob + item.hover * 0.16;
+        scratch.z += item.hover * 0.32;
+
         item.object.position.copy(scratch);
 
+        /* ---------------------------------------------------------------
+        * Base shelf rotation
+        * --------------------------------------------------------------- */
+
+        const baseX =
+          mix(item.scatterSpin.x, item.helixSpin.x, arriving) *
+          (1 - settling);
+
+        const baseY =
+          mix(item.scatterSpin.y, item.helixSpin.y, arriving) *
+          (1 - settling);
+
+        const baseZ =
+          mix(item.scatterSpin.z, item.helixSpin.z, arriving) *
+          (1 - settling);
+
+        /* ---------------------------------------------------------------
+        * Subtle idle wave
+        * --------------------------------------------------------------- */
+
+        const idleX = wave;
+
+        const idleZ =
+          Math.cos(elapsed * 0.75 + phase) *
+          0.014 *
+          settling;
+
+        /* ---------------------------------------------------------------
+        * Hover tilt toward cursor
+        * --------------------------------------------------------------- */
+
+        const hoverTiltX =
+          -item.pointerY * 0.12 * item.hover;
+
+        const hoverTiltY =
+          item.pointerX * 0.16 * item.hover;
+
         item.object.rotation.set(
-          mix(item.scatterSpin.x, item.helixSpin.x, arriving) * (1 - settling),
-          mix(item.scatterSpin.y, item.helixSpin.y, arriving) * (1 - settling),
-          mix(item.scatterSpin.z, item.helixSpin.z, arriving) * (1 - settling),
+          baseX + idleX + hoverTiltX,
+          baseY + hoverTiltY,
+          baseZ + idleZ,
         );
-        item.object.scale.setScalar(mix(0.85, 1, settling));
+
+        /* ---------------------------------------------------------------
+        * Hover scale
+        * --------------------------------------------------------------- */
+
+        item.object.scale.setScalar(
+          mix(0.85, 1, settling) *
+            (1 + item.hover * 0.045),
+        );
+
+        /* ---------------------------------------------------------------
+        * Opacity
+        * --------------------------------------------------------------- */
 
         item.materials.forEach((m) => {
           m.opacity = opacity;
@@ -723,10 +981,34 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     },
     dispose() {
       stop();
+
       visibility.disconnect();
       resizeObserver.disconnect();
-      document.removeEventListener("visibilitychange", onVisibilityChange);
+
+      document.removeEventListener(
+        "visibilitychange",
+        onVisibilityChange,
+      );
+
+      canvas.removeEventListener(
+        "pointermove",
+        onPointerMove,
+      );
+
+      canvas.removeEventListener(
+        "pointerleave",
+        onPointerLeave,
+      );
+
+      canvas.removeEventListener(
+        "pointerdown",
+        onPointerDown,
+      );
+
+      canvas.style.cursor = "default";
+
       disposables.forEach((d) => d.dispose());
+
       renderer.dispose();
     },
   };

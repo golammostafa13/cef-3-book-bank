@@ -152,6 +152,7 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
           statAuthors: dict.home.statAuthors,
           statDownloads: dict.home.statDownloads,
           ...dict.home.scene,
+          featuredTitle: dict.home.featuredTitle,
         }}
         stats={{
           books: formatCompactIn(stats.totalBooks, lang),
@@ -159,13 +160,15 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
           downloads: formatCompactIn(stats.totalDownloads, lang),
         }}
         fallback={
-          <BookStack3D
-            books={pileBooks}
-            lang={lang}
-            className="absolute inset-0"
-          />
+          // <BookStack3D
+          //   books={pileBooks}
+          //   lang={lang}
+          //   className="absolute inset-0"
+          // />
+          <></>
         }
       />
+      
 
       {/* ---------------------------------------------------------------
           Recently added — a plain section below the hero, no overlay

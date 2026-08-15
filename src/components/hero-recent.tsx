@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Download } from "lucide-react";
+import { ArrowRight, Download, ExternalLink } from "lucide-react";
 import { coverTheme } from "@/lib/cover-theme";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import {
@@ -14,6 +14,7 @@ import {
 import { fill } from "@/lib/i18n/format";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/types";
+import { useRouter } from "next/navigation";
 
 /**
  * The newest arrivals, as a list.
@@ -28,8 +29,8 @@ import type { Book } from "@/types";
  * this block answers.
  *
  * Two controls per row, no more: the title opens the record, the disc beside
- * it takes the file. The row is not one big link — it holds several, and
- * nesting anchors is neither valid nor keyboard-usable.
+ * it takes the file. The row navigates as a whole via onClick+router.push;
+ * only the download button stops propagation to act independently.
  */
 
 /**
@@ -78,6 +79,8 @@ export function HeroRecent({
   href: string;
   className?: string;
 }) {
+  const router = useRouter();
+
   return (
     <div className={cn("hero-recent", className)}>
       <div className="hero-recent__head">
@@ -116,9 +119,23 @@ export function HeroRecent({
           const theme = coverTheme(book);
           const title = bookTitle(book, lang);
           const format = book.format.toUpperCase();
+          const detailHref = localePath(lang, `/books/${book.slug}`);
 
           return (
-            <li key={book.id} className="hero-recent__row">
+            <li
+              key={book.id}
+              className="hero-recent__row cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label={title}
+              onClick={() => router.push(detailHref)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  router.push(detailHref);
+                }
+              }}
+            >
               {/* The arrival's place in the queue — 01 is the newest. Padded
                   with the reader's own zero, so a Bengali list does not count
                   "0১". Tabular, so the column stays a column down the list. */}
@@ -140,15 +157,14 @@ export function HeroRecent({
               />
 
               <span className="min-w-0 flex-1">
-                <Link
-                  href={localePath(lang, `/books/${book.slug}`)}
+                <span
                   className={cn(
-                    "block truncate text-[0.95rem] font-semibold text-ink transition-colors hover:text-accent",
+                    "block truncate text-[0.95rem] font-semibold text-ink hero-recent__title",
                     textClass(lang),
                   )}
                 >
                   {title}
-                </Link>
+                </span>
                 <span
                   className={cn(
                     "mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.75rem] text-ink-faint",
@@ -170,19 +186,20 @@ export function HeroRecent({
               </span>
 
               <span className="hero-recent__actions">
-                <Link
-                  href={localePath(lang, `/books/${book.slug}`)}
-                  className={cn(
-                    "hero-recent__details",
-                    textClass(lang),
-                  )}
+                {/* Details badge — reveals on row hover */}
+                <span
+                  className={cn("hero-recent__details", textClass(lang))}
+                  aria-hidden="true"
                 >
                   {copy.details}
-                  <ArrowRight className="size-3" aria-hidden="true" />
-                </Link>
+                  <ExternalLink className="size-3" aria-hidden="true" />
+                </span>
+
+                {/* Download stops the row's onClick so it acts independently */}
                 <a
                   href={book.fileUrl}
                   download
+                  onClick={(e) => e.stopPropagation()}
                   aria-label={fill(lang, copy.downloadOf, {
                     title,
                     format,

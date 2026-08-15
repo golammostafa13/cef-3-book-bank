@@ -54,6 +54,7 @@ export interface Hero3DCopy {
   openTitle: string;
   openLead: string;
   scrollHint: string;
+  featuredTitle: string;
 }
 
 interface Hero3DProps {
@@ -193,6 +194,10 @@ export function Hero3D({
             // static hero up while the scene was still coming.
             delete track!.dataset.static;
             setLive(true);
+          },
+          onBookClick: (book) => {
+            const slug = (book as HeroBook).slug ?? String(book.id);
+            window.location.href = `/${lang}/books/${slug}`;
           },
         });
         sceneRef.current = scene;
@@ -395,13 +400,32 @@ export function Hero3D({
 
           </div>
 
+          {/* Final Featured Books title */}
+          <div
+            className="absolute inset-x-0 bottom-[8%] z-20 flex justify-center"
+            style={{ opacity: "var(--b2)" }}
+          >
+            <Link
+              href={hrefs.books}
+              className="group inline-block"
+            >
+              <h2
+                className={cn(
+                  "text-[clamp(2rem,4vw,3rem)] font-bold tracking-tight text-ink transition-colors group-hover:text-accent",
+                  textClass(lang)
+                )}
+              >
+                {copy.featuredTitle}
+              </h2>
+            </Link>
+          </div>
+
           {/* The hero the page has before three.js arrives, and the hero it
               keeps for a reader who has asked for less motion. */}
-          <div className="hero3d__fallback" aria-hidden="true">
+          {/* <div className="hero3d__fallback" aria-hidden="true">
             {fallback}
-          </div>
+          </div> */}
         </div>
-
         {/* The one instruction the scene needs: a hero this tall has to say
             that scrolling is what it is for. */}
         <div className={cn("hero3d__hint", textClass(lang))} aria-hidden="true">

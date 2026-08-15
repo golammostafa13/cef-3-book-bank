@@ -102,7 +102,7 @@ export const bn: Dictionary = {
       },
     ],
     featuredEyebrow: "নির্বাচিত",
-    featuredTitle: "পড়ার সেরা বইগুলো",
+    featuredTitle: "নির্বাচিত বই",
     featuredLead:
       "এমন এক জগৎ আবিষ্কার করুন যেখানে কল্পনা প্রাণ পায় আর জ্ঞানের কোনো সীমা নেই।",
     categoriesTitle: "বিভাগ ধরে দেখুন",
