@@ -322,6 +322,9 @@ export const en = {
 
     errorEmailTaken: "An account with this email already exists.",
     errorInvalidCredentials: "Invalid email or password.",
+    accountExists: "An account with this email already exists. Please sign in.",
+    accountCreated:
+      "Account created successfully. Please sign in with your password.",
 
     signUpTitle: "Create your account",
     signUpLead:

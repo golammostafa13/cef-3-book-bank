@@ -9,7 +9,7 @@ export interface UserRecord {
   email: string;
   name: string;
   phone?: string;
-  passwordHash: string;
+  passwordHash?: string;
   via: "password";
   createdAt: number;
 }

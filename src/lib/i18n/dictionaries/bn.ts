@@ -318,6 +318,9 @@ export const bn: Dictionary = {
 
     errorEmailTaken: "এই ইমেল ঠিকানategorical অ্যাকাউন্টটি আগেই আছে।",
     errorInvalidCredentials: "ইমেল বা পাসওয়ার্ড ভুল।",
+    accountExists: "এই ইমেল ঠিকানategorical অ্যাকাউন্টটি আগেই আছে। অনুগ্রহ করে সাইন ইন করুন।",
+    accountCreated:
+      "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। অনুগ্রহ করে পাসওয়ার্ড দিয়ে সাইন ইন করুন।",
 
     signUpTitle: "অ্যাকাউন্ট তৈরি করুন",
     signUpLead:

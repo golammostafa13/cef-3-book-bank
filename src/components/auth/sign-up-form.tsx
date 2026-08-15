@@ -105,28 +105,6 @@ export function SignUpForm({ lang, next = "" }: { lang: Locale; next?: string })
         </p>
       </div>
 
-      <div>
-        <label
-          htmlFor="password"
-          className={cn("mb-2 block text-sm font-medium text-ink", bn)}
-        >
-          {dict.auth.passwordLabel}
-        </label>
-        <div className="relative">
-          <input
-            key={`password-${attempt}`}
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            minLength={5}
-            required
-            placeholder={dict.auth.passwordPlaceholder}
-            className={fieldClass(state.message, "pl-4")}
-          />
-        </div>
-      </div>
-
       {state.message && (
         <p
           role="alert"

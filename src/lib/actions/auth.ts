@@ -13,7 +13,7 @@ import {
 } from "@/lib/auth/config";
 import { verifyGoogleIdToken } from "@/lib/auth/google";
 import { signSession } from "@/lib/auth/session";
-import { createUser, findUserByEmail } from "@/lib/auth/users";
+import { createUser, findUserByEmail, updateUserPassword } from "@/lib/auth/users";
 import { getDictionaryFor, localePath } from "@/lib/i18n";
 import { defaultLocale, hasLocale } from "@/lib/i18n/config";
 
@@ -168,10 +168,10 @@ export async function devSignInAction(
  * ---------------------------------------------------------------------- */
 
 /**
- * Register with name, email, optional phone and password.
+ * Register with name, email and optional phone.
  *
- * Creates a user record in `private/users.json`, then issues a session that
- * has full access to the library. There is no second step.
+ * Creates a user record in `private/users.json`, then redirects to the sign-in
+ * page. The password is set on first sign-in. There is no second step.
  */
 export async function signUpAction(
   prev: SignInState,
@@ -183,7 +183,6 @@ export async function signUpAction(
   const name = String(formData.get("name") ?? "").trim();
   const email = normaliseEmail(String(formData.get("email") ?? ""));
   const phone = String(formData.get("phone") ?? "").trim() || undefined;
-  const password = String(formData.get("password") ?? "");
 
   const reject = (message: string): SignInState => ({
     ok: false,
@@ -200,42 +199,26 @@ export async function signUpAction(
 
   if (isAdminEmail(email)) return reject(dict.auth.errorEmailReserved);
 
-  if (!password || password.length < 5) {
-    return reject(dict.auth.errorPasswordShort);
-  }
-
-  const passwordHash = await sha256(password);
-
   try {
     createUser({
       email,
       name,
       phone,
-      passwordHash,
       via: "password",
     });
   } catch {
-    return reject(dict.auth.errorEmailTaken);
+    redirect(localePath(lang, "/signin?exists=1"));
   }
 
-  await setSessionCookie(
-    await signSession({
-      email,
-      name,
-      phone,
-      via: "password",
-      gate: "unlocked",
-    }),
-  );
-
-  redirect(destination(formData, lang));
+  redirect(localePath(lang, "/signin?created=1"));
 }
 
 /**
  * Sign in with email and password.
  *
  * Looks up the user in `private/users.json`, verifies the password hash, and
- * issues a fresh session.
+ * issues a fresh session. If the user signed up without a password, the
+ * provided password is set on first sign-in.
  */
 export async function signInWithPasswordAction(
   _prev: SignInState,
@@ -259,9 +242,17 @@ export async function signInWithPasswordAction(
   const user = findUserByEmail(email);
   if (!user) return reject(dict.auth.errorInvalidCredentials);
 
-  const passwordHash = await sha256(password);
-  if (passwordHash !== user.passwordHash) {
-    return reject(dict.auth.errorInvalidCredentials);
+  if (!user.passwordHash) {
+    if (!password || password.length < 5) {
+      return reject(dict.auth.errorPasswordShort);
+    }
+    const passwordHash = await sha256(password);
+    updateUserPassword(email, passwordHash);
+  } else {
+    const passwordHash = await sha256(password);
+    if (passwordHash !== user.passwordHash) {
+      return reject(dict.auth.errorInvalidCredentials);
+    }
   }
 
   await setSessionCookie(

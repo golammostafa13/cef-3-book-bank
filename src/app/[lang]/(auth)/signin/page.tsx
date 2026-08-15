@@ -32,6 +32,8 @@ export default async function SignInPage(props: PageProps<"/[lang]/signin">) {
 
   const sp = await props.searchParams;
   const next = typeof sp.next === "string" ? sp.next : "";
+  const exists = sp.exists === "1";
+  const created = sp.created === "1";
 
   const session = await getSession();
   if (session) {
@@ -70,6 +72,28 @@ export default async function SignInPage(props: PageProps<"/[lang]/signin">) {
           </Link>
         }
       >
+        {exists && (
+          <p
+            role="alert"
+            className={cn(
+              "mb-4 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-accent",
+              bn,
+            )}
+          >
+            {dict.auth.accountExists}
+          </p>
+        )}
+        {created && (
+          <p
+            role="alert"
+            className={cn(
+              "mb-4 rounded-xl border border-success/30 bg-success-soft px-4 py-3 text-sm text-success",
+              bn,
+            )}
+          >
+            {dict.auth.accountCreated}
+          </p>
+        )}
         {showGoogle && (
           <div className={showPassword ? "mb-6" : ""}>
             <GoogleSignIn clientId={googleClientId} lang={lang} next={next} />
