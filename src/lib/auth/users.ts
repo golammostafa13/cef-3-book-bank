@@ -21,7 +21,7 @@ const redisToken = process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_RE
 let redis: Redis | undefined;
 function getRedis(): Redis | undefined {
   if (!redis && redisUrl && redisToken) {
-    redis = new Redis({ url: redisUrl, token: redisToken });
+    redis = new Redis({ url: redisUrl, token: redisToken, automaticDeserialization: false });
   }
   return redis;
 }
