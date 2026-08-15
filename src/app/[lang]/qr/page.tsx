@@ -35,7 +35,7 @@ async function svg(text: string): Promise<string> {
 
 async function png(text: string): Promise<string> {
   return QRCode.toDataURL(text, {
-    type: "png",
+    type: "image/png",
     errorCorrectionLevel: "M",
     margin: 2,
     width: 800,
@@ -45,7 +45,7 @@ async function png(text: string): Promise<string> {
 
 async function jpg(text: string): Promise<string> {
   return QRCode.toDataURL(text, {
-    type: "jpg",
+    type: "image/jpeg",
     errorCorrectionLevel: "M",
     margin: 2,
     width: 800,
