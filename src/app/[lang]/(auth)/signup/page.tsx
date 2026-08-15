@@ -3,8 +3,6 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AuthAside, AuthCard, AuthLayoutGrid } from "@/components/auth/auth-aside";
 import { SignUpForm } from "@/components/auth/sign-up-form";
-import { isRegistrationOpen } from "@/lib/auth/config";
-import { getSession } from "@/lib/auth/current";
 import { getDictionary, hasLocale, localePath } from "@/lib/i18n";
 import { textClass } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
@@ -23,12 +21,6 @@ export async function generateMetadata(
 /** Session state is per-request; nothing here may be prerendered. */
 export const dynamic = "force-dynamic";
 
-/**
- * Where the first QR code in a hard copy lands.
- *
- * Step one of two. It takes a name, an address and the code printed beside the
- * QR, and hands back a session that can see step two and nothing else.
- */
 export default async function SignUpPage(props: PageProps<"/[lang]/signup">) {
   const { lang } = await props.params;
   if (!hasLocale(lang)) notFound();
@@ -37,11 +29,8 @@ export default async function SignUpPage(props: PageProps<"/[lang]/signup">) {
   const sp = await props.searchParams;
   const next = typeof sp.next === "string" ? sp.next : "";
 
-  // Someone who is already through has nothing to do here. A half-finished
-  // registration is sent on to the code it still owes rather than back to the
-  // start, which would ask for the first code a second time.
+  const { getSession } = await import("@/lib/auth/current");
   const session = await getSession();
-  if (session?.gate === "registered") redirect(localePath(lang, "/unlock"));
   if (session) redirect(next.startsWith("/") ? next : localePath(lang));
 
   const bn = textClass(lang);
@@ -52,7 +41,6 @@ export default async function SignUpPage(props: PageProps<"/[lang]/signup">) {
 
       <AuthCard
         lang={lang}
-        step={dict.auth.stepOne}
         title={dict.auth.signUpTitle}
         lead={dict.auth.signUpLead}
         footer={
@@ -67,19 +55,7 @@ export default async function SignUpPage(props: PageProps<"/[lang]/signup">) {
           </Link>
         }
       >
-        {isRegistrationOpen() ? (
-          <SignUpForm lang={lang} next={next} />
-        ) : (
-          <p
-            role="alert"
-            className={cn(
-              "rounded-xl border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger",
-              bn,
-            )}
-          >
-            {dict.auth.notConfigured}
-          </p>
-        )}
+        <SignUpForm lang={lang} next={next} />
       </AuthCard>
     </AuthLayoutGrid>
   );

@@ -23,6 +23,7 @@ type BookLike = Pick<
   | "authorName"
   | "authorNameBn"
   | "coverHue"
+  | "coverImage"
   | "pages"
   | "featured"
 >;

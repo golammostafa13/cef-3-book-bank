@@ -130,6 +130,7 @@ export function SearchClient({
                     authorName: doc.author,
                     authorNameBn: doc.authorBn || undefined,
                     coverHue: doc.coverHue,
+                    coverImage: doc.coverImage,
                   }}
                   lang={lang}
                   size="sm"

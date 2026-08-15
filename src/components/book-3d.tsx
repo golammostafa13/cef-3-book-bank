@@ -18,7 +18,14 @@ import type { Book } from "@/types";
 
 type BookLike = Pick<
   Book,
-  "id" | "title" | "titleBn" | "authorName" | "authorNameBn" | "coverHue" | "pages"
+  | "id"
+  | "title"
+  | "titleBn"
+  | "authorName"
+  | "authorNameBn"
+  | "coverHue"
+  | "coverImage"
+  | "pages"
 >;
 
 interface Book3DProps {

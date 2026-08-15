@@ -1452,6 +1452,46 @@ body {
 }
 
 /* ---------------------------------------------------------------
+   PendulumScene — CEF-3 pendulum in the signin-page illustration
+   style. Same visual language as `ReadingScene`: warm ground glow,
+   ink stroke, sparkles, and a hover lift.
+--------------------------------------------------------------- */
+.pscene {
+  color: var(--ink);
+}
+
+.pscene__ink {
+  stroke: var(--ink);
+  stroke-width: 0;
+}
+
+.pscene__hoverlift {
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pscene:hover .pscene__hoverlift {
+  transform: translateY(-11px);
+}
+
+.pscene__twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pscene-twinkle 5s ease-in-out infinite;
+}
+
+@keyframes pscene-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  45% {
+    opacity: 0.3;
+    transform: scale(0.78);
+  }
+}
+
+/* ---------------------------------------------------------------
    Closing CTA — volumes adrift over paper.
 
    This section used to be a solid near-black slab. A black rectangle is
@@ -1608,7 +1648,8 @@ body {
   .book-card:focus-within,
   .shelf-tilt,
   .rscene:hover .rscene__hoverlift,
-  .rscene:hover .rscene__lean {
+  .rscene:hover .rscene__lean,
+  .pscene:hover .pscene__hoverlift {
     /* Zeroed transition durations would otherwise turn every lift into an
        instant jump, which is worse than no lift at all. */
     transform: none !important;

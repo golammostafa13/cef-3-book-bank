@@ -25,7 +25,13 @@ import type { Book } from "@/types";
 
 export type CoverBook = Pick<
   Book,
-  "id" | "title" | "titleBn" | "authorName" | "authorNameBn" | "coverHue"
+  | "id"
+  | "title"
+  | "titleBn"
+  | "authorName"
+  | "authorNameBn"
+  | "coverHue"
+  | "coverImage"
 >;
 
 /** The proportions every volume in the catalogue is drawn at. */

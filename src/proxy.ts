@@ -19,9 +19,8 @@ import { preferredLocale } from "@/lib/i18n/negotiate";
  *    further redirects happen while browsing.
  *
  * 2. **The library gate.** Nothing on these shelves opens for a signed-out
- *    visitor. Three routes are outside it — the two doors and the second
- *    printed code — and everything else, catalogue included, needs a session
- *    that has finished getting one.
+ *    visitor. Two routes are outside it — sign-in and sign-up — and everything
+ *    else, catalogue included, needs a session.
  *
  * 3. **The admin guard.** This is the optimistic check the Next.js docs
  *    describe: it keeps everyone who is not the administrator from ever seeing
@@ -44,7 +43,7 @@ import { preferredLocale } from "@/lib/i18n/negotiate";
  * has to be scannable before anyone has an account — and it answers 404 in a
  * production build, which is the check that actually matters.
  */
-const OPEN_ROUTES = new Set(["signin", "signup", "unlock", "qr"]);
+const OPEN_ROUTES = new Set(["signin", "signup", "qr"]);
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -55,10 +54,6 @@ export async function proxy(request: NextRequest) {
   if (!lang) {
     const target = request.nextUrl.clone();
     const chosen = preferredLocale(request.headers.get("accept-language"));
-    // The bare domain opens the door, not the library: `/` lands on sign-in,
-    // which is where someone without an account has to start. Every other path
-    // keeps whatever it asked for, so a gated URL survives the round trip
-    // through sign-in and the reader arrives where they were going.
     target.pathname =
       pathname === "/" ? `/${chosen}/signin` : `/${chosen}${pathname}`;
     return NextResponse.redirect(target);
@@ -77,15 +72,6 @@ export async function proxy(request: NextRequest) {
 
   if (!session) {
     target.pathname = `/${lang}/signin`;
-    // Come back to whatever was asked for once the sign-in finishes.
-    target.searchParams.set("next", pathname + search);
-    return NextResponse.redirect(target);
-  }
-
-  // Registered with the first printed code and no further. There is exactly
-  // one page such a session may see, and it is the one asking for the second.
-  if (session.gate === "registered") {
-    target.pathname = `/${lang}/unlock`;
     target.searchParams.set("next", pathname + search);
     return NextResponse.redirect(target);
   }
@@ -94,27 +80,11 @@ export async function proxy(request: NextRequest) {
   if (route !== "admin") return NextResponse.next();
   if (canAdminister(session)) return NextResponse.next();
 
-  // Signed in, but not as the administrator: there is nothing to sign in *to*,
-  // so sending them to the sign-in form would be a loop. They go to the
-  // catalogue instead — which is everything this site is for anyway.
   target.pathname = `/${lang}/books`;
   return NextResponse.redirect(target);
 }
 
 export const config = {
-  /**
-   * Everything except Next's own assets and the files that must keep their
-   * real, unprefixed paths: the sitemap and robots.txt (crawlers ask for them
-   * at the root), the PDF worker, and anything else in `public/`.
-   *
-   * Matching on "has a dot in the last segment" is what excludes public files
-   * without having to list them. The book files themselves are no longer among
-   * them — they live outside `public/` now, precisely because a rule this
-   * broad cannot tell a protected PDF from a favicon.
-   */
-  // A plain string literal, not String.raw or a computed value: the build
-  // statically parses this export, and anything it cannot evaluate fails the
-  // build with "Invalid segment configuration export".
   matcher: [
     "/((?!_next/|api/|favicon\\.ico|sitemap\\.xml|robots\\.txt|.*\\.[\\w]+$).*)",
   ],

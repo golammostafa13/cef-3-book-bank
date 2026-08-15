@@ -106,7 +106,8 @@ export const en = {
       },
     ],
     featuredEyebrow: "Featured",
-    featuredTitle: "Featured Books",
+    featuredTitle1: "Featured Books",
+    featuredTitle: "Best Rating Books",
     featuredLead:
       "Discover a world where imagination comes alive and knowledge knows no bounds.",
     categoriesTitle: "Browse by category",
@@ -293,15 +294,21 @@ export const en = {
   auth: {
     title: "Sign in",
     lead: "Continue with your Google account.",
+    leadPassword: "Sign in with your email and password.",
     leadEmail: "Sign in with your admin email address.",
-    needAccount: "Have a hard copy? Set up your account",
-    haveAccount: "Already set up? Sign in",
+    needAccount: "Need an account? Sign up",
+    haveAccount: "Already have an account? Sign in",
     notConfigured: "Sign-in is not available on this deployment.",
     devTitle: "Development sign-in",
     adminTitle: "Admin sign-in",
     devEmailLabel: "Email address",
     devContinue: "Sign in",
+    emailLabel: "Email address",
+    passwordLabel: "Password",
+    passwordPlaceholder: "At least 5 characters",
+    passwordSignIn: "Sign in",
     signingIn: "Signing in…",
+    orContinueWith: "or continue with email",
     metaSignIn: "Sign in",
     errorNoCredential: "No credential from Google.",
     errorUnverified: "That sign-in could not be verified.",
@@ -309,50 +316,31 @@ export const en = {
     errorEmailInvalid: "That does not look like an email address.",
     errorNotAdmin: "This email address is not authorized to sign in.",
     errorUnavailable: "Not available.",
-
-    /* The two printed codes ------------------------------------------- */
-    stepOne: "Step 1 of 2",
-    stepTwo: "Step 2 of 2",
-    signUpTitle: "Set up your account",
-    signUpLead:
-      "Your copy of the book carries the code. Fill this in once and the shelves are yours.",
-    metaSignUp: "Set up your account",
-    nameLabel: "Your name",
-    namePlaceholder: "Apu Roy",
-    codeLabel: "Code from your book",
-    codePlaceholder: "Cef-3",
-    codeHint: "Printed beside the first QR code inside the cover.",
-    signUpContinue: "Continue",
-    signingUp: "Setting up…",
-
-    unlockTitle: "One code to go",
-    unlockLead:
-      "The second QR code in your copy finishes the account and opens the library.",
-    metaUnlock: "Finish setting up",
-    unlockScanHint:
-      "Point your camera at the second QR code in the book. It will bring you straight in — nothing to type.",
-    unlockCodeLabel: "Or type the code",
-    unlockContinue: "Open the library",
-    unlocking: "Opening…",
-
-    errorNameEmpty: "Enter your name.",
-    errorCodeWrong: "That code does not match the one in your book.",
     errorEmailReserved:
       "That address belongs to a librarian. Sign in instead.",
-    errorScanFailed:
-      "That code did not match. Check you scanned the second code, not the first.",
+    errorPasswordShort: "Password must be at least 5 characters.",
 
-    /**
-     * The panel beside the card. It is not instructions — a reader who got
-     * here already knows what a sign-in form is — so it says what the library
-     * is instead, which is the one thing the form cannot.
-     */
+    errorEmailTaken: "An account with this email already exists.",
+    errorInvalidCredentials: "Invalid email or password.",
+
+    signUpTitle: "Create your account",
+    signUpLead:
+      "Enter your details below and get straight into the library.",
+    metaSignUp: "Create your account",
+    nameLabel: "Your name",
+    namePlaceholder: "Apu Roy",
+    phoneLabel: "Phone number",
+    phonePlaceholder: "+880 1XXX-XXXXXX",
+    phoneOptional: "Optional.",
+    signUpContinue: "Create account",
+    signingUp: "Creating account…",
+
+    errorNameEmpty: "Enter your name.",
+
     sideEyebrow: "The reading room",
     sideLead: "Sign in to open the shelves. Every book, in your browser.",
     sideLeadSignUp:
-      "Two codes are printed in your copy. They are the key to the whole collection.",
-    sideLeadUnlock:
-      "One scan from the shelves. The second code is on the page after the first.",
+      "Create an account and the whole collection is yours.",
     sideAlt:
       "A reader sitting on a stack of colourful books with an open book, a pencil leaning against the pile and a tree behind.",
     badgeWithBook: "Yours with the book",
@@ -478,7 +466,12 @@ export const en = {
         "Uploads presigned direct to R2; the demo build serves a sample file instead.",
       feature: "Feature this book on the home page",
       cover: "Cover",
-      coverLead: "Drawn from the metadata — no artwork to upload.",
+      coverLead: "Upload a cover image, or let the metadata generate one.",
+      coverImage: "Cover image",
+      chooseCover: "Choose an image",
+      removeCover: "Remove cover",
+      coverUploadNote:
+        "WebP or JPEG, up to 2 MB. Saved as /covers/{slug}.webp.",
       scheme: "Scheme",
       save: "Save changes",
       add: "Add to the library",

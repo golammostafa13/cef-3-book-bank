@@ -12,4 +12,4 @@
  * in the sign-in form, the admin topbar and the catalogue bar. It is not a
  * secret and grants nothing on its own — the email address is what is checked.
  */
-export const adminUsername = "cef-3-book-bank";
+export const adminUsername = "pediatric-book-bank";

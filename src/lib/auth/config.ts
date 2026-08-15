@@ -115,53 +115,14 @@ export function isEmailSignInAllowed(): boolean {
 export const isDevSignInAllowed = isEmailSignInAllowed;
 
 /* -------------------------------------------------------------------------
- * The two printed codes
+ * Registration
  * ---------------------------------------------------------------------- */
 
 /**
- * Registration takes two codes, and both are printed in the hard copy as QR
- * codes. The first opens the sign-up form, the second finishes the account.
- *
- * They are shared secrets on paper, which means they are not secrets in any
- * strong sense: anyone who photographs the page can pass on what they saw.
- * That is inherent to a single static print run and is the level of assurance
- * being bought here — a door with a lock on it, not a vault. Nothing that
- * matters is decided by these codes; being an administrator still hangs
- * entirely on `ADMIN_EMAILS`, which no QR can grant.
- *
- * `SIGNUP_CODE` falls back to the value printed in the current run, so a fresh
- * clone matches the books already in circulation without any configuration.
+ * Password-based registration is always open. The printed-code flow is
+ * removed; accounts are created directly from the sign-up form.
  */
-export const signupCode = (process.env.SIGNUP_CODE ?? "Cef-3").trim();
-
-/** The second code. Unset means the second gate cannot be passed at all. */
-export const unlockCode = (process.env.UNLOCK_CODE ?? "").trim();
-
-/**
- * Codes are compared leniently — trimmed, case-insensitive, and with the dashes
- * and spaces people insert when copying from a printed page thrown away.
- *
- * The strictness would buy nothing: an attacker pastes the code exactly, and
- * the only person a case-sensitive comparison ever turns away is the reader
- * typing `cef-3` off the back of a book.
- */
-function canonicalCode(value: string): string {
-  return value.trim().toLowerCase().replace(/[\s-]+/g, "");
-}
-
-/**
- * Compares a submitted code against a configured one.
- *
- * An unset expected code matches nothing. Otherwise a blank `UNLOCK_CODE` on a
- * misconfigured deployment would let an empty form field through the gate.
- */
-export function matchesCode(submitted: string, expected: string): boolean {
-  if (!expected) return false;
-  return canonicalCode(submitted) === canonicalCode(expected);
-}
-
-/** True when the printed-code registration flow can actually complete. */
 export function isRegistrationOpen(): boolean {
-  return Boolean(signupCode && unlockCode);
+  return true;
 }
 

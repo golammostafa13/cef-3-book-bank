@@ -2,7 +2,7 @@
 
 import { useActionState, useId, useState } from "react";
 import Link from "next/link";
-import { Check, FileUp, Loader2, Save } from "lucide-react";
+import { Check, FileUp, Loader2, Save, Trash2 } from "lucide-react";
 import { Book3D } from "@/components/book-3d";
 import { Button } from "@/components/ui/button";
 import { Field, fieldClass } from "@/components/ui/field";
@@ -64,19 +64,34 @@ export function BookForm({
   const [scheme, setScheme] = useState(
     schemeIndexOf(book?.coverHue ?? hueForScheme(0)),
   );
+  const [coverImageData, setCoverImageData] = useState<string | null>(null);
+  const [removingCover, setRemovingCover] = useState(false);
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCoverImageData(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const getCoverImageValue = () => {
+    if (removingCover) return "";
+    if (coverImageData) return coverImageData;
+    return book?.coverImage || "";
+  };
 
   const previewId = useId();
   const selectedAuthor = authors.find((a) => a.id === authorId);
 
   const preview = {
-    // Layout variant is hashed from the id, so an existing book keeps the
-    // cover art it already has and a new one is stable for this form session.
     id: book?.id ?? previewId,
     title: title || "Untitled",
     titleBn: titleBn || undefined,
     authorName: selectedAuthor?.name ?? "",
     authorNameBn: selectedAuthor?.nameBn,
     coverHue: hueForScheme(scheme),
+    coverImage: coverImageData || book?.coverImage,
     pages: Number(pages) || 240,
   };
 
@@ -88,6 +103,7 @@ export function BookForm({
     <form action={formAction} className="grid gap-6 xl:grid-cols-[1fr_20rem]">
       {editing && <input type="hidden" name="id" value={book!.id} />}
       <input type="hidden" name="coverHue" value={hueForScheme(scheme)} />
+      <input type="hidden" name="coverImage" value={getCoverImageValue()} />
       {/* Server Actions cannot read route params, so the language the librarian
           is working in rides along and the validation answers in it. */}
       <input type="hidden" name="lang" value={lang} />
@@ -385,6 +401,54 @@ export function BookForm({
               hoverAngle={-6}
               depthScale={1.1}
             />
+          </div>
+
+          <div className="mx-auto mt-6 w-[62%] xl:w-[74%]">
+            <span className={cn("mb-2 block text-sm font-medium text-ink", bn)}>
+              {f.coverImage}
+            </span>
+            {coverImageData || (!removingCover && book?.coverImage) ? (
+              <div className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={coverImageData || book!.coverImage!}
+                  alt=""
+                  className="w-full rounded-lg border border-line"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-2 right-2 bg-surface/80 backdrop-blur"
+                  onClick={() => {
+                    setRemovingCover(true);
+                    setCoverImageData(null);
+                  }}
+                >
+                  <Trash2 className="size-3.5" aria-hidden="true" />
+                  <span className="ml-1">{f.removeCover}</span>
+                </Button>
+              </div>
+            ) : (
+              <label
+                htmlFor="coverImage"
+                className="flex h-12 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-line bg-bg px-4 text-[0.95rem] text-ink-mute transition-colors hover:border-accent hover:text-ink"
+              >
+                <FileUp className="size-4 text-accent" aria-hidden="true" />
+                {f.chooseCover}
+              </label>
+            )}
+            <input
+              id="coverImage"
+              name="coverImage"
+              type="file"
+              accept="image/webp,image/jpeg,image/png"
+              className="sr-only"
+              onChange={handleCoverChange}
+            />
+            <p className={cn("mt-1.5 text-sm text-ink-faint", bn)}>
+              {f.coverUploadNote}
+            </p>
           </div>
 
           <fieldset className="mt-10">

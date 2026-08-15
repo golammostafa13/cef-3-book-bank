@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Book3D } from "@/components/book-3d";
 import { Button } from "@/components/ui/button";
 import { defaultLocale, type Locale } from "@/lib/i18n/config";
 import { textClass } from "@/lib/i18n/content";
@@ -252,55 +251,6 @@ export function Hero3D({
         {/* The scene. Decorative by definition — everything it says is said
             again in the copy layered over it. */}
         <canvas ref={canvasRef} className="hero3d__canvas" aria-hidden="true" />
-
-        {/* Floating 3D books — visible on desktop in the right half of the
-            hero, behind the WebGL canvas while it loads and fading with
-            beat-0 as the user scrolls. Each one links to its book page.
-            Hidden below lg where there is no horizontal room beside the
-            headline. The animation is pure CSS (Book3D) so it works before
-            and without three.js. */}
-        <div
-          aria-hidden="true"
-          className="hero3d__floaters"
-          style={{ opacity: "var(--b0)" }}
-        >
-          {[
-            // right column, top — most prominent
-            { book: books[0], x: "62%",  y: "12%", w: "160px", angle: -26, hoverAngle: -6,  dur: "14s", delay: "0s"   },
-            // right column, lower — slightly smaller, different angle
-            { book: books[1], x: "76%",  y: "52%", w: "130px", angle: -18, hoverAngle: -4,  dur: "11s", delay: "-4s"  },
-            // far right, mid — tilted the other way for variety
-            { book: books[2], x: "88%",  y: "28%", w: "110px", angle: -34, hoverAngle: -10, dur: "17s", delay: "-8s"  },
-            // right edge, near bottom
-            { book: books[3], x: "70%",  y: "74%", w: "100px", angle: -14, hoverAngle: -3,  dur: "13s", delay: "-2s"  },
-          ].filter((f) => f.book).map((f, i) => (
-            <Link
-              key={f.book.id}
-              href={`/${lang}/books/${f.book.slug}`}
-              tabIndex={-1}
-              className="hero3d__floater"
-              style={
-                {
-                  "--fx": f.x,
-                  "--fy": f.y,
-                  "--fw": f.w,
-                  "--fdur": f.dur,
-                  "--fdelay": f.delay,
-                  zIndex: 4 - i,
-                } as React.CSSProperties
-              }
-            >
-              <Book3D
-                book={f.book}
-                lang={lang}
-                size="md"
-                angle={f.angle}
-                hoverAngle={f.hoverAngle}
-                depthScale={0.9}
-              />
-            </Link>
-          ))}
-        </div>
 
         <div className="hero3d__stage">
           <div className="hero3d__copy">

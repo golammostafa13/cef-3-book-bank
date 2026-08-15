@@ -5,22 +5,30 @@ import { cn } from "@/lib/utils";
 import type { Book } from "@/types";
 
 /**
- * Generated cover art.
+ * Cover front.
  *
- * Every cover is drawn — no image bytes, no CDN (which keeps the CSP tight),
- * and real selectable text instead of baked-in pixels. Colour comes from the
- * curated schemes in `lib/cover-theme`, and the five layouts below are all
- * built from the reference design's vocabulary: a heavy grotesk title, hairline
- * rules, a single geometric field, and one hot-orange mark.
+ * When the book has its own scanned cover (`book.coverImage` — a path in
+ * `public/covers/`), that photo is painted on as the board. The generated art
+ * below is the fallback for any title without a real scan, so a shelf never
+ * goes blank for lack of a file; it was written that way from the start.
  *
- * When real covers land in R2 this component takes an `imageUrl` prop and
- * falls back to the generated art for books that have no artwork yet.
+ * The generated schemes live in `lib/cover-theme`: warm stone ground, near-black
+ * ink, one hot-orange mark — the reference design's three colours, sampled so a
+ * shelf of fallbacks stays in the same world. The five layouts below are all
+ * cut from that vocabulary: a heavy grotesk title, hairline rules, a single
+ * geometric field, and one hot-orange mark.
  */
 
 interface CoverArtProps {
   book: Pick<
     Book,
-    "id" | "title" | "titleBn" | "authorName" | "authorNameBn" | "coverHue"
+    | "id"
+    | "title"
+    | "titleBn"
+    | "authorName"
+    | "authorNameBn"
+    | "coverHue"
+    | "coverImage"
   >;
   /** The cover is typeset in the reader's language, like a translated edition. */
   lang?: Locale;
@@ -35,6 +43,33 @@ export function CoverArt({
   className,
   size = "md",
 }: CoverArtProps) {
+  // A book's own cover wins. The scan carries the real type and colour, so it
+  // is painted on as the face and the generated art beneath it is dropped; the
+  // generated path stays as the fallback when no scan exists.
+  if (book.coverImage) {
+    return (
+      <div
+        className={cn(
+          "relative isolate h-full w-full overflow-hidden [container-type:inline-size]",
+          className,
+        )}
+        aria-hidden="true"
+      >
+        {/* Local, already-optimised WebP scans from /public — a plain <img>
+            keeps these SSR-safe and works inside the 3D-transformed boards,
+            where next/image's layout assumptions would fight the geometry. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={book.coverImage}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    );
+  }
+
   const t = coverTheme(book);
   const variant = coverVariant(book);
 

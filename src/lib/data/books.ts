@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import {
   books,
   authors,
@@ -272,6 +274,7 @@ export interface SearchDoc {
   categoryBn: string;
   year: number;
   coverHue: number;
+  coverImage?: string;
 }
 
 /* ---------------------------------------------------------------------------
@@ -314,6 +317,26 @@ function nextAccessionCode(): string {
   return `BK-${String(highest + 37).padStart(5, "0")}`;
 }
 
+const COVERS_DIR = path.join(process.cwd(), "public", "covers");
+
+function writeCoverImage(slug: string, base64Data: string): string {
+  const matches = base64Data.match(/^data:image\/(\w+);base64,(.+)$/);
+  if (!matches) throw new Error("Invalid cover image data");
+  const ext = matches[1] === "jpeg" ? "jpg" : matches[1];
+  const buffer = Buffer.from(matches[2], "base64");
+  const filename = `${slug}.${ext}`;
+  const filepath = path.join(COVERS_DIR, filename);
+  fs.writeFileSync(filepath, buffer);
+  return `/covers/${filename}`;
+}
+
+function deleteCoverImage(coverImage?: string): void {
+  if (!coverImage) return;
+  const filename = path.basename(coverImage);
+  const filepath = path.join(COVERS_DIR, filename);
+  if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+}
+
 export async function insertBook(input: NewBookInput): Promise<Book> {
   const author = authors.find((a) => a.id === input.authorId);
   const category = categories.find((c) => c.id === input.categoryId);
@@ -324,6 +347,12 @@ export async function insertBook(input: NewBookInput): Promise<Book> {
   // Hoisted: the file's address is built from it too, and the two must not be
   // allowed to disagree.
   const slug = uniqueSlug(slugify(input.title));
+
+  let coverImage = input.coverImage;
+  if (coverImage && coverImage.startsWith("data:")) {
+    coverImage = writeCoverImage(slug, coverImage);
+  }
+
   const book: Book = {
     id: `bk-${String(seq).padStart(3, "0")}-${Date.now().toString(36)}`,
     code: nextAccessionCode(),
@@ -349,6 +378,7 @@ export async function insertBook(input: NewBookInput): Promise<Book> {
       (seq % 4) + 1
     }-P${String((seq % 12) + 1).padStart(2, "0")}`,
     coverHue: input.coverHue,
+    coverImage,
     format: input.format,
     fileSizeMb: input.fileSizeMb,
     // Until R2 is wired up every book streams the same sample file — but it
@@ -392,6 +422,14 @@ export async function updateBook(
     author.bookCount += 1;
   }
 
+  let coverImage = input.coverImage;
+  if (coverImage && coverImage.startsWith("data:")) {
+    if (previous.coverImage) deleteCoverImage(previous.coverImage);
+    coverImage = writeCoverImage(previous.slug, coverImage);
+  } else if (!coverImage && previous.coverImage) {
+    deleteCoverImage(previous.coverImage);
+  }
+
   const next: Book = {
     ...previous,
     ...input,
@@ -400,6 +438,7 @@ export async function updateBook(
     authorName: author.name,
     authorNameBn: author.nameBn,
     categoryName: category.name,
+    coverImage,
     // The slug is a published URL: it only follows a retitle if nothing links
     // to the old one yet, which for a demo means "never".
     slug: previous.slug,
@@ -498,11 +537,12 @@ export async function getSearchIndex(): Promise<SearchDoc[]> {
     title: b.title,
     titleBn: b.titleBn ?? "",
     author: b.authorName,
-    authorBn: b.authorNameBn ?? "",
-    category: b.categoryName,
-    categoryBn:
-      categories.find((c) => c.id === b.categoryId)?.nameBn ?? b.categoryName,
-    year: b.year,
-    coverHue: b.coverHue,
-  }));
+     authorBn: b.authorNameBn ?? "",
+     category: b.categoryName,
+     categoryBn:
+       categories.find((c) => c.id === b.categoryId)?.nameBn ?? b.categoryName,
+     year: b.year,
+     coverHue: b.coverHue,
+     coverImage: b.coverImage,
+   }));
 }

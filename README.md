@@ -88,7 +88,7 @@ revoke; editing the variable moves the admin, and it takes effect on the next
 request rather than when an eight-hour cookie expires. That is also why there is no `role` in
 the token: a claim stamped into a session outlives the decision that granted it.
 
-The admin account shows as `cef-3-book-bank` wherever it appears — a constant in
+The admin account shows as `pediatric-book-bank` wherever it appears — a constant in
 [`src/lib/auth/username.ts`](src/lib/auth/username.ts), not a setting. Everyone
 else shows the name they signed in with.
 

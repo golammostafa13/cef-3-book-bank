@@ -25,8 +25,7 @@ export const site = {
   descriptionBn:
     "সেফ ৩ বুক ব্যাংক সেফ ৩ সংগ্রহের পাঠকদের জন্য একটি ডিজিটাল গ্রন্থাগার। আপনার কপিতে ছাপা কোড দিয়ে অ্যাকাউন্ট তৈরি করুন, তারপর হাজারো বাংলা ও ইংরেজি বই পড়ুন বা ডাউনলোড করুন — বিনামূল্যে, ব্রাউজারেই।",
   url: "https://cef3.example.org",
-  email: "hello@cef3.example.org",
-  phone: "+880 1700 000000",
+  email: "apu_roy@live.com",
   /**
    * Navigation is defined by route and dictionary key; the labels themselves
    * live in the dictionaries so a new language does not have to edit this file.

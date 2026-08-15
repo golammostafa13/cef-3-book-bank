@@ -217,6 +217,43 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     return item;
   };
 
+  /**
+   * Loads a book's real cover scan as a texture, resolving null on failure so
+   * the generated canvas texture can stay in place. The canvas art is drawn
+   * first and synchronously, so the board is never blank while the image is in
+   * flight — the photo only swaps in over the top when it arrives.
+   */
+  const imageLoader = new THREE.TextureLoader();
+  const pendingCoverImages: Promise<unknown>[] = [];
+
+  function applyCoverImage(
+    material: THREE.MeshStandardMaterial,
+    book: SceneBook,
+  ): void {
+    if (!book.coverImage) return;
+    const fallback = material.map;
+    pendingCoverImages.push(
+      new Promise<void>((resolve) => {
+        imageLoader.load(
+          book.coverImage!,
+          (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.anisotropy = anisotropy;
+            track(texture);
+            // Replacing the map invalidates the material on the next frame; the
+            // canvas keeps its generated art until the photo is actually live.
+            material.map = texture;
+            material.needsUpdate = true;
+            fallback?.dispose();
+            resolve();
+          },
+          undefined,
+          () => resolve(),
+        );
+      }),
+    );
+  }
+
   const pageEdgeTexture = track(textureFrom(drawPageEdge(512), anisotropy));
   const creamMaterial = track(
     new THREE.MeshStandardMaterial({ color: 0xf3ecdd, roughness: 0.94 }),
@@ -245,6 +282,7 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       roughness: 0.66,
     }),
   );
+  applyCoverImage(faceMaterial, hero);
   const backMaterial = track(
     new THREE.MeshStandardMaterial({
       map: track(textureFrom(drawCoverBack(hero, 512), anisotropy)),
@@ -357,6 +395,11 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     pages.push(leaf);
   }
 
+  const heroMeshes: THREE.Mesh[] = [];
+  bookGroup.traverse((child) => {
+    if (child instanceof THREE.Mesh) heroMeshes.push(child);
+  });
+
   /* --- Contact shadow ----------------------------------------------- *
    * A shadow-only plane. It catches the key light and nothing else, so
    * the volume sits on something without a floor ever being drawn.
@@ -433,6 +476,7 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       map: track(textureFrom(drawCoverFace(book, lang, 384), anisotropy)),
       roughness: 0.66,
     });
+    applyCoverImage(face, book);
     const back = new THREE.MeshStandardMaterial({
       map: track(textureFrom(drawCoverBack(book, 192), anisotropy)),
       roughness: 0.7,
@@ -484,13 +528,23 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   });
 /* --- Interactive settled books ------------------------------------ */
 
+  /**
+   * The real cover scans are fetched from /covers with a TextureLoader — that
+   * is async, so the first painted frame still carries the generated canvas art.
+   * `onReady` is held until every photo has loaded (or failed and kept its
+   * canvas fallback), which is what keeps the canvas from fading in on
+   * generated art and then snapping to the scan a frame later.
+   */
+  const imagesReady = Promise.allSettled(pendingCoverImages).then(
+    () => undefined,
+  );
+
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
 
   let hoveredItem: FieldItem | null = null;
-  let pointerInside = false;
-
-  const pointerWorld = new THREE.Vector3();
+  let hoveredHero = false;
+  let heroHover = 0;
 
   function updatePointer(event: PointerEvent) {
     const rect = canvas.getBoundingClientRect();
@@ -500,17 +554,15 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
 
     pointer.y =
       -((event.clientY - rect.top) / Math.max(rect.height, 1)) * 2 + 1;
-
-    pointerInside = true;
   }
 
   function clearHover() {
-    pointerInside = false;
-
     if (hoveredItem) {
       hoveredItem.hoverTarget = 0;
       hoveredItem = null;
     }
+
+    hoveredHero = false;
 
     items.forEach((item) => {
       item.hoverTarget = 0;
@@ -520,23 +572,44 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   }
 
   function findHoveredBook() {
-    // Do not allow interaction while the collection is arriving.
-    if (progress < 0.86 || progress > 1.001 || !fieldGroup.visible) {
+    const heroAvailable = progress >= 0 && progress <= 1.001 && bookGroup.visible;
+
+    raycaster.setFromCamera(pointer, camera);
+
+    let hit: THREE.Intersection | undefined;
+
+    if (heroAvailable) {
+      const heroIntersections = raycaster.intersectObjects(heroMeshes, false);
+      hit = heroIntersections[0];
+    }
+
+    if (!hit) {
+      if (progress < 0.86 || progress > 1.001 || !fieldGroup.visible) {
+        clearHover();
+        return;
+      }
+
+      const fieldIntersections = raycaster.intersectObjects(
+        items.map((item) => item.object),
+        false,
+      );
+      hit = fieldIntersections[0];
+    }
+
+    if (!hit) {
       clearHover();
       return;
     }
 
-    raycaster.setFromCamera(pointer, camera);
+    const isHeroHit = heroMeshes.includes(hit.object as THREE.Mesh);
 
-    const intersections = raycaster.intersectObjects(
-      items.map((item) => item.object),
-      false,
-    );
-
-    const hit = intersections[0];
-
-    if (!hit) {
-      clearHover();
+    if (isHeroHit) {
+      hoveredHero = true;
+      hoveredItem = null;
+      items.forEach((item) => {
+        item.hoverTarget = 0;
+      });
+      canvas.style.cursor = "pointer";
       return;
     }
 
@@ -555,6 +628,7 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       hoveredItem = item;
     }
 
+    hoveredHero = false;
     item.hoverTarget = 1;
 
     // Store where the pointer is relative to the viewport.
@@ -577,18 +651,26 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
   function onPointerDown(event: PointerEvent) {
     updatePointer(event);
 
-    if (progress < 0.86 || progress > 1.001) {
+    if (progress < 0 || progress > 1.001) {
       return;
     }
 
     raycaster.setFromCamera(pointer, camera);
 
-    const intersections = raycaster.intersectObjects(
+    const heroIntersections = raycaster.intersectObjects(heroMeshes, false);
+    const heroHit = heroIntersections[0];
+
+    if (heroHit) {
+      options.onBookClick?.(hero);
+      return;
+    }
+
+    const fieldIntersections = raycaster.intersectObjects(
       items.map((item) => item.object),
       false,
     );
 
-    const hit = intersections[0];
+    const hit = fieldIntersections[0];
 
     if (!hit) return;
 
@@ -723,17 +805,28 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     bookGroup.visible = !gone;
     if (!gone) {
       const idle = 1 - opening;
+      const heroTarget = hoveredHero ? 1 : 0;
+      heroHover = mix(heroHover, heroTarget, 0.14);
+
+      const baseY = heroOffsetY * (1 - Math.max(opening * 0.6, leaving));
+      const hoverLift = heroHover * 0.12;
+
       bookGroup.position.set(
         heroOffsetX * (1 - Math.max(opening * 0.55, leaving)),
-        heroOffsetY * (1 - Math.max(opening * 0.6, leaving)),
-        mix(0, -7, leaving),
+        baseY + hoverLift,
+        mix(0, -7, leaving) + heroHover * 0.15,
       );
+
+      const baseRotY =
+        mix(-0.62, -0.16, opening) + Math.sin(elapsed * 0.42) * 0.09 * idle;
+      const hoveredRotY = mix(baseRotY, -0.08, heroHover);
+
       bookGroup.rotation.set(
         mix(-0.14, -0.04, opening) + Math.sin(elapsed * 0.31) * 0.045 * idle,
-        mix(-0.62, -0.16, opening) + Math.sin(elapsed * 0.42) * 0.09 * idle,
+        hoveredRotY,
         mix(0.04, 0.01, opening),
       );
-      bookGroup.scale.setScalar(mix(1, 0.3, leaving));
+      bookGroup.scale.setScalar(mix(1, 0.3, leaving) + heroHover * 0.04);
 
       // The board swings a little past flat, the way a hardback does when it
       // has been opened right back on itself.
@@ -764,18 +857,14 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
       }
     }
 
-    if (hoveredItem) {
-      hoverLight.intensity = mix(
-        hoverLight.intensity,
-        hoveredItem.hover * 2.2,
-        0.12,
-      );
+    if (hoveredHero || hoveredItem) {
+      const targetIntensity = hoveredHero
+        ? mix(0, 2.2, heroHover)
+        : hoveredItem!.hover * 2.2;
+      hoverLight.intensity = mix(hoverLight.intensity, targetIntensity, 0.12);
 
-      hoverLight.position.lerp(
-        hoveredItem.object.position,
-        0.12,
-      );
-
+      const targetPos = hoveredHero ? bookGroup.position : hoveredItem!.object.position;
+      hoverLight.position.lerp(targetPos, 0.12);
       hoverLight.position.z += 1.4;
     } else {
       hoverLight.intensity = mix(
@@ -930,7 +1019,10 @@ export function createHeroScene(options: HeroSceneOptions): HeroScene {
     render();
     if (!ready) {
       ready = true;
-      options.onReady?.();
+      // Wait for the real cover scans to land (or fall back to canvas art)
+      // before revealing the canvas, so the first frame the reader sees has
+      // the right textures rather than a generated-art flash.
+      void imagesReady.then(() => options.onReady?.());
     }
   }
 

@@ -1,21 +1,6 @@
-import type { Metadata } from "next";
-import { ViewTransition } from "react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import {
-  BookOpen,
-  Building2,
-  Calendar,
-  Download,
-  FileText,
-  Hash,
-  Languages,
-  Layers,
-  MapPin,
-  Star,
-} from "lucide-react";
 import { Book3D } from "@/components/book-3d";
 import { BookCard } from "@/components/book-card";
+import { PendulumScene } from "@/components/pendulum-scene";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import {
@@ -36,9 +21,25 @@ import {
   formatYearIn,
   textClass,
 } from "@/lib/i18n/content";
+import { fill } from "@/lib/i18n/format";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import { fill } from "@/lib/i18n/format";
+import {
+  BookOpen,
+  Building2,
+  Calendar,
+  Download,
+  FileText,
+  Hash,
+  Languages,
+  Layers,
+  MapPin,
+  Star,
+} from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ViewTransition } from "react";
 
 /**
  * Prerender every book in both languages. Two locales × forty books is eighty
@@ -63,11 +64,10 @@ export async function generateMetadata(
   const primary = bookTitle(book, lang);
   const secondary = bookSubtitle(book, lang);
   const title = secondary ? `${primary} (${secondary})` : primary;
-  const description = `${bookDescription(book, lang)} ${
-    lang === "bn"
-      ? `${bookAuthorName(book, lang)}-এর ${primary} অনলাইনে বিনামূল্যে পড়ুন বা ${book.format.toUpperCase()} ডাউনলোড করুন।`
-      : `Read ${primary} by ${bookAuthorName(book, lang)} online free, or download the ${book.format.toUpperCase()}.`
-  }`;
+  const description = `${bookDescription(book, lang)} ${lang === "bn"
+    ? `${bookAuthorName(book, lang)}-এর ${primary} অনলাইনে বিনামূল্যে পড়ুন বা ${book.format.toUpperCase()} ডাউনলোড করুন।`
+    : `Read ${primary} by ${bookAuthorName(book, lang)} online free, or download the ${book.format.toUpperCase()}.`
+    }`;
 
   return {
     title,
@@ -286,43 +286,63 @@ export default async function BookDetailPage(
             >
               {title}
             </h1>
-            {subtitle && (
-              <p className="mt-2 text-xl text-ink-mute">{subtitle}</p>
-            )}
 
-            <p className={cn("mt-4 text-lg text-ink-mute", textClass(lang))}>
-              {dict.book.by}{" "}
-              <Link
-                href={href(author ? `/authors/${author.slug}` : "/authors")}
-                className="font-medium text-ink underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
-              >
-                {bookAuthorName(book, lang)}
-              </Link>
-            </p>
 
-            <div
-              className={cn(
-                "mt-6 flex flex-wrap items-center gap-6 text-sm text-ink-mute",
-                textClass(lang),
-              )}
-            >
-              <span className="inline-flex items-center gap-1.5">
-                <Star
-                  className="size-4 fill-accent text-accent"
-                  aria-hidden="true"
-                />
-                <span className="font-semibold text-ink">
-                  {formatNumberIn(book.rating, lang)}
-                </span>
-                {dict.book.ratingOutOf}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Download className="size-4" aria-hidden="true" />
-                {fill(lang, dict.book.downloads, {
-                  n: formatCompactIn(book.downloads, lang),
-                })}
-              </span>
-              <span>{fill(lang, dict.book.added, { date: formatDateIn(book.addedAt, lang) })}</span>
+
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="min-w-0 flex-1">
+                {subtitle && (
+                  <p className="text-xl text-ink-mute">{subtitle}</p>
+                )}
+
+                <p className={cn("mt-4 text-lg text-ink-mute", textClass(lang))}>
+                  {dict.book.by}{" "}
+                  <Link
+                    href={href(author ? `/authors/${author.slug}` : "/authors")}
+                    className="font-medium text-ink underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                  >
+                    {bookAuthorName(book, lang)}
+                  </Link>
+                </p>
+
+                <div
+                  className={cn(
+                    "mt-6 flex flex-wrap items-center gap-6 text-sm text-ink-mute",
+                    textClass(lang),
+                  )}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <Star
+                      className="size-4 fill-accent text-accent"
+                      aria-hidden="true"
+                    />
+                    <span className="font-semibold text-ink">
+                      {formatNumberIn(book.rating, lang)}
+                    </span>
+                    {dict.book.ratingOutOf}
+                  </span>
+
+                  <span className="inline-flex items-center gap-1.5">
+                    <Download className="size-4" aria-hidden="true" />
+                    {fill(lang, dict.book.downloads, {
+                      n: formatCompactIn(book.downloads, lang),
+                    })}
+                  </span>
+
+                  <span>
+                    {fill(lang, dict.book.added, {
+                      date: formatDateIn(book.addedAt, lang),
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Pendulum */}
+              <div className="flex w-full justify-center lg:w-[320px] lg:shrink-0">
+                <div className="h-[220px] w-full sm:h-[260px] lg:h-[300px]">
+                  <PendulumScene />
+                </div>
+              </div>
             </div>
 
             <div className="reveal-3d mt-10 space-y-4">

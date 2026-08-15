@@ -72,6 +72,7 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
     authorName: book.authorName,
     authorNameBn: book.authorNameBn,
     coverHue: book.coverHue,
+    coverImage: book.coverImage,
     pages: book.pages,
   }));
 
@@ -152,7 +153,7 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
           statAuthors: dict.home.statAuthors,
           statDownloads: dict.home.statDownloads,
           ...dict.home.scene,
-          featuredTitle: dict.home.featuredTitle,
+          featuredTitle: dict.home.featuredTitle1,
         }}
         stats={{
           books: formatCompactIn(stats.totalBooks, lang),
@@ -231,14 +232,6 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
       <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
         <div className="reveal-3d flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p
-              className={cn(
-                "text-sm font-semibold uppercase tracking-[0.2em] text-accent",
-                textClass(lang),
-              )}
-            >
-              {dict.home.featuredEyebrow}
-            </p>
             <h2
               className={cn(
                 "mt-2 text-[clamp(1.9rem,4vw,2.9rem)] font-bold tracking-tight text-ink",

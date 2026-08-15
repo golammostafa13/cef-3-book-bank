@@ -94,6 +94,7 @@ function bookSchema(dict: Dictionary) {
       .max(512, e.fileSizeMax),
     featured: z.coerce.boolean(),
     coverHue: z.coerce.number().int().min(0).max(359),
+    coverImage: z.string().trim().optional(),
   });
 }
 
@@ -127,6 +128,7 @@ function readBookForm(formData: FormData, dict: Dictionary) {
     // An unchecked checkbox sends nothing at all.
     featured: formData.get("featured") === "on",
     coverHue: formData.get("coverHue"),
+    coverImage: formData.get("coverImage") ? String(formData.get("coverImage")) : undefined,
   });
 }
 

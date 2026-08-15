@@ -23,20 +23,20 @@ import {
  * records *what was proved* at the door, which is a fact about the past and so
  * is safe to carry in the token.
  *
- *   • `google` — an ID token verified against Google's published keys.
- *   • `email`  — an address typed into the direct sign-in form.
- *   • `qr`     — the codes printed in a hard copy. Proves possession of a book
- *                and nothing whatever about the address that was typed.
+ *   • `google`   — an ID token verified against Google's published keys.
+ *   • `email`    — an address typed into the direct sign-in form.
+ *   • `qr`       — the codes printed in a hard copy. Proves possession of a book
+ *                  and nothing whatever about the address that was typed.
+ *   • `password` — registered with email and password.
  */
-export type SignInMethod = "google" | "email" | "qr";
+export type SignInMethod = "google" | "email" | "qr" | "password";
 
 /**
  * How far through the printed-code flow this account is.
  *
- * `registered` has passed the first code and may see exactly one page: the one
- * asking for the second. `unlocked` has passed both and reads the library.
- * Sessions from `google` and `email` sign-in carry no gate at all — they never
- * entered the flow, and an absent gate reads as open.
+ * Kept for backward compatibility with existing cookies that still carry a
+ * `gate` value. New registrations land directly on `unlocked`; the `registered`
+ * state is no longer reachable.
  */
 export type Gate = "registered" | "unlocked";
 
@@ -45,6 +45,7 @@ export interface Session {
   email: string;
   /** Display name — Google's profile name, or the address for a local sign-in. */
   name: string;
+  phone?: string;
   picture?: string;
   via?: SignInMethod;
   gate?: Gate;
@@ -71,14 +72,13 @@ export interface Session {
 /**
  * Whether a session may read the library at all.
  *
- * Everything except the door is behind this: the catalogue, the book pages,
- * the reader and the files. Half-finished registrations are held back so that
- * scanning only the first of the two printed codes is not enough.
+ * Every signed-in session has full access. The old `registered` gate no longer
+ * exists; accounts finish sign-up and arrive here already unlocked.
  */
 export function hasLibraryAccess(
   session: Session | null | undefined,
 ): session is Session {
-  return session != null && session.gate !== "registered";
+  return session != null;
 }
 
 /**

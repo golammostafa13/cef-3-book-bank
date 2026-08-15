@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Two letters for the fallback avatar. Splits on spaces *and* hyphens, because
- * the account is a handle rather than a person's name — `cef-3-book-bank` gives
+ * the account is a handle rather than a person's name — `pediatric-book-bank` gives
  * "CB". Numeric segments are skipped; a digit is not an initial.
  */
 function initialsOf(name: string): string {
