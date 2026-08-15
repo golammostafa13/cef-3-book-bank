@@ -170,8 +170,8 @@ export async function devSignInAction(
 /**
  * Register with name, email and optional phone.
  *
- * Creates a user record in `private/users.json`, then redirects to the sign-in
- * page. The password is set on first sign-in. There is no second step.
+ * Creates a user record in Vercel KV (or `private/users.json` locally),
+ * then redirects to the sign-in page. The password is set on first sign-in. There is no second step.
  */
 export async function signUpAction(
   prev: SignInState,
@@ -200,14 +200,17 @@ export async function signUpAction(
   if (isAdminEmail(email)) return reject(dict.auth.errorEmailReserved);
 
   try {
-    createUser({
+    await createUser({
       email,
       name,
       phone,
       via: "password",
     });
-  } catch {
-    redirect(localePath(lang, "/signin?exists=1"));
+  } catch (error) {
+    if (error instanceof Error && error.message === "User already exists.") {
+      redirect(localePath(lang, "/signin?exists=1"));
+    }
+    return reject(dict.auth.errorUnavailable);
   }
 
   redirect(localePath(lang, "/signin?created=1"));
@@ -216,8 +219,8 @@ export async function signUpAction(
 /**
  * Sign in with email and password.
  *
- * Looks up the user in `private/users.json`, verifies the password hash, and
- * issues a fresh session. If the user signed up without a password, the
+ * Looks up the user in Vercel KV (or `private/users.json` locally), verifies
+ * the password hash, and issues a fresh session. If the user signed up without a password, the
  * provided password is set on first sign-in.
  */
 export async function signInWithPasswordAction(
@@ -239,7 +242,7 @@ export async function signInWithPasswordAction(
   if (!email) return reject(dict.auth.errorEmailEmpty);
   if (!isEmailShaped(email)) return reject(dict.auth.errorEmailInvalid);
 
-  const user = findUserByEmail(email);
+  const user = await findUserByEmail(email);
   if (!user) return reject(dict.auth.errorInvalidCredentials);
 
   if (!user.passwordHash) {
@@ -247,7 +250,7 @@ export async function signInWithPasswordAction(
       return reject(dict.auth.errorPasswordShort);
     }
     const passwordHash = await sha256(password);
-    updateUserPassword(email, passwordHash);
+    await updateUserPassword(email, passwordHash);
   } else {
     const passwordHash = await sha256(password);
     if (passwordHash !== user.passwordHash) {
