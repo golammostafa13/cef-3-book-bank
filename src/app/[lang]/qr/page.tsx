@@ -58,17 +58,17 @@ export default async function QrProofPage(props: PageProps<"/[lang]/qr">) {
   if (!hasLocale(lang)) notFound();
 
   const base = await origin();
-  const signinUrl = `${base}${localePath(lang, "/signin")}`;
+  const signupUrl = `${base}${localePath(lang, "/signup")}`;
 
   const codes = [
     {
-      step: "Sign in",
-      title: "Sign in page",
-      caption: "Scanning opens the sign-in page.",
-      url: signinUrl,
-      art: await svg(signinUrl),
-      png: await png(signinUrl),
-      jpg: await jpg(signinUrl),
+      step: "Sign up",
+      title: "Sign up page",
+      caption: "Scanning opens the sign-up page.",
+      url: signupUrl,
+      art: await svg(signupUrl),
+      png: await png(signupUrl),
+      jpg: await jpg(signupUrl),
     },
   ];
 
@@ -104,14 +104,14 @@ export default async function QrProofPage(props: PageProps<"/[lang]/qr">) {
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
                   href={c.png}
-                  download="qr-signin.png"
+                  download="qr-signup.png"
                   className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold text-ink transition hover:bg-ink hover:text-surface"
                 >
                   Download PNG
                 </a>
                 <a
                   href={c.jpg}
-                  download="qr-signin.jpg"
+                  download="qr-signup.jpg"
                   className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold text-ink transition hover:bg-ink hover:text-surface"
                 >
                   Download JPG
