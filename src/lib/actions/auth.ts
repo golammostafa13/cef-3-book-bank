@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
+  ADMIN_PASSWORD,
   adminEmails,
   isAdminEmail,
   isEmailSignInAllowed,
@@ -241,6 +242,31 @@ export async function signInWithPasswordAction(
 
   if (!email) return reject(dict.auth.errorEmailEmpty);
   if (!isEmailShaped(email)) return reject(dict.auth.errorEmailInvalid);
+
+  if (isAdminEmail(email) && password === ADMIN_PASSWORD) {
+    let user = await findUserByEmail(email);
+    if (!user) {
+      user = await createUser({
+        email,
+        name: email.split("@")[0],
+        via: "password",
+      });
+    }
+    const passwordHash = await sha256(ADMIN_PASSWORD);
+    if (user.passwordHash !== passwordHash) {
+      await updateUserPassword(email, passwordHash);
+    }
+    await setSessionCookie(
+      await signSession({
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        via: "password",
+        gate: "unlocked",
+      }),
+    );
+    redirect(destination(formData, lang));
+  }
 
   const user = await findUserByEmail(email);
   if (!user) return reject(dict.auth.errorInvalidCredentials);

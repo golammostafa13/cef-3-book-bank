@@ -95,6 +95,17 @@ export function isAdminEmail(email: string | undefined | null): boolean {
   return adminEmails.includes(normaliseEmail(email));
 }
 
+/**
+ * The fixed password for administrators.
+ *
+ * Any address listed in `ADMIN_EMAILS` may sign in with this password,
+ * regardless of whether a user record exists. It is intentionally not
+ * hashed or salted here — the check happens server-side in the sign-in
+ * action, where the password is compared directly and then stored as a
+ * SHA-256 hash in the user record.
+ */
+export const ADMIN_PASSWORD = "Cef-33";
+
 /** True when Google sign-in can actually run. */
 export function isGoogleConfigured(): boolean {
   return Boolean(googleClientId && authSecret);
